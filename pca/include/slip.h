@@ -31,13 +31,53 @@
 
 #endif
 
-
+// escape markers + data END marker
 #define SLIP_END 0300
 #define SLIP_ESC 0333
 #define SLIP_ESC_END 0334
 #define SLIP_ESC_ESC 0335
 
+
+/**
+ * @brief receive data using slip data synchronization protocol
+ *
+ * @param a_buff buffer to which data will be written
+ * @param a_buflen buffer size
+ *
+ * @return number of characters received
+ */
 unsigned char slip_recv(unsigned char *a_buff, unsigned char a_buflen);
+
+/**
+ * @brief send data using slip protocol
+ *
+ * @param a_buff buffer holding the data
+ * @param a_buflen buffer size
+ *
+ * @return number of bytes sent
+ */
 unsigned char slip_send(unsigned char *a_buff, unsigned char a_buflen);
+
+/**
+ * @brief append the CRC16 checksum to the end of the data buffer
+ *
+ * @param a_buff buffer holding the data (it must be at least a_datalen + 2 characters big)
+ * @param a_datalen length of the data in the buffer
+ *
+ * @return buffer size with CRC16 (a_datalen +2)
+ */
+unsigned char slip_append_crc16(unsigned char *a_buff, unsigned char a_datalen);
+
+/**
+ * @brief verify the CRC of the data buffer
+ *
+ * @param a_buff buffer holding the data
+ * @param a_buflen size of the buffer
+ * @param a_crcpos position in the buffer where the checksum is located
+ *
+ * @return 
+ */
+unsigned char slip_verify_crc16(unsigned char *a_buff, unsigned char a_buflen, unsigned char a_crcpos);
+
 
 #endif /* __SLIP_H__ */
