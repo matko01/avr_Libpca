@@ -92,6 +92,9 @@ e_return serial_init(e_serial_speed a_speed) {
 	// enable receive interrupt
 	UCSR0B |= _BV(RXCIE0);
 
+	// enable global interrupts
+	sei();
+
 	return RET_OK;
 }
 

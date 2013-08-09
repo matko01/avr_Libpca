@@ -81,7 +81,7 @@ unsigned char slip_verify_crc16(unsigned char *a_buff, unsigned char a_buflen, u
 	uint16_t crc_recv = 0x00;
 	uint16_t crc_calcd = 0x00;
 
-	if ((a_crcpos + 2) >= a_buflen || !a_buflen) {
+	if ((a_crcpos + 2) > a_buflen || !a_buflen) {
 		return 0;
 	}
 

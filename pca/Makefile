@@ -22,7 +22,6 @@ all: $(TARGET)
 $(TARGET): $(COBJ)
 	@echo -e "\tARCHIVING CC" $<
 	$(AR) rcsv $(TARGET) $(COBJ)
-	$(STRIP) --strip-debug --strip-unneeded $(TARGET)
 
 clean:
 	@echo ========== cleanup ========== 
