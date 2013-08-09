@@ -101,7 +101,7 @@ unsigned char slip_append_crc16(unsigned char *a_buff, unsigned char a_datalen) 
 	uint16_t crc_calcd = 0x00;
 	
 	memset(&a_buff[a_datalen], 0x00, 2);
-	for (uint8_t i = 0; i<a_datalen; i++) {
+	for (uint8_t i = 0; i<(a_datalen + 2); i++) {
 		crc_calcd = _crc16_update(crc_calcd, a_buff[i]);
 	}
 
