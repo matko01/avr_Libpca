@@ -26,7 +26,7 @@
 #include "serial.h"
 
 // redefine those two in your code to use different interface
-#define SLIP_CHAR_SEND(__x)	serial_sendc(__x)
+#define SLIP_CHAR_SEND(__x)	serial_poll_sendc(__x)
 #define SLIP_CHAR_RECV(__x) serial_getc(__x)
 
 #endif

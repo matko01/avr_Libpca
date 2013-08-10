@@ -65,9 +65,49 @@ e_return serial_init(e_serial_speed a_speed) {
 	power_usart0_enable();	
 
 	switch (a_speed) { 
+		case E_BAUD_2400:
+			UBRR0H = 1;
+			UBRR0L = 160;
+			break;
+
 		case E_BAUD_4800:
 			UBRR0H = 0;
 			UBRR0L = 207;
+			break;
+
+		case E_BAUD_14400:
+			UBRR0H = 0;
+			UBRR0L = 68;
+			break;
+
+		case E_BAUD_19200:
+			UBRR0H = 0;
+			UBRR0L = 51;
+			break;
+
+		case E_BAUD_28800:
+			UBRR0H = 0;
+			UBRR0L = 34;
+			break;
+
+		case E_BAUD_38400:
+			UBRR0H = 0;
+			UBRR0L = 25;
+			break;
+
+		case E_BAUD_57600:
+			UBRR0H = 0;
+			UBRR0L = 16;
+			break;
+
+		case E_BAUD_76800:
+			UBRR0H = 0;
+			UBRR0L = 12;
+			break;
+
+		case E_BAUD_115200:
+			UBRR0H = 0;
+			UBRR0L = 8;
 			break;
 
 		case E_BAUD_9600:
@@ -88,14 +128,15 @@ e_return serial_init(e_serial_speed a_speed) {
 	UCSR0B |= _BV(TXEN0);
 
 	serial_flush();
+	return RET_OK;
+}
 
+void serial_install_interrupts() {
 	// enable receive interrupt
 	UCSR0B |= _BV(RXCIE0);
 
 	// enable global interrupts
 	sei();
-
-	return RET_OK;
 }
 
 inline unsigned char serial_available() {
@@ -113,6 +154,15 @@ unsigned char serial_peek(void *a_data, unsigned char a_size) {
 	}
 
 	return read;
+}
+
+unsigned char serial_poll_getc(unsigned char *a_data) {
+	/* Wait for data to be received */
+	while ( !(UCSR0A & (1<<RXC0)) );
+
+	/* Get and return received data from buffer */
+	*a_data = UDR0;
+	return 1;
 }
 
 unsigned char serial_getc(unsigned char *a_data) {
@@ -148,11 +198,12 @@ unsigned int serial_recv(void *a_data, unsigned int a_size, unsigned char a_wait
 }
 
 void serial_flush() {
-	unsigned char dummy __attribute__((unused)) = UDR0;
+	unsigned char dummy __attribute__((unused)) = 0x00;
 	g_rx_buff.tail = g_rx_buff.head = 0x00;
+	while ( UCSR0A & (1<<RXC0) ) dummy = UDR0;
 }
 
-unsigned int serial_send(void *data, unsigned int a_size) {
+unsigned int serial_poll_send(void *data, unsigned int a_size) {
 	unsigned int i = 0x00;
 	while (i < a_size) {
 		// wait until usart buffer is empty
@@ -165,8 +216,8 @@ unsigned int serial_send(void *data, unsigned int a_size) {
 	return i;
 }
 
-unsigned int serial_sendc(unsigned char a_char) {
-	return serial_send((void *)&a_char, 1);
+unsigned int serial_poll_sendc(unsigned char a_char) {
+	return serial_poll_send((void *)&a_char, 1);
 }
 
 volatile t_buffer* serial_get_state() {
