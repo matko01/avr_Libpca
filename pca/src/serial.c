@@ -19,7 +19,8 @@
 #include <avr/io.h>
 #include <avr/power.h>
 #include <avr/interrupt.h>
-#include "string.h"
+#include <stdio.h>
+#include <string.h>
 
 #include "serial.h"
 
@@ -32,13 +33,12 @@ static volatile t_buffer g_rx_buff;
  *
  * @param USART_RX_vect
  */
-ISR(USART_RX_vect) {
-	
-	// must read the data in order to clear the interrupt flag
-	unsigned char data = UDR0;
-
+ISR(USART_RX_vect, ISR_BLOCK) {
 	// no frame error
+	// UCSR0A must be read before UDR0 !!!
 	if (bit_is_clear(UCSR0A, FE0)) {
+		// must read the data in order to clear the interrupt flag
+		volatile unsigned char data = UDR0;
 		volatile unsigned char next =
 		   	((g_rx_buff.head + 1) % SERIAL_RING_SIZE);
 
@@ -54,68 +54,108 @@ ISR(USART_RX_vect) {
 		}
 	}
 	else {
+		// must read the data in order to clear the interrupt flag
+		volatile unsigned char data __attribute__((unused)) = UDR0;
+
 		/// increase the frame error counter
 		g_rx_buff.stats.frame_error++;
 	}
-
 }
 
-e_return serial_init(e_serial_speed a_speed) {
+/* ================================================================================ */
+
+static void _serial_putc(char c, FILE *stream) {
+	if ('\n' == c) {
+		_serial_putc('\r', stream);
+	}
+
+	serial_poll_sendc(c);
+}
+
+static char _serial_getc(FILE *stream) {
+	unsigned char c = 0x00;
+	while (!serial_getc(&c));
+	return (char)c;
+}
+
+/* ================================================================================ */
+
+e_return serial_init(uint32_t a_speed) {
 	
+	// baud value
+	uint16_t baud_value = 0x00;
+
+	// enable power
 	power_usart0_enable();	
 
+	// double mode disabled
+	UCSR0A = 0x00;
+
+	// choose predefined value or calculate
 	switch (a_speed) { 
 		case E_BAUD_2400:
-			UBRR0H = 1;
-			UBRR0L = 160;
+			UCSR0A |= _BV(U2X0);
+			baud_value = 832;
 			break;
 
 		case E_BAUD_4800:
-			UBRR0H = 0;
-			UBRR0L = 207;
-			break;
-
-		case E_BAUD_14400:
-			UBRR0H = 0;
-			UBRR0L = 68;
-			break;
-
-		case E_BAUD_19200:
-			UBRR0H = 0;
-			UBRR0L = 51;
-			break;
-
-		case E_BAUD_28800:
-			UBRR0H = 0;
-			UBRR0L = 34;
-			break;
-
-		case E_BAUD_38400:
-			UBRR0H = 0;
-			UBRR0L = 25;
-			break;
-
-		case E_BAUD_57600:
-			UBRR0H = 0;
-			UBRR0L = 16;
-			break;
-
-		case E_BAUD_76800:
-			UBRR0H = 0;
-			UBRR0L = 12;
-			break;
-
-		case E_BAUD_115200:
-			UBRR0H = 0;
-			UBRR0L = 8;
+			baud_value = 207;
 			break;
 
 		case E_BAUD_9600:
+			baud_value = 103;
+			break;
+
+		case E_BAUD_14400:
+			baud_value = 68;
+			break;
+
+		case E_BAUD_19200:
+			baud_value = 51;
+			break;
+
+		case E_BAUD_28800:
+			baud_value = 34;
+			break;
+
+		case E_BAUD_38400:
+			baud_value = 25;
+			break;
+
+		case E_BAUD_57600:
+			UCSR0A |= _BV(U2X0);
+			baud_value = 34;
+			break;
+
+		case E_BAUD_76800:
+			baud_value = 12;
+			break;
+
+		case E_BAUD_115200:
+			baud_value = 8;
+			break;
+
 		default:
-			UBRR0H = 0;
-			UBRR0L = 103;
+			// manual calculation
+			{
+				int8_t use_double = 1;
+
+				do {
+					if (use_double) {
+						UCSR0A |= _BV(U2X0);
+						baud_value = (F_CPU / 4 / a_speed - 1) / 2;
+					} else {
+						UCSR0A = 0x00;
+						baud_value = (F_CPU / 8 / a_speed - 1) / 2;
+					}
+
+				} while (baud_value > 4095 && use_double--);
+			}
 			break;
 	} // switch
+
+	UBRR0H = (baud_value >> 8) & 0xff;
+	UBRR0L = baud_value & 0xff;
 
 	// clear the ring
 	memset((unsigned char *)&g_rx_buff, 0x00, sizeof(g_rx_buff));
@@ -134,9 +174,18 @@ e_return serial_init(e_serial_speed a_speed) {
 void serial_install_interrupts() {
 	// enable receive interrupt
 	UCSR0B |= _BV(RXCIE0);
+	UCSR0B &= ~_BV(UDRIE0);
 
 	// enable global interrupts
 	sei();
+}
+
+void serial_install_stdio() {
+	static FILE uart_stdout = FDEV_SETUP_STREAM(_serial_putc, NULL, _FDEV_SETUP_WRITE);
+	static FILE uart_stdin = FDEV_SETUP_STREAM(NULL, _serial_getc, _FDEV_SETUP_READ);
+
+	stdout = &uart_stdout;
+	stdin = &uart_stdin;
 }
 
 inline unsigned char serial_available() {
@@ -166,6 +215,7 @@ unsigned char serial_poll_getc(unsigned char *a_data) {
 }
 
 unsigned char serial_getc(unsigned char *a_data) {
+	
 	if (g_rx_buff.head == g_rx_buff.tail)
 		return 0;
 

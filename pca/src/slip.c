@@ -10,8 +10,9 @@ unsigned char slip_recv(unsigned char *a_buff, unsigned char a_buflen) {
 
 	// collect a full slip packet
 	while (1) {
-		if (!SLIP_CHAR_RECV(&c))
+		if (!SLIP_CHAR_RECV(&c)) {
 			continue;
+		}
 
 		if (mode) {
 			a_buff[recv++] = 
@@ -92,7 +93,7 @@ unsigned char slip_verify_crc16(unsigned char *a_buff, unsigned char a_buflen, u
 		crc_calcd = _crc16_update(crc_calcd, a_buff[i]);
 	}
 
-	return (crc_calcd == crc_recv ? 1 : 0);
+	return (crc_calcd == crc_recv ? crc_calcd : 0);
 }
 
 

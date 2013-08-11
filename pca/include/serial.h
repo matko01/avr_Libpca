@@ -24,7 +24,7 @@
 /**
  * @brief module version definition
  */
-#define SERIAL_VERSION "0.003"
+#define SERIAL_VERSION "0.004"
 
 /**
  * @brief ring size
@@ -35,16 +35,16 @@
  * @brief serial speeds available
  */
 typedef enum _e_serial_speed {
-	E_BAUD_2400 = 0,
-	E_BAUD_4800,
-	E_BAUD_9600,
-	E_BAUD_14400,
-	E_BAUD_19200,
-	E_BAUD_28800,
-	E_BAUD_38400,
-	E_BAUD_57600,
-	E_BAUD_76800,
-	E_BAUD_115200
+	E_BAUD_2400 = 2400,
+	E_BAUD_4800 = 4800,
+	E_BAUD_9600 = 9600,
+	E_BAUD_14400 = 14400,
+	E_BAUD_19200 = 19200,
+	E_BAUD_28800 = 28800,
+	E_BAUD_38400 = 38400,
+	E_BAUD_57600 = 57600,
+	E_BAUD_76800 = 76800,
+	E_BAUD_115200 = 115200
 } e_serial_speed;
 
 /**
@@ -73,12 +73,17 @@ typedef struct _t_buffer {
  *
  * @return success
  */
-e_return serial_init(e_serial_speed a_speed);
+e_return serial_init(uint32_t a_speed);
 
 /**
  * @brief install USART interrupts
  */
 void serial_install_interrupts();
+
+/**
+ * @brief install serial handlers so we can use printf-like functions with serial console
+ */
+void serial_install_stdio();
 
 /**
  * @brief check how many bytes are available to read

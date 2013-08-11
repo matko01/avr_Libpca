@@ -20,7 +20,8 @@ all: $(TARGET)
 	@$(CC) -mmcu=$(MCU) -c -o $@ $< $(CFLAGS)
 
 $(TARGET): $(COBJ)
-	@echo -e "\tARCHIVING CC" $<
+	@echo -e "\tARCHIVING CC" $(COBJ)
+	$(STRIP) -g --strip-unneeded $(COBJ)
 	$(AR) rcsv $(TARGET) $(COBJ)
 
 clean:
