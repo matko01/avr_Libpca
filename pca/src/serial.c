@@ -81,6 +81,11 @@ ISR(USART_RX_vect, ISR_BLOCK) {
 }
 #endif
 
+#if SERIAL_IMPLEMENT_TX_INT == 1
+// TODO implement me
+#error not yet implemented
+#endif
+
 /* ================================================================================ */
 
 static void _serial_putc(char c, FILE *stream) {
