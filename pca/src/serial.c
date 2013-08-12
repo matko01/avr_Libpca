@@ -27,15 +27,19 @@
 
 /* ================================================================================ */
 
+#if SERIAL_IMPLEMENT_RX_INT == 1
 /// serial rx ring buffer
 static volatile t_buffer g_rx_buff;
+#endif
 
+#if SERIAL_IMPLEMENT_TX_INT == 1
 /// serial tx ring buffer
 static volatile t_buffer g_tx_buff;
+#endif
 
 /* ================================================================================ */
 
-
+#if SERIAL_IMPLEMENT_RX_INT == 1
 /**
  * @brief receive USART interrupt
  *
@@ -53,12 +57,16 @@ ISR(USART_RX_vect, ISR_BLOCK) {
 		// do not overflow the buffer
 		if (next != g_rx_buff.tail) {
 			g_rx_buff.ring[g_rx_buff.head] = data;
-			g_rx_buff.head = next;
+			g_rx_buff.head = next;			
+#if SERIAL_COLLECT_STATS == 1
 			g_rx_buff.stats.ok++;
+#endif
 		}
 		else {
 			/// increase the dropped counter
+#if SERIAL_COLLECT_STATS == 1
 			g_rx_buff.stats.dropped++;
+#endif
 		}
 	}
 	else {
@@ -66,9 +74,12 @@ ISR(USART_RX_vect, ISR_BLOCK) {
 		volatile unsigned char data __attribute__((unused)) = UDR0;
 
 		/// increase the frame error counter
+#if SERIAL_COLLECT_STATS == 1
 		g_rx_buff.stats.frame_error++;
+#endif
 	}
 }
+#endif
 
 /* ================================================================================ */
 
@@ -77,12 +88,27 @@ static void _serial_putc(char c, FILE *stream) {
 		_serial_putc('\r', stream);
 	}
 
+#if SERIAL_STDOUT_POLL == 1
 	serial_poll_sendc(c);
+#elif SERIAL_STDOUT_POLL == 0
+	while (!serial_sendc(c));
+#else
+#error SERIAL_STDOUT_POLL must be either 0 (interrupt driven) or 1 (polling)
+#endif
+
 }
 
 static char _serial_getc(FILE *stream) {
 	unsigned char c = 0x00;
+
+#if SERIAL_STDIN_POLL == 1
+	serial_poll_getc(&c);
+#elif SERIAL_STDIN_POLL == 0	
 	while (!serial_getc(&c));
+#else
+#error SERIAL_STDIN_POLL must be either 0 (interrupt driven) or 1 (polling)
+#endif
+
 	return (char)c;
 }
 
@@ -166,8 +192,14 @@ e_return serial_init(uint32_t a_speed) {
 	UBRR0H = (baud_value >> 8) & 0xff;
 	UBRR0L = baud_value & 0xff;
 
+#if SERIAL_IMPLEMENT_RX_INT == 1
 	// clear the ring
 	memset((unsigned char *)&g_rx_buff, 0x00, sizeof(g_rx_buff));
+#endif
+
+#if SERIAL_IMPLEMENT_TX_INT == 1
+	memset((unsigned char *)&g_tx_buff, 0x00, sizeof(g_tx_buff));
+#endif
 
 	// asynchronous, 8N1 mode
 	UCSR0C |= 0x06;
@@ -183,15 +215,19 @@ e_return serial_init(uint32_t a_speed) {
 
 void serial_install_interrupts(unsigned char a_flags) {
 
+#if SERIAL_IMPLEMENT_RX_INT == 1
 	if (a_flags & SERIAL_RX_INTERRUPT) {
 		// enable receive interrupt
 		UCSR0B |= _BV(RXCIE0);
 		UCSR0B &= ~_BV(UDRIE0);
 	}
+#endif
 
+#if SERIAL_IMPLEMENT_TX_INT == 1
 	if (a_flags & SERIAL_TX_INTERRUPT) {
 		// TODO implement me
 	}
+#endif
 
 	// enable global interrupts
 	sei();
@@ -206,7 +242,7 @@ void serial_install_stdio() {
 	stdin = &uart_stdin;
 }
 
-
+#if SERIAL_IMPLEMENT_RX_INT == 1
 inline unsigned char serial_available() {
 	return (SERIAL_RX_RING_SIZE + g_rx_buff.head - g_rx_buff.tail) % SERIAL_RX_RING_SIZE;
 }
@@ -259,7 +295,7 @@ unsigned char serial_getc(unsigned char *a_data) {
 	g_rx_buff.tail = (g_rx_buff.tail + 1) % SERIAL_RX_RING_SIZE;
 	return 1;
 }
-
+#endif
 
 unsigned char serial_poll_recv(unsigned char *a_data, unsigned int a_size) {
 	unsigned int cnt = 0x00;
@@ -280,7 +316,7 @@ unsigned char serial_poll_getc(unsigned char *a_data) {
 	return serial_poll_recv(a_data, 1);
 }
 
-
+#if SERIAL_IMPLEMENT_TX_INT == 1
 unsigned char serial_send(void *a_data, unsigned int a_size, unsigned char a_waitall) {
 // TODO implement me
 	return 0;
@@ -291,7 +327,7 @@ unsigned char serial_sendc(unsigned char a_data) {
 // TODO implement me
 	return 0;
 }
-
+#endif
 
 unsigned int serial_poll_send(void *data, unsigned int a_size) {
 	unsigned int i = 0x00;
@@ -314,18 +350,25 @@ unsigned int serial_poll_sendc(unsigned char a_char) {
 
 void serial_flush() {
 	unsigned char dummy __attribute__((unused)) = 0x00;
+
+#if SERIAL_IMPLEMENT_RX_INT == 1
 	g_rx_buff.tail = g_rx_buff.head = 0x00;
+#endif
 
 	// flush the input fifo
 	while ( UCSR0A & (1<<RXC0) ) dummy = UDR0;
 }
 
 
+#if SERIAL_IMPLEMENT_RX_INT == 1
 volatile t_buffer* serial_get_rx_state() {
 	return &g_rx_buff;
 }
+#endif
 
 
+#if SERIAL_IMPLEMENT_TX_INT == 1
 volatile t_buffer* serial_get_tx_state() {
 	return &g_tx_buff;
 }
+#endif

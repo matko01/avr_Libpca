@@ -19,18 +19,13 @@
  * 
  */
 
+#include "config.h"
 #include "common.h"
 
 /**
  * @brief module version definition
  */
-#define SERIAL_VERSION "0.006"
-
-/**
- * @brief ring sizes
- */
-#define SERIAL_RX_RING_SIZE 32
-#define SERIAL_TX_RING_SIZE 32
+#define SERIAL_VERSION "0.010"
 
 /**
  * @brief interrupt flags
@@ -54,14 +49,16 @@ typedef enum _e_serial_speed {
 	E_BAUD_115200 = 115200
 } e_serial_speed;
 
+#if SERIAL_COLLECT_STATS == 1
 /**
  * @brief buffer statistics
  */
 typedef struct _t_stats {
-	volatile unsigned int ok;
-	volatile unsigned int dropped;
-	volatile unsigned int frame_error;
+	volatile uint32_t ok;
+	volatile uint32_t dropped;
+	volatile uint32_t frame_error;
 } t_stats;
+#endif
 
 /**
  * @brief ring buffer
@@ -70,7 +67,9 @@ typedef struct _t_buffer {
 	volatile unsigned char ring[SERIAL_RX_RING_SIZE];
 	volatile unsigned char head;
 	volatile unsigned char tail;
+#if SERIAL_COLLECT_STATS == 1
 	volatile t_stats stats;
+#endif
 } t_buffer;
 
 /**
@@ -97,6 +96,7 @@ void serial_install_stdio();
  *
  * @return number of bytes received and waiting
  */
+#if SERIAL_IMPLEMENT_RX_INT == 1
 unsigned char serial_available();
 
 /**
@@ -129,6 +129,7 @@ unsigned int serial_recv(void *a_data, unsigned int a_size, unsigned char a_wait
  * @return 1 if character available, 0 if not
  */
 unsigned char serial_getc(unsigned char *a_data);
+#endif
 
 /**
  * @brief receive data (this function is blocking)
@@ -159,6 +160,7 @@ unsigned char serial_poll_getc(unsigned char *a_data);
  *
  * @return number of characters send
  */
+#if SERIAL_IMPLEMENT_TX_INT == 1
 unsigned char serial_send(void *a_data, unsigned int a_size, unsigned char a_waitall);
 
 /**
@@ -169,6 +171,7 @@ unsigned char serial_send(void *a_data, unsigned int a_size, unsigned char a_wai
  * @return 1 if sent
  */
 unsigned char serial_sendc(unsigned char a_data);
+#endif
 
 /**
  * @brief send data using serial port TX status polling (it will block until data is fully transmitted)
@@ -194,14 +197,18 @@ unsigned int serial_poll_sendc(unsigned char a_char);
  *
  * @return serial buffer info
  */
+#if SERIAL_IMPLEMENT_RX_INT == 1
 volatile t_buffer* serial_get_rx_state();
+#endif
 
 /**
  * @brief return serial buffer context for TX (information and statistics about serial port)
  *
  * @return serial buffer info
  */
+#if SERIAL_IMPLEMENT_TX_INT == 1
 volatile t_buffer* serial_get_tx_state();
+#endif
 
 /**
  * @brief flush data & rx fifo
