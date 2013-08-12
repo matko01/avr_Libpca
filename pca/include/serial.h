@@ -24,12 +24,19 @@
 /**
  * @brief module version definition
  */
-#define SERIAL_VERSION "0.004"
+#define SERIAL_VERSION "0.006"
 
 /**
- * @brief ring size
+ * @brief ring sizes
  */
-#define SERIAL_RING_SIZE 32
+#define SERIAL_RX_RING_SIZE 32
+#define SERIAL_TX_RING_SIZE 32
+
+/**
+ * @brief interrupt flags
+ */
+#define SERIAL_RX_INTERRUPT 0x01
+#define SERIAL_TX_INTERRUPT 0x02
 
 /**
  * @brief serial speeds available
@@ -60,7 +67,7 @@ typedef struct _t_stats {
  * @brief ring buffer
  */
 typedef struct _t_buffer {
-	volatile unsigned char ring[SERIAL_RING_SIZE];
+	volatile unsigned char ring[SERIAL_RX_RING_SIZE];
 	volatile unsigned char head;
 	volatile unsigned char tail;
 	volatile t_stats stats;
@@ -78,7 +85,7 @@ e_return serial_init(uint32_t a_speed);
 /**
  * @brief install USART interrupts
  */
-void serial_install_interrupts();
+void serial_install_interrupts(unsigned char a_flags);
 
 /**
  * @brief install serial handlers so we can use printf-like functions with serial console
@@ -93,7 +100,8 @@ void serial_install_stdio();
 unsigned char serial_available();
 
 /**
- * @brief check if there is any data available pending
+ * @brief check if there is any data available pending 
+ * (this only works if interrupts are installed)
  *
  * @param a_data buffer to place any data in
  * @param a_size size of the buffer
@@ -123,6 +131,17 @@ unsigned int serial_recv(void *a_data, unsigned int a_size, unsigned char a_wait
 unsigned char serial_getc(unsigned char *a_data);
 
 /**
+ * @brief receive data (this function is blocking)
+ *
+ * @param a_data buffer for the data
+ * @param a_size buffer size
+ * @param a_flag flags
+ *
+ * @return number of bytes read
+ */
+unsigned char serial_poll_recv(unsigned char *a_data, unsigned int a_size);
+
+/**
  * @brief get a character through polling. It will block until there is a byte available
  *
  * @param a_data data holder
@@ -132,13 +151,24 @@ unsigned char serial_getc(unsigned char *a_data);
 unsigned char serial_poll_getc(unsigned char *a_data);
 
 /**
- * @brief transmit a single character (this is a wrapper for serial_poll_send)
+ * @brief send data using interrupts
  *
- * @param a_char character to send
+ * @param a_data data to be send
+ * @param a_size size of data
+ * @param a_waitall block until everything is sent
  *
- * @return 1 if success, 0 if failure
+ * @return number of characters send
  */
-unsigned int serial_poll_sendc(unsigned char a_char);
+unsigned char serial_send(void *a_data, unsigned int a_size, unsigned char a_waitall);
+
+/**
+ * @brief send a character using interrupts
+ *
+ * @param a_data character to be sent
+ *
+ * @return 1 if sent
+ */
+unsigned char serial_sendc(unsigned char a_data);
 
 /**
  * @brief send data using serial port TX status polling (it will block until data is fully transmitted)
@@ -151,11 +181,27 @@ unsigned int serial_poll_sendc(unsigned char a_char);
 unsigned int serial_poll_send(void *data, unsigned int a_size);
 
 /**
- * @brief return serial buffer context (information and statistics about serial port)
+ * @brief transmit a single character (this is a wrapper for serial_poll_send)
+ *
+ * @param a_char character to send
+ *
+ * @return 1 if success, 0 if failure
+ */
+unsigned int serial_poll_sendc(unsigned char a_char);
+
+/**
+ * @brief return serial buffer context for RX (information and statistics about serial port)
  *
  * @return serial buffer info
  */
-volatile t_buffer* serial_get_state();
+volatile t_buffer* serial_get_rx_state();
+
+/**
+ * @brief return serial buffer context for TX (information and statistics about serial port)
+ *
+ * @return serial buffer info
+ */
+volatile t_buffer* serial_get_tx_state();
 
 /**
  * @brief flush data & rx fifo

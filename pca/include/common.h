@@ -35,6 +35,10 @@ typedef enum _e_return {
 
 // ================================================================================
 
+#ifndef NULL
+#define NULL (void *)0x00
+#endif
+
 #define IS_ERROR(__x) \
 	( (__x) >= RET_ERROR)
 
