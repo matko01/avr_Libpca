@@ -1,7 +1,7 @@
 #ifndef CONFIG_H_VPGOK90D
 #define CONFIG_H_VPGOK90D
 
-// ================================================================================
+// ============================ SERIAL PORT =======================================
 
 /// change to 0 and rebuild if you do not need stats information
 #define SERIAL_COLLECT_STATS 1

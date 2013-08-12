@@ -1,6 +1,7 @@
 TARGET=libpca.a
 SOURCES= \
 		serial.c \
+		common.c \
 		slip.c
 
 DEPS=

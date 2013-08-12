@@ -58,5 +58,11 @@ typedef enum _e_return {
 
 // ================================================================================
 
+/**
+ * @brief provide a brief calculation of the memory usage and report how much is left
+ *
+ * @return number of bytes available
+ */
+unsigned int common_memory_left();
 
 #endif /* __COMMON_H__ */
