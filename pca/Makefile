@@ -2,7 +2,10 @@ TARGET=libpca.a
 SOURCES= \
 		serial.c \
 		common.c \
-		slip.c
+		slip.c \
+		tdelay_common.c \
+		tdelay.c \
+		beeper.c
 
 DEPS=
 COBJ=$(SOURCES:.c=.o)

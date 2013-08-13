@@ -26,7 +26,19 @@
 /// TX ring buffer size if SERIAL_IMPLEMENT_TX_INT == 1
 #define SERIAL_TX_RING_SIZE 32
 
+// ============================ TIMERS/BEEPER =====================================
+
+/// change to 0 if to disable timer 0 delay and beeper interrupts and routines
+#define TDELAY_IMPLEMENT_T0_INT 1
+
+/// change to 1 if to disable timer 0 delay and beeper interrupts and routines
+#define TDELAY_IMPLEMENT_T1_INT 1
+
+/// change to 2 if to disable timer 0 delay and beeper interrupts and routines
+#define TDELAY_IMPLEMENT_T2_INT 1
+
 // ================================================================================
+
 
 #endif /* end of include guard: CONFIG_H_VPGOK90D */
 
