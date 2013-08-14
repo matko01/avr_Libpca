@@ -23,30 +23,6 @@ static void _find_ocr_prescaler(uint32_t *ocr, uint8_t *prescaler, uint32_t a_fr
 }
 
 /**
- * @brief calculate prescaler and OCR value for 8 bit counters
- *
- * @param a_freq requested frequency
- * @param a_ocr ocr value returned by reference
- * @param a_prescaler prescaler value returned by reference
- */
-static void _timer8_prescaler(uint32_t a_freq, 
-		uint8_t *a_ocr, 
-		uint8_t *a_prescaler) {
-
-	uint32_t ocr = 0x00;
-
-	// smallest achievable frequency with this timer
-	if (a_freq < 62) {
-		*a_prescaler = 5;
-		*a_ocr = 0;
-		return;
-	}
-
-	_find_ocr_prescaler(&ocr, a_prescaler, a_freq, 255);
-	*a_ocr = (ocr & 0xff);	
-}
-
-/**
  * @brief calculate prescaler and ocr values for 16 bit counter
  *
  * @param a_freq requested frequency
@@ -54,14 +30,37 @@ static void _timer8_prescaler(uint32_t a_freq,
  * @param a_ocrl ocr low
  * @param a_prescaler prescaler value
  */
-static void _timer16_prescaler(uint32_t a_freq,
+static void _timer_prescaler(uint32_t a_freq,
 		uint8_t *a_ocrh,
 		uint8_t *a_ocrl,
 		uint8_t *a_prescaler) {
 
 	uint32_t ocr = 0x00;
-	_find_ocr_prescaler(&ocr, a_prescaler, a_freq, 300);
-	*a_ocrh = (ocr >> 8) & 0xff;
+
+	// smallest achievable frequency with this timer
+	if (a_freq < 62) {
+		*a_prescaler = 5;
+		*a_ocrh = 0x00;
+		*a_ocrl = 255;
+		return;
+	}
+
+	// highest frequency we can generate
+	if (a_freq > 18000) {
+		*a_prescaler = 2;
+		*a_ocrh = 0x00;
+		*a_ocrl = 55;
+		return;
+	}
+
+	if (NULL != a_ocrh) {
+		_find_ocr_prescaler(&ocr, a_prescaler, a_freq, 255);
+		*a_ocrh = (ocr >> 8) & 0xff;
+	}
+	else {
+		_find_ocr_prescaler(&ocr, a_prescaler, a_freq, 512);
+	}
+
 	*a_ocrl = (ocr & 0xff);
 }
 
@@ -119,7 +118,7 @@ void beeper_beep(e_timer a_timer,
 #if TDELAY_IMPLEMENT_T0_INT == 1
 			case E_TIMER0:
 				TCCR0A |= 0x40;
-				_timer8_prescaler(freq, &ocr, &presc);
+				_timer_prescaler(freq, NULL, &ocr, &presc);
 				TCCR0B = 0x00 | (presc & 0x07);
 				OCR0A = ocr;
 				freq = freq < 62 ? 62 : freq;
@@ -128,21 +127,21 @@ void beeper_beep(e_timer a_timer,
 
 #if TDELAY_IMPLEMENT_T1_INT == 1
 			case E_TIMER1:
-				_timer16_prescaler(freq, 
+				_timer_prescaler(freq, 
 						&ocrh, 
 						&ocr, 
 						&presc);
 
 				OCR1AH = ocrh;
 				OCR1AL = ocr;
-				TCCR1A = 0x40;
+				TCCR1A |= 0x40;
 				TCCR1B = 0x08 | presc;
 				break;
 #endif
 
 #if TDELAY_IMPLEMENT_T2_INT == 1
 			case E_TIMER2:
-				_timer8_prescaler(freq, &ocr, &presc);
+				_timer_prescaler(freq, NULL, &ocr, &presc);
 				OCR2A = ocr;
 				TCCR2A |= 0x40;
 				TCCR2B = 0x00 | (presc & 0x07);
@@ -190,8 +189,4 @@ void beeper_off(e_timer a_timer) {
 			break;
 	} // switch
 	_tdc_set_duration(a_timer, 0x00);
-}
-
-inline void beeper_block(e_timer a_timer) {
-	_tdc_block(a_timer);
 }

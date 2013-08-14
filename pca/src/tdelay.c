@@ -25,12 +25,12 @@ void tdelay_init(e_timer a_timer) {
 		case E_TIMER1:
 			power_timer1_enable();
 			// clock disabled, CTC mode
-			/* TCCR1A = 0x00; */
-			/* TCCR1B = 0x08; */
-			/* TCNT1H = 0x00; */
-			/* TCNT1L = 0x00; */
-			/* OCR1AH = 0x00; */
-			/* OCR1AL = 0x00; */
+			TCCR1A = 0x00;
+			TCCR1B = 0x08;
+			TCNT1H = 0x00;
+			TCNT1L = 0x00;
+			OCR1AH = 0x00;
+			OCR1AL = 0x00;
 			break;
 #endif
 

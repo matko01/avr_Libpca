@@ -41,8 +41,8 @@ static void _isr_tdelay_handler(volatile struct regs *sregs) {
 		if (g_tc[sregs->timer].duration) 
 			g_tc[sregs->timer].duration--;
 	}
-
 }
+
 #endif
 
 static uint8_t __tdc_block(e_timer a_timer, volatile uint8_t *timsk, uint8_t map) {
