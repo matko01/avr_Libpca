@@ -14,7 +14,7 @@ void tdelay_init(e_timer a_timer) {
 		case E_TIMER0:
 			power_timer0_enable();
 			// clock disabled
-			/* TCCR0A = 0x02; */
+			TCCR0A = 0x02;
 			TCCR0B = 0x00;
 			TCNT0 = 0x00;
 			OCR0A = 0x00;

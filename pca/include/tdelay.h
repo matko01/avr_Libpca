@@ -1,6 +1,7 @@
 #ifndef TDELAY_H_IPOQKAD0
 #define TDELAY_H_IPOQKAD0
 
+#include "config.h"
 #include "common.h"
 #include "tdelay_common.h"
 
