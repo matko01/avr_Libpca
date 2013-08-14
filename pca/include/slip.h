@@ -23,6 +23,7 @@
 
 #if !defined(SLIP_CHAR_SEND) || !defined(SLIP_CHAR_RECV)
 
+#include "config.h"
 #include "serial.h"
 
 // redefine those two in your code to use different interface

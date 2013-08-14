@@ -1,6 +1,7 @@
 #ifndef BEEPER_H_URHFWD8M
 #define BEEPER_H_URHFWD8M
 
+#include "config.h"
 #include "tdelay.h"
 
 /**
@@ -10,7 +11,7 @@
  *
  * @return void
  */
-#define beeper_block(__a_timer) _tdc_block(__a_timer)
+void beeper_block(e_timer a_timer);
 
 /**
  * @brief initialize a given timer to act as a tone generator

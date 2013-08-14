@@ -3,9 +3,9 @@ SOURCES= \
 		serial.c \
 		common.c \
 		slip.c \
-		tdelay_common.c \
 		tdelay.c \
-		beeper.c
+		beeper.c \
+		tdelay_common.c
 
 DEPS=
 COBJ=$(SOURCES:.c=.o)
@@ -25,7 +25,7 @@ all: $(TARGET)
 
 $(TARGET): $(COBJ)
 	@echo -e "\tARCHIVING CC" $(COBJ)
-	$(STRIP) -g --strip-unneeded $(COBJ)
+	$(STRIP) -g $(COBJ)
 	$(AR) rcsv $(TARGET) $(COBJ)
 
 clean:
