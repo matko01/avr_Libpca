@@ -53,12 +53,12 @@ static void _timer_prescaler(uint32_t a_freq,
 		return;
 	}
 
-	if (NULL != a_ocrh) {
-		_find_ocr_prescaler(&ocr, a_prescaler, a_freq, 255);
-		*a_ocrh = (ocr >> 8) & 0xff;
+	if (!a_ocrh) {
+		_find_ocr_prescaler(&ocr, a_prescaler, a_freq, 512);
 	}
 	else {
-		_find_ocr_prescaler(&ocr, a_prescaler, a_freq, 512);
+		_find_ocr_prescaler(&ocr, a_prescaler, a_freq, 255);
+		*a_ocrh = (ocr >> 8) & 0xff;
 	}
 
 	*a_ocrl = (ocr & 0xff);
@@ -108,7 +108,11 @@ void beeper_beep(e_timer a_timer,
 	beeper_off(a_timer);
 	_tdc_setup_ms(a_timer, duration);
 
-	if (freq) {
+	if (!freq) {
+		// settings correction
+		_tdc_set_duration(a_timer, (uint32_t)((freq*duration) / 500));
+	}
+	else {
 		uint8_t ocr = 0x00;
 		uint8_t ocrh = 0x00;
 		uint8_t presc = 0x00;
@@ -153,10 +157,7 @@ void beeper_beep(e_timer a_timer,
 				return;
 				break;
 		} // switch
-
-		// settings correction
-		_tdc_set_duration(a_timer, (uint32_t)((freq*duration) / 500));
-	}
+	}	
 
 	_tdc_enable_interrupt(a_timer);
 }

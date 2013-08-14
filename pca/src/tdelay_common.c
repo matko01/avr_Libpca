@@ -38,8 +38,7 @@ static void _isr_tdelay_handler(volatile struct regs *sregs) {
 			*(sregs->port) &= ~_BV(sregs->pin);
 	}
 	else {
-		if (g_tc[sregs->timer].duration) 
-			g_tc[sregs->timer].duration--;
+		g_tc[sregs->timer].duration--;
 	}
 }
 
@@ -209,7 +208,6 @@ void _tdc_block(e_timer a_timer) {
 #endif
 
 		default:
-			return;
 			break;
 	} // switch
 
