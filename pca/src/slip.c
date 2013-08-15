@@ -14,12 +14,7 @@ unsigned char slip_recv(unsigned char *a_buff, unsigned char a_buflen) {
 			continue;
 		}
 
-		if (mode) {
-			a_buff[recv++] = 
-				(c == SLIP_ESC_END ? SLIP_END : (c == SLIP_ESC_ESC ? SLIP_ESC : c));
-			mode = 0;
-		}
-		else {
+		if (!mode) {
 			switch(c) {
 				case SLIP_END:
 					if (recv) return recv;
@@ -34,7 +29,12 @@ unsigned char slip_recv(unsigned char *a_buff, unsigned char a_buflen) {
 					break;
 
 			} // switch
-		} // if
+		}
+		else {
+			a_buff[recv++] = 
+				(c == SLIP_ESC_END ? SLIP_END : (c == SLIP_ESC_ESC ? SLIP_ESC : c));
+			mode = 0;
+		}
 
 		if (recv >= a_buflen) {
 			return recv;
@@ -48,12 +48,10 @@ unsigned char slip_recv(unsigned char *a_buff, unsigned char a_buflen) {
 unsigned char slip_send(unsigned char *a_buff, unsigned char a_buflen) {
 
 	SLIP_CHAR_SEND(SLIP_END);
-	unsigned char send = 0;
+	unsigned char send = a_buflen;
 
-	while(send < a_buflen) {
-
+	while (a_buflen) {
 		switch (*a_buff) {
-
 			case SLIP_END:
 				SLIP_CHAR_SEND(SLIP_ESC);
 				SLIP_CHAR_SEND(SLIP_ESC_END);
@@ -70,8 +68,8 @@ unsigned char slip_send(unsigned char *a_buff, unsigned char a_buflen) {
 		} // switch
 
 		a_buff++;
-		send++;
-	} // while
+		a_buflen--;
+	}
 
 	return send;
 }
@@ -89,8 +87,10 @@ unsigned char slip_verify_crc16(unsigned char *a_buff, unsigned char a_buflen, u
 	memcpy(&crc_recv, &a_buff[a_crcpos], 2);
 	memset(&a_buff[a_crcpos], 0x00, 2);
 
-	for (uint8_t i = 0; i<a_buflen; i++) {
-		crc_calcd = _crc16_update(crc_calcd, a_buff[i]);
+	while (a_buflen) {
+		crc_calcd = _crc16_update(crc_calcd, *a_buff);
+		a_buff++;
+		a_buflen--;
 	}
 
 	return (crc_calcd == crc_recv ? crc_calcd : 0);

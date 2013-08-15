@@ -303,14 +303,16 @@ unsigned char serial_getc(unsigned char *a_data) {
 #endif
 
 unsigned char serial_poll_recv(unsigned char *a_data, unsigned int a_size) {
-	unsigned int cnt = 0x00;
+	unsigned int cnt = a_size;
 
-	while (cnt < a_size) {
+	while (a_size) {
 		/* Wait for data to be received */
 		while ( !(UCSR0A & (1<<RXC0)) );
 
 		/* Get and return received data from buffer */
-		a_data[cnt++] = UDR0;
+		*a_data = UDR0;
+		a_data++;
+		a_size--;
 	}
 
 	return cnt;
