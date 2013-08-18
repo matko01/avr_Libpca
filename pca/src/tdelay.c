@@ -6,12 +6,12 @@
 /* ================================================================================ */
 
 static void _tdelay_setup_ms(e_timer a_timer, uint32_t a_delay) {
-	_tdc_setup_delay(a_timer, 1000, a_delay);
+	_tdc_setup_delay(_tdc_get_tdelay_timer(a_timer), 1000, a_delay);
 }
 
 
 static void _tdelay_setup_us(e_timer a_timer, uint32_t a_delay) {
-	_tdc_setup_delay(a_timer, 1000000, a_delay);
+	_tdc_setup_delay(_tdc_get_tdelay_timer(a_timer), 1000000, a_delay);
 }
 
 /* ================================================================================ */
@@ -22,7 +22,6 @@ void tdelay_init(e_timer a_timer) {
 	sei();
 	switch (a_timer) {
 
-#if TDELAY_IMPLEMENT_T0_INT == 1
 		case E_TIMER0:
 			power_timer0_enable();
 			// clock disabled
@@ -31,9 +30,7 @@ void tdelay_init(e_timer a_timer) {
 			TCNT0 = 0x00;
 			OCR0A = 0x00;
 			break;
-#endif
 
-#if TDELAY_IMPLEMENT_T1_INT == 1
 		case E_TIMER1:
 			power_timer1_enable();
 			// clock disabled, CTC mode
@@ -44,9 +41,7 @@ void tdelay_init(e_timer a_timer) {
 			OCR1AH = 0x00;
 			OCR1AL = 0x00;
 			break;
-#endif
 
-#if TDELAY_IMPLEMENT_T2_INT == 1
 		case E_TIMER2:
 			power_timer2_enable();
 			TCCR2A = 0x02;
@@ -54,26 +49,25 @@ void tdelay_init(e_timer a_timer) {
 			TCNT2 = 0x00;
 			OCR2A = 0x00;
 			break;
-#endif
 
 		default:
 			break;
 	} // switch
 
-	_tdc_set_cmp_pin(a_timer, 0x01);
+	_tdc_set_cmp_pin(_tdc_get_tdelay_timer(a_timer), 0x01);
 }
 
 
 void tdelay_ms(e_timer a_timer, uint32_t a_delay) {
 	_tdelay_setup_ms(a_timer, a_delay);
-	_tdc_enable_interrupt(a_timer);
-	_tdc_block(a_timer);
+	_timer_enable_interrupt(a_timer);
+	_tdc_block(_tdc_get_tdelay_timer(a_timer));
 }
 
 
 void tdelay_us(e_timer a_timer, uint32_t a_delay) {
 	_tdelay_setup_us(a_timer, a_delay);
-	_tdc_enable_interrupt(a_timer);
-	_tdc_block(a_timer);
+	_timer_enable_interrupt(a_timer);
+	_tdc_block(_tdc_get_tdelay_timer(a_timer));
 }
 

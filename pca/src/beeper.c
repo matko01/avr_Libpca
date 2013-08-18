@@ -32,7 +32,7 @@ void beeper_init(e_timer a_timer) {
 			break;
 	} // switch
 
-	_tdc_set_cmp_pin(a_timer, 0x00);
+	_tdc_set_cmp_pin(_tdc_get_tdelay_timer(a_timer), 0x00);
 }
 
 
@@ -41,7 +41,7 @@ void beeper_beep(e_timer a_timer,
 	uint32_t duration) {
 	
 	beeper_off(a_timer);
-	_tdc_setup_delay(a_timer, freq, duration);
+	_tdc_setup_delay(_tdc_get_tdelay_timer(a_timer), freq, duration);
 
 	if (freq) {
 		switch(a_timer) {
@@ -68,7 +68,7 @@ void beeper_beep(e_timer a_timer,
 		} // switch
 	}	
 
-	_tdc_enable_interrupt(a_timer);
+	_timer_enable_interrupt(a_timer);
 }
 
 void beeper_off(e_timer a_timer) {
@@ -76,7 +76,7 @@ void beeper_off(e_timer a_timer) {
 
 #if TDELAY_IMPLEMENT_T0_INT == 1
 		case E_TIMER0:
-			_tdc_disable_interrupt(a_timer);
+			_timer_disable_interrupt(a_timer);
 			TCCR0B &= 0xf8;
 			TCCR0A &= ~_BV(COM0A0);
 			break;
@@ -84,7 +84,7 @@ void beeper_off(e_timer a_timer) {
 
 #if TDELAY_IMPLEMENT_T1_INT == 1
 		case E_TIMER1:
-			_tdc_disable_interrupt(a_timer);
+			_timer_disable_interrupt(a_timer);
 			TCCR1B &= 0xf8;
 			TCCR1A &= ~_BV(COM1A0);
 			break;
@@ -92,7 +92,7 @@ void beeper_off(e_timer a_timer) {
 
 #if TDELAY_IMPLEMENT_T2_INT == 1
 		case E_TIMER2:
-			_tdc_disable_interrupt(a_timer);
+			_timer_disable_interrupt(a_timer);
 			TCCR2B &= 0xf8;
 			TCCR2A &= ~_BV(COM2A0);
 			break;
@@ -101,9 +101,9 @@ void beeper_off(e_timer a_timer) {
 		default:
 			break;
 	} // switch
-	_tdc_set_duration(a_timer, 0x00);
+	_tdc_set_duration(_tdc_get_tdelay_timer(a_timer), 0x00);
 }
 
 inline void beeper_block(e_timer a_timer) {
-	_tdc_block(a_timer);
+	_tdc_block(_tdc_get_tdelay_timer(a_timer));
 }

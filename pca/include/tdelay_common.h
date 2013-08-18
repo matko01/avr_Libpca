@@ -3,38 +3,49 @@
 
 #include "config.h"
 #include "common.h"
+#include "timer_common.h"
 
 
 /**
- * @brief timer prescalers bitmasks
+ * @brief Since we do not have to use all timers for delays, there is
+ *  no need to implement and declare interrupts and data structures for
+ * 	every timer. That's why there is a need for tdelay specific denomination
  */
-#define TIMER_PRESCALER_1 0x01
-#define TIMER_PRESCALER_8 0x02
-#define TIMER_PRESCALER_64 0x03
-#define TIMER_PRESCALER_256 0x04
-#define TIMER_PRESCALER_1024 0x05
-
-
-/**
- * @brief available timers which can be used for delays
- */
-typedef enum _e_timer {
+typedef enum _e_tdelay_timer {
 
 #if TDELAY_IMPLEMENT_T0_INT == 1
-	E_TIMER0,
+	E_TDELAY_TIMER0,
 #endif
 
 #if TDELAY_IMPLEMENT_T1_INT == 1	
-	E_TIMER1,
+	E_TDELAY_TIMER1,
 #endif
 
 #if TDELAY_IMPLEMENT_T2_INT == 1	
-	E_TIMER2,
+	E_TDELAY_TIMER2,
 #endif
 
-	E_TIMER_LAST
-} e_timer;
+	E_TDELAY_TIMER_LAST
+} e_tdelay_timer;
 
+
+/**
+ * @brief convert an e_timer to e_tdelay_timer
+ *
+ * @param a_timer e_timer
+ *
+ * @return e_tdelay_timer
+ */
+e_tdelay_timer _tdc_get_tdelay_timer(e_timer a_timer);
+
+/**
+ * @brief convert e_tdelay_timer to e_timer denominator
+ *
+ * @param a_timer e_tdelay_timer
+ *
+ * @return e_timer
+ */
+e_timer _tdc_get_timer(e_tdelay_timer a_timer);
 
 /**
  * @brief configure the duration for a given timer
@@ -42,7 +53,7 @@ typedef enum _e_timer {
  * @param a_tim timer
  * @param a_dur duration value (in cycles)
  */
-void _tdc_set_duration(e_timer a_tim, uint32_t a_dur);
+void _tdc_set_duration(e_tdelay_timer a_tim, uint32_t a_dur);
 
 /**
  * @brief set to 1 if you want to toggle OCMPXA PIN down, once timer expires
@@ -50,7 +61,7 @@ void _tdc_set_duration(e_timer a_tim, uint32_t a_dur);
  * @param a_tim timer
  * @param a_pin 1 - pull down, 0 - do nothing
  */
-void _tdc_set_cmp_pin(e_timer a_tim, uint8_t a_pin);
+void _tdc_set_cmp_pin(e_tdelay_timer a_tim, uint8_t a_pin);
 
 /**
  * @brief configure timer for a specified frequency and duration
@@ -59,41 +70,14 @@ void _tdc_set_cmp_pin(e_timer a_tim, uint8_t a_pin);
  * @param a_freq freq
  * @param a_delay duration
  */
-void _tdc_setup_delay(e_timer a_timer, uint32_t a_freq, uint32_t a_delay);
-
-/**
- * @brief enable timer interrupt (start counting down)
- *
- * @param a_timer timer
- */
-void _tdc_enable_interrupt(e_timer a_timer);
-
-/**
- * @brief disable COMPA interrupt for timer
- *
- * @param a_timer timer
- */
-void _tdc_disable_interrupt(e_timer a_timer);
+void _tdc_setup_delay(e_tdelay_timer a_timer, uint32_t a_freq, uint32_t a_delay);
 
 /**
  * @brief block until timer expires (must be configured before)
  *
  * @param a_timer time
  */
-void _tdc_block(e_timer a_timer);
-
-
-/**
- * @brief calculate prescaler and OCR value for a given frequency
- *
- * @param a_freq requested frequency
- * @param a_criterion maximum value for OCR (255 for 8 bit timers 65535 for 16 bit timers)
- *
- * @return 3 bit prescaler value starting at bit 24 + 16 bit OCR starting from bit 0
- */
-uint32_t _tdc_freq_prescale(uint32_t a_freq, uint16_t a_criterion);
-
-
+void _tdc_block(e_tdelay_timer a_timer);
 
 #endif /* end of include guard: TDELAY_COMMON_H_NXGPZAZA */
 
