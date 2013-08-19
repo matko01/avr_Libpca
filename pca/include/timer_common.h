@@ -29,14 +29,14 @@ typedef enum _e_timer {
  *
  * @param a_timer timer
  */
-void _timer_enable_interrupt(e_timer a_timer);
+void _timer_en_compa_int(e_timer a_timer);
 
 /**
  * @brief disable COMPA interrupt for timer
  *
  * @param a_timer timer
  */
-void _timer_disable_interrupt(e_timer a_timer);
+void _timer_dis_compa_int(e_timer a_timer);
 
 /**
  * @brief calculate prescaler and OCR value for a given frequency
@@ -48,6 +48,20 @@ void _timer_disable_interrupt(e_timer a_timer);
  */
 uint32_t _timer_freq_prescale(uint32_t a_freq, uint16_t a_criterion);
 
+/**
+ * @brief initialize requested timer to CTC mode. Prescaler is set to 0x00 (no clock)
+ *
+ * @param a_timer timer
+ */
+void _timer_init_ctc(e_timer a_timer);
+
+/**
+ * @brief setup the top value in OCRXA and the prescaler value accordingly to the contents of combined variable pocr
+ *
+ * @param a_timer timer
+ * @param a_pocr combined variable containing info about OCRXA value and prescaler
+ */
+void _timer_setup_ctc(e_timer a_timer, uint32_t a_pocr);
 
 
 #endif /* __TIMER_COMMON_H__ */

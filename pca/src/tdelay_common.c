@@ -166,39 +166,15 @@ e_tdelay_timer _tdc_get_tdelay_timer(e_timer a_timer) {
 void _tdc_setup_delay(e_tdelay_timer a_timer, uint32_t a_freq, uint32_t a_delay) {
 
 	uint32_t pocr = 0x00;
+	
+	if (E_TDELAY_TIMER1 == a_timer) {
+		pocr = _timer_freq_prescale(a_freq, 260);
+	}
+	else {
+		pocr = _timer_freq_prescale(a_freq, 255);
+	}
 
-	// which pin
-	switch(a_timer) {
-
-		case E_TDELAY_TIMER0:
-			pocr = _timer_freq_prescale(a_freq, 255);
-			TCCR0B &= 0xf8;
-			TCCR0B |= (pocr >> 24) & 0x07;			
-			OCR0A = pocr & 0xff;
-			TCNT0 = 0x00;
-			break;
-
-		case E_TDELAY_TIMER1:
-			pocr = _timer_freq_prescale(a_freq, 260);
-			TCCR1B &= 0xf8;
-			TCCR1B |= ((pocr >> 24) & 0x07);
-			OCR1AL = pocr & 0xff;
-			OCR1AH = (pocr >> 8) & 0xff;
-			TCNT1H = TCNT1L = 0x00;
-			break;
-
-		case E_TDELAY_TIMER2:
-			pocr = _timer_freq_prescale(a_freq, 255);
-			TCCR2B &= 0xf8;
-			TCCR2B |= (pocr >> 24) & 0x07;			
-			OCR2A = pocr & 0xff;
-			TCNT2 = 0x00;
-			break;
-
-		default:
-			break;
-	} // switch
-
+	_timer_setup_ctc(_tdc_get_timer(a_timer), pocr);
 	_tdc_set_duration(a_timer, (uint32_t)((a_freq*a_delay)/500));
 }
 
