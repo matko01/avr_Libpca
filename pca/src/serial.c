@@ -46,6 +46,7 @@ static volatile t_buffer g_tx_buff;
  * @param USART_RX_vect
  */
 ISR(USART_RX_vect, ISR_BLOCK) {
+
 	// no frame error
 	// UCSR0A must be read before UDR0 !!!
 	if (bit_is_clear(UCSR0A, FE0)) {
@@ -172,7 +173,8 @@ e_return serial_init(uint32_t a_speed) {
 			break;
 
 		case E_BAUD_115200:
-			baud_value = 8;
+			UCSR0A |= _BV(U2X0);
+			baud_value = 16;
 			break;
 
 		default:
