@@ -44,8 +44,9 @@ void _timer_dis_compa_int(e_timer a_timer) {
 }
 
 
-uint32_t _timer_freq_prescale(uint32_t a_freq, uint16_t a_criterion) {
-	uint8_t prescalers[] = { 0x00, 0x03, 0x06, 0x08, 0x0a, 0x00 };
+uint32_t _timer_freq_prescale(e_timer a_timer, uint32_t a_freq, uint16_t a_criterion) {
+	uint8_t prescalers01[] = { 0x00, 0x03, 0x05, 0x06, 0x07, 0x08, 0x0a, 0x00};
+	uint8_t prescalers2[] = { 0x00, 0x03, 0x06, 0x08, 0x0a, 0x00 };
 
 	/**
 	 * combine both prescaler and ocr value in one 32bit value 
@@ -53,13 +54,18 @@ uint32_t _timer_freq_prescale(uint32_t a_freq, uint16_t a_criterion) {
 	uint32_t retval = 0x00;
 	uint16_t *ocr = (uint16_t *)&retval;
 	uint8_t *presc = ((uint8_t *)&retval) + 3;
+	uint8_t *prescalers = prescalers01;
+
+	if (E_TIMER2 == a_timer) {
+		prescalers = prescalers2;
+	}
 
 	do {
-		*ocr = F_CPU / ((a_freq << 1) * (0x01 << prescalers[*presc]));
+		*ocr = (uint16_t) (F_CPU / ((a_freq << 1) * (0x01 << prescalers[*presc])));
 		++*presc;		
 	} while ((*ocr > a_criterion) && (prescalers[*presc]));
 
-	/* --*ocr; */
+	--*ocr;
 	if (*ocr > a_criterion) *ocr = a_criterion;
 	return retval;
 }

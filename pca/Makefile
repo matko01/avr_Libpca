@@ -5,6 +5,7 @@ SOURCES= \
 		slip.c \
 		tdelay.c \
 		beeper.c \
+		sched.c \
 		timer_common.c \
 		tdelay_common.c
 

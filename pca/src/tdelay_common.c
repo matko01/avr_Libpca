@@ -168,10 +168,10 @@ void _tdc_setup_delay(e_tdelay_timer a_timer, uint32_t a_freq, uint32_t a_delay)
 	uint32_t pocr = 0x00;
 	
 	if (E_TDELAY_TIMER1 == a_timer) {
-		pocr = _timer_freq_prescale(a_freq, 260);
+		pocr = _timer_freq_prescale(E_TIMER1, a_freq, 260);
 	}
 	else {
-		pocr = _timer_freq_prescale(a_freq, 255);
+		pocr = _timer_freq_prescale(a_timer, a_freq, 255);
 	}
 
 	_timer_setup_ctc(_tdc_get_timer(a_timer), pocr);

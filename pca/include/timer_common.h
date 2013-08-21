@@ -46,7 +46,7 @@ void _timer_dis_compa_int(e_timer a_timer);
  *
  * @return 3 bit prescaler value starting at bit 24 + 16 bit OCR starting from bit 0
  */
-uint32_t _timer_freq_prescale(uint32_t a_freq, uint16_t a_criterion);
+uint32_t _timer_freq_prescale(e_timer a_timer, uint32_t a_freq, uint16_t a_criterion);
 
 /**
  * @brief initialize requested timer to CTC mode. Prescaler is set to 0x00 (no clock)

@@ -31,11 +31,25 @@
 /// change to 0 if to disable timer 0 delay and beeper interrupts and routines
 #define TDELAY_IMPLEMENT_T0_INT 1
 
-/// change to 1 if to disable timer 0 delay and beeper interrupts and routines
+/// change to 0 if to disable timer 1 delay and beeper interrupts and routines
 #define TDELAY_IMPLEMENT_T1_INT 1
 
-/// change to 2 if to disable timer 0 delay and beeper interrupts and routines
+/// change to 0 if to disable timer 2 delay and beeper interrupts and routines
 #define TDELAY_IMPLEMENT_T2_INT 1
+
+// ============================== SCHEDULER =======================================
+
+/// time resolution definition for scheduler
+#define SCHED_TIME_RESOLUTION uint16_t
+
+///which timer to use as a tick generator
+#define SCHED_TIMER E_TIMER0
+
+/// maximum number of tasks allowed to run simultaneously
+#define SCHED_MAX_TASKS 8
+
+/// implement timer interrupt, chage this to 0 to disable interrupt impl
+#define SCHED_IMPLEMENT_TIMER_INT 1
 
 // ================================================================================
 
