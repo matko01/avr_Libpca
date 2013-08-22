@@ -71,6 +71,68 @@ uint32_t _timer_freq_prescale(e_timer a_timer, uint32_t a_freq, uint16_t a_crite
 }
 
 
+void _timer_init_fpwm(e_timer a_timer) {
+
+	switch(a_timer) {
+		case E_TIMER0:
+			power_timer0_enable();
+			TCCR0A = 0x03;
+			TCCR0B = 0x00;
+			OCR0A = 0x00;
+			break;
+
+		case E_TIMER1:
+			power_timer1_enable();
+			TCCR1A = 0x02;
+			TCCR1B = 0x18;
+			OCR1AH = OCR1AL = 0x00;
+			break;
+
+		case E_TIMER2:
+			power_timer2_enable();
+			ASSR &= ~(_BV(EXCLK) | _BV(AS2));
+			TCCR2A = 0x03;
+			TCCR2B = 0x00;
+			OCR2A = 0x00;
+			break;
+
+		default:
+			break;
+	} // switch
+}
+
+
+void _timer_init_pwm(e_timer a_timer) {
+
+	switch(a_timer) {
+		case E_TIMER0:
+			power_timer0_enable();
+			TCCR0A = 0x01;
+			TCCR0B = 0x00;
+			OCR0A = 0x00;
+			break;
+
+		case E_TIMER1:
+			power_timer1_enable();
+			TCCR1A = 0x00;
+			TCCR1B = 0x10;
+			OCR1AH = OCR1AL = 0x00;
+			break;
+
+		case E_TIMER2:
+			power_timer2_enable();
+			ASSR &= ~(_BV(EXCLK) | _BV(AS2));
+			TCCR2A = 0x01;
+			TCCR2B = 0x00;
+			OCR2A = 0x00;
+			break;
+
+		default:
+			break;
+	} // switch
+}
+
+
 void _timer_init_ctc(e_timer a_timer) {
 
 	switch (a_timer) {
@@ -136,5 +198,46 @@ void _timer_setup_ctc(e_timer a_timer, uint32_t a_pocr) {
 		default:
 			break;
 	} // switch
-
 }
+
+
+void _timer_en_oca(e_timer a_timer) {
+	switch (a_timer) {
+		case E_TIMER0:
+			DDRD |= _BV(PORTD6);
+			break;
+
+		case E_TIMER1:
+			DDRB |= _BV(PORTB1);
+			break;
+
+		case E_TIMER2:
+			DDRB |= _BV(PORTB3);
+			break;
+
+		default:
+			break;
+	} // switch
+}
+
+
+void _timer_en_ocb(e_timer a_timer) {
+	switch (a_timer) {
+		case E_TIMER0:
+			DDRD |= _BV(PORTD5);
+			break;
+
+		case E_TIMER1:
+			DDRB |= _BV(PORTB2);
+			break;
+
+		case E_TIMER2:
+			DDRD |= _BV(PORTD3);
+			break;
+
+		default:
+			break;
+	} // switch
+}
+
+

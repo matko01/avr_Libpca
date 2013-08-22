@@ -6,6 +6,7 @@ SOURCES= \
 		tdelay.c \
 		beeper.c \
 		sched.c \
+		tpwm.c \
 		timer_common.c \
 		tdelay_common.c
 

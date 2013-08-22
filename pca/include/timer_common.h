@@ -63,5 +63,23 @@ void _timer_init_ctc(e_timer a_timer);
  */
 void _timer_setup_ctc(e_timer a_timer, uint32_t a_pocr);
 
+/**
+ * @brief enable OCXA pin as output
+ *
+ * @param a_timer timer
+ */
+void _timer_en_oca(e_timer a_timer);
+
+/**
+ * @brief enable OCXB pin as output
+ *
+ * @param a_timer timer
+ */
+void _timer_en_ocb(e_timer a_timer);
+
+
+void _timer_init_fpwm(e_timer a_timer);
+void _timer_init_pwm(e_timer a_timer);
+
 
 #endif /* __TIMER_COMMON_H__ */

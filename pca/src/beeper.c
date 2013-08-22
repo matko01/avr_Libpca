@@ -3,27 +3,26 @@
 
 
 void beeper_init(e_timer a_timer) {
+
 	tdelay_init(a_timer);
+	_timer_en_oca(a_timer);
 
 	switch (a_timer) {
 
 #if TDELAY_IMPLEMENT_T0_INT == 1
 		case E_TIMER0:
-			DDRD |= _BV(PORTD6);
 			TCCR0A |= 0x40;
 			break;
 #endif
 
 #if TDELAY_IMPLEMENT_T1_INT == 1
 		case E_TIMER1:
-			DDRB |= _BV(PORTB1);
 			TCCR1A |= 0x40;
 			break;
 #endif
 
 #if TDELAY_IMPLEMENT_T2_INT == 1
 		case E_TIMER2:
-			DDRB |= _BV(PORTB3);
 			TCCR2A |= 0x40;
 			break;
 #endif
