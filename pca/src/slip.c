@@ -47,8 +47,8 @@ unsigned char slip_recv(unsigned char *a_buff, unsigned char a_buflen) {
 
 unsigned char slip_send(unsigned char *a_buff, unsigned char a_buflen) {
 
-	SLIP_CHAR_SEND(SLIP_END);
 	unsigned char send = a_buflen;
+	SLIP_CHAR_SEND(SLIP_END);
 
 	while (a_buflen) {
 		switch (*a_buff) {
@@ -71,6 +71,7 @@ unsigned char slip_send(unsigned char *a_buff, unsigned char a_buflen) {
 		a_buflen--;
 	}
 
+	SLIP_CHAR_SEND(SLIP_END);
 	return send;
 }
 
