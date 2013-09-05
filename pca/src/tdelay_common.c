@@ -167,10 +167,13 @@ void _tdc_setup_delay(e_tdelay_timer a_timer, uint32_t a_freq, uint32_t a_delay)
 
 	uint32_t pocr = 0x00;
 	
+#if TDELAY_IMPLEMENT_T1_INT == 1
 	if (E_TDELAY_TIMER1 == a_timer) {
 		pocr = _timer_freq_prescale(E_TIMER1, a_freq, 260);
 	}
-	else {
+	else 
+#endif	
+	{
 		pocr = _timer_freq_prescale(a_timer, a_freq, 255);
 	}
 
@@ -184,17 +187,23 @@ void _tdc_block(e_tdelay_timer a_timer) {
 
 	// deadlock protection
 	switch (a_timer) {
+#if TDELAY_IMPLEMENT_T0_INT == 1
 		case E_TDELAY_TIMER0:
 			wait = __tdc_block(a_timer, &TIMSK0, OCIE0A);
 			break;
+#endif
 
+#if TDELAY_IMPLEMENT_T1_INT == 1
 		case E_TDELAY_TIMER1:
 			wait = __tdc_block(a_timer, &TIMSK1, OCIE1A);
 			break;
+#endif
 
+#if TDELAY_IMPLEMENT_T2_INT == 1
 		case E_TDELAY_TIMER2:
 			wait = __tdc_block(a_timer, &TIMSK2, OCIE2A);
 			break;
+#endif
 
 		default:
 			break;
