@@ -81,6 +81,6 @@ typedef enum _e_return {
  *
  * @return number of bytes available
  */
-unsigned int common_memory_left();
+uint16_t common_memory_left();
 
 #endif /* __COMMON_H__ */

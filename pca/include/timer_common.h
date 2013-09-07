@@ -77,8 +77,18 @@ void _timer_en_oca(e_timer a_timer);
  */
 void _timer_en_ocb(e_timer a_timer);
 
-
+/**
+ * @brief configure given timer to fast pwm mode
+ *
+ * @param a_timer
+ */
 void _timer_init_fpwm(e_timer a_timer);
+
+/**
+ * @brief configure given timer to phase correct mode
+ *
+ * @param a_timer
+ */
 void _timer_init_pwm(e_timer a_timer);
 
 
