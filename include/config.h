@@ -29,7 +29,7 @@
 // ============================ TIMERS/BEEPER =====================================
 
 /// change to 0 if to disable timer 0 delay and beeper interrupts and routines
-#define TDELAY_IMPLEMENT_T0_INT 1
+#define TDELAY_IMPLEMENT_T0_INT 0
 
 /// change to 0 if to disable timer 1 delay and beeper interrupts and routines
 #define TDELAY_IMPLEMENT_T1_INT 0

@@ -41,8 +41,6 @@ static void _isr_tdelay_handler(volatile struct regs *sregs) {
 	}
 }
 
-#endif
-
 static uint8_t __tdc_block(e_timer a_timer, volatile uint8_t *timsk, uint8_t map) {
 	if (bit_is_clear((*timsk), map)) {				
 		_tdc_set_duration(a_timer, 0x00);
@@ -50,6 +48,8 @@ static uint8_t __tdc_block(e_timer a_timer, volatile uint8_t *timsk, uint8_t map
 	}
 	return 1;
 }
+
+#endif
 
 /* ================================================================================ */
 
@@ -98,12 +98,16 @@ ISR(TIMER0_COMPA_vect, ISR_NOBLOCK) {
 
 
 inline void _tdc_set_duration(e_tdelay_timer a_tim, uint32_t a_dur) {
+#if TDELAY_IMPLEMENT_T0_INT == 1 || TDELAY_IMPLEMENT_T1_INT == 1 || TDELAY_IMPLEMENT_T2_INT == 1
 	g_tc[a_tim].duration = a_dur;
+#endif
 }
 
 
 inline void _tdc_set_cmp_pin(e_tdelay_timer a_tim, uint8_t a_pin) {
+#if TDELAY_IMPLEMENT_T0_INT == 1 || TDELAY_IMPLEMENT_T1_INT == 1 || TDELAY_IMPLEMENT_T2_INT == 1
 	g_tc[a_tim].reset_cmpa_pin = a_pin;
+#endif
 }
 
 
@@ -183,7 +187,7 @@ void _tdc_setup_delay(e_tdelay_timer a_timer, uint32_t a_freq, uint32_t a_delay)
 
 
 void _tdc_block(e_tdelay_timer a_timer) {
-	unsigned char wait = 0;
+	unsigned char wait UNUSED = 0;
 
 	// deadlock protection
 	switch (a_timer) {
@@ -209,6 +213,8 @@ void _tdc_block(e_tdelay_timer a_timer) {
 			break;
 	} // switch
 
+#if TDELAY_IMPLEMENT_T0_INT == 1 || TDELAY_IMPLEMENT_T1_INT == 1 || TDELAY_IMPLEMENT_T2_INT == 1
 	if (wait) while (g_tc[a_timer].duration);
+#endif
 }
 
