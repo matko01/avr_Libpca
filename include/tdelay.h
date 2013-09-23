@@ -20,6 +20,28 @@
  */
 
 
+/**
+ * @file tdelay.h 
+ *
+ * @brief API for timer delays
+ *
+ * This file provides a basic API for timer based delays.
+ *
+ * In order to use this API an interrupt implementation must be enabled in config.h for a requested timer (TDELAY_IMPLEMENT_T0_INT, TDELAY_IMPLEMENT_T1_INT, TDELAY_IMPLEMENT_T2_INT).
+ * For details please refer to the documentation of config.h options
+ *
+ * This API works in general the same as beeper API. The only difference between those two is that beeper API in addition toggles the OCXA pin of the associated timer in order to
+ * generate the requested frequency on the pin. tdelay API does not configure the OCXA pin as output.
+ *
+ * @example tdelay_01.c
+ *
+ * General tdelay API usage example
+ *
+ * @example tdelay_02.c
+ *
+ * Using tdelay API in conjunction with beeper API
+ */
+
 #include "config.h"
 #include "common.h"
 #include "tdelay_common.h"

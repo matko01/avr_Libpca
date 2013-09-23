@@ -30,6 +30,9 @@
  * In order to use this API an interrupt implementation must be enabled in config.h for a requested timer (TDELAY_IMPLEMENT_T0_INT, TDELAY_IMPLEMENT_T1_INT, TDELAY_IMPLEMENT_T2_INT).
  * For details please refer to the documentation of config.h options
  *
+ * This API works in general the same as tdelay API. The only difference between those two is that beeper API in addition toggles the OCXA pin of the associated timer in order to
+ * generate the requested frequency on the pin.
+ *
  * @example beeper_01.c
  *
  * General beeper API usage example
