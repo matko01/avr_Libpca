@@ -19,21 +19,59 @@
  * 
  */
 
+
+/**
+ * @file common.h 
+ *
+ * @brief common macros and definitions
+ *
+ * This file provides some general purpose data types definitions, macros and routines
+ *
+ */
+
 #include <stdint.h>
 
 // ================================================================================
 
 
 /**
- * volatile fixed size data types declaration
+ * @brief volatile int8_t
  */
 typedef volatile int8_t vint8_t;
+
+/**
+ * @brief volatile uint8_t
+ */
 typedef volatile uint8_t vuint8_t;
+
+/**
+ * @brief volatile int16_t
+ */
 typedef volatile int16_t vint16_t;
+
+/**
+ * @brief volatile uint16_t
+ */
 typedef volatile uint16_t vuint16_t;
+
+/**
+ * @brief volatile int32_t
+ */
 typedef volatile int32_t vint32_t;
+
+/**
+ * @brief volatile uint32_t
+ */
 typedef volatile uint32_t vuint32_t;
+
+/**
+ * @brief volatile int64_t
+ */
 typedef volatile int64_t vint64_t;
+
+/**
+ * @brief volatile uint64_t
+ */
 typedef volatile uint64_t vuint64_t;
 
 
@@ -57,7 +95,9 @@ typedef enum _e_return {
 #endif
 
 
-// unused attribute - to make the compiler happy when needed
+/**
+ * @brief unused attribute - to make the compiler happy when needed
+ */
 #define UNUSED __attribute__((unused))
 
 
