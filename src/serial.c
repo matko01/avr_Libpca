@@ -338,6 +338,7 @@ unsigned char serial_sendc(unsigned char a_data) {
 }
 #endif
 
+
 unsigned int serial_poll_send(void *data, unsigned int a_size) {
 	unsigned int i = 0x00;
 	while (i < a_size) {

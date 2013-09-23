@@ -59,6 +59,7 @@ void _timer_dis_compa_int(e_timer a_timer);
 /**
  * @brief calculate prescaler and OCR value for a given frequency
  *
+ * @param a_timer timer
  * @param a_freq requested frequency
  * @param a_criterion maximum value for OCR (255 for 8 bit timers 65535 for 16 bit timers)
  *

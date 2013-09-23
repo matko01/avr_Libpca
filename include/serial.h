@@ -115,7 +115,7 @@ unsigned char serial_peek(void *a_data, unsigned char a_size);
  *
  * @param a_data buffer for the data
  * @param a_size buffer size
- * @param a_flag flags
+ * @param a_waitall 1 - block until a data block of requested size is assembled
  *
  * @return number of bytes read
  */
@@ -136,7 +136,6 @@ unsigned char serial_getc(unsigned char *a_data);
  *
  * @param a_data buffer for the data
  * @param a_size buffer size
- * @param a_flag flags
  *
  * @return number of bytes read
  */
@@ -176,12 +175,12 @@ unsigned char serial_sendc(unsigned char a_data);
 /**
  * @brief send data using serial port TX status polling (it will block until data is fully transmitted)
  *
- * @param data data to send
+ * @param a_data data to be sent
  * @param a_size size of the buffer
  *
  * @return number of bytes sent
  */
-unsigned int serial_poll_send(void *data, unsigned int a_size);
+unsigned int serial_poll_send(void *a_data, unsigned int a_size);
 
 /**
  * @brief transmit a single character (this is a wrapper for serial_poll_send)
