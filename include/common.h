@@ -25,7 +25,7 @@
 
 
 /**
- * volatile fixed size data types
+ * volatile fixed size data types declaration
  */
 typedef volatile int8_t vint8_t;
 typedef volatile uint8_t vuint8_t;
@@ -49,6 +49,9 @@ typedef enum _e_return {
 
 // ================================================================================
 
+/**
+ * @brief define NULL just for convenience
+ */
 #ifndef NULL
 #define NULL (void *)0x00
 #endif
@@ -66,15 +69,34 @@ typedef enum _e_return {
 #define IS_WARNING_OK(__x) \
 	( ((__x) >= RET_OK) && ((__x) < RET_ERROR))
 
+
 // ================================================================================
 
+/**
+ * @brief return maximum value out of two given
+ *
+ * @param __x first value
+ * @param __y second value
+ *
+ * @return __x or __y depending on which is bigger
+ */
 #define MAX(__x, __y) \
 	( (__x) > (__y) ? (__x) : (__y))
 
+
+/**
+ * @brief return minimum value out of two given
+ *
+ * @param __x first value
+ * @param __y second value
+ *
+ * @return __x or __y depending on which is smaller
+ */
 #define MIN(__x, __y) \
 	( (__x) < (__y) ? (__x) : (__y))
 
 // ================================================================================
+
 
 /**
  * @brief provide a brief calculation of the memory usage and report how much is left
