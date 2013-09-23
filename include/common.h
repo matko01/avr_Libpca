@@ -56,16 +56,28 @@ typedef enum _e_return {
 #define NULL (void *)0x00
 #endif
 
+
 // unused attribute - to make the compiler happy when needed
 #define UNUSED __attribute__((unused))
 
 
+/**
+ * @brief macro to determine if the returned value is an error
+ */
 #define IS_ERROR(__x) \
 	( (__x) >= RET_ERROR)
 
+
+/**
+ * @brief macro to determine if the returned value is a warning
+ */
 #define IS_WARNING(__x) \
 	( ((__x) > RET_OK) && ((__x) < RET_ERROR) )
 
+
+/**
+ * @brief macro to determine if the returned value is a warning or a success
+ */
 #define IS_WARNING_OK(__x) \
 	( ((__x) >= RET_OK) && ((__x) < RET_ERROR))
 

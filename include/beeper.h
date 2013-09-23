@@ -20,17 +20,38 @@
  */
 
 
+/**
+ * @file beeper.h 
+ *
+ * @brief API for generating tones using timer(s).
+ *
+ * This file provides a basic API to use the Atmega328p timers as tone generators.
+ *
+ * In order to use this API an interrupt implementation must be enabled in config.h for a requested timer (TDELAY_IMPLEMENT_T0_INT, TDELAY_IMPLEMENT_T1_INT, TDELAY_IMPLEMENT_T2_INT).
+ * For details please refer to the documentation of config.h options
+ *
+ * @example beeper_01.c
+ *
+ * General beeper API usage example
+ *
+ * @example beeper_02.c
+ *
+ * Using beeper_block() and beeper_off() functions
+ */
+
 #include "config.h"
 #include "tdelay.h"
+
 
 /**
  * @brief block execution until the tone fades out
  *
- * @param __a_timer timer used for tone generation
+ * @param a_timer timer used for tone generation
  *
  * @return void
  */
 void beeper_block(e_timer a_timer);
+
 
 /**
  * @brief initialize a given timer to act as a tone generator
@@ -39,14 +60,17 @@ void beeper_block(e_timer a_timer);
  */
 void beeper_init(e_timer a_timer);
 
+
 /**
  * @brief generate a tone of specific frequency and duration using a timer
  *
  * @param a_timer timer 
  * @param freq frequency in Hz 
+ *  (may be 0 - will allow to use bepper_block for an amount of timer specified in duration argument)
  * @param duration duration in milliseconds
  */
 void beeper_beep(e_timer a_timer, uint32_t freq, uint32_t duration);
+
 
 /**
  * @brief cancel tone generation 
