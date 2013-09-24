@@ -220,10 +220,10 @@ e_return serial_init(uint32_t a_speed) {
 }
 
 
-void serial_install_interrupts(unsigned char a_flags) {
+void serial_install_interrupts(e_serial_flags a_flags) {
 
 #if SERIAL_IMPLEMENT_RX_INT == 1
-	if (a_flags & SERIAL_RX_INTERRUPT) {
+	if (a_flags & E_FLAGS_SERIAL_RX_INTERRUPT) {
 		// enable receive interrupt
 		UCSR0B |= _BV(RXCIE0);
 		UCSR0B &= ~_BV(UDRIE0);
@@ -231,7 +231,7 @@ void serial_install_interrupts(unsigned char a_flags) {
 #endif
 
 #if SERIAL_IMPLEMENT_TX_INT == 1
-	if (a_flags & SERIAL_TX_INTERRUPT) {
+	if (a_flags & E_FLAGS_SERIAL_TX_INTERRUPT) {
 		// TODO implement me
 	}
 #endif
@@ -248,6 +248,7 @@ void serial_install_stdio() {
 	stdout = &uart_stdout;
 	stdin = &uart_stdin;
 }
+
 
 #if SERIAL_IMPLEMENT_RX_INT == 1
 inline unsigned char serial_available() {

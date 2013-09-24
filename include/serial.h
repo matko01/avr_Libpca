@@ -19,22 +19,54 @@
  * 
  */
 
+
+/**
+ * @file serial.h 
+ *
+ * @brief API over UART configured as RS232. Contains all the necessary routines in order to provide basic means
+ *  of communication over serial port
+ *
+ * Using macro definitions here you can enable/disable some of the library implementation features, aw well
+ *  as change the default values for some of the important configuration constants.
+ *
+ * @example serial_01.c
+ *
+ * Basic Serial port usage example
+ *
+ * @example serial_02.c
+ *
+ * Using serial port used in polled fashion
+ *
+ * @example serial_03.c
+ *
+ * Using serial port as STDOUT
+ *
+ * @example serial_04.c
+ *
+ * Using serial port along with SLIP protocol for binary data IO synchronization
+ */
+
 #include "config.h"
 #include "common.h"
 
+
 /**
- * @brief module version definition
+ * @brief module version definition (just for internal use, to determine API incompatibilities)
  */
 #define SERIAL_VERSION "0.010"
 
-/**
- * @brief interrupt flags
- */
-#define SERIAL_RX_INTERRUPT 0x01
-#define SERIAL_TX_INTERRUPT 0x02
 
 /**
- * @brief serial speeds available
+ * @brief available flags used by the serial API functions
+ */
+typedef enum _e_serial_flags {
+	E_FLAGS_SERIAL_RX_INTERRUPT = 0x01,
+	E_FLAGS_SERIAL_TX_INTERRUPT,
+} e_serial_flags;
+
+
+/**
+ * @brief serial pre calculated supported USART baud rates
  */
 typedef enum _e_serial_speed {
 	E_BAUD_2400 = 2400,
@@ -49,59 +81,83 @@ typedef enum _e_serial_speed {
 	E_BAUD_115200 = 115200
 } e_serial_speed;
 
+
 #if SERIAL_COLLECT_STATS == 1
 /**
- * @brief buffer statistics
+ * @brief IO buffer statistics type  declaration
  */
 typedef struct _t_stats {
+
+	/// number of a valid rx/tx bytes
 	volatile uint32_t ok;
+
+	/// number of dropped data bytes due to buffer being full
 	volatile uint32_t dropped;
+
+	/// number of bytes received with frame error indicator
 	volatile uint32_t frame_error;
 } t_stats;
 #endif
 
+
 /**
- * @brief ring buffer
+ * @brief TX/RX ring buffer declaration
  */
 typedef struct _t_buffer {
+	/// data storage space for the ring buffer
 	volatile unsigned char ring[SERIAL_RX_RING_SIZE];
+
+	/// head index
 	volatile unsigned char head;
+
+	/// tail index
 	volatile unsigned char tail;
+
 #if SERIAL_COLLECT_STATS == 1
+
+	/// statistics for the buffer
 	volatile t_stats stats;
 #endif
 } t_buffer;
 
+
 /**
  * @brief initialize USART as RS232 port
  *
- * @param a_speed speed
+ * @param a_speed speed (e_serial_speed enumeration can be used for standard BAUD rates)
  *
- * @return success
+ * @return always success
  */
 e_return serial_init(uint32_t a_speed);
 
+
 /**
  * @brief install USART interrupts
+ *
+ * @param a_flags bitfield defining interrupt which user want to install (accepted values: E_FLAGS_SERIAL_RX_INTERRUPT, E_FLAGS_SERIAL_TX_INTERRUPT)
  */
-void serial_install_interrupts(unsigned char a_flags);
+void serial_install_interrupts(e_serial_flags a_flags);
+
 
 /**
  * @brief install serial handlers so we can use printf-like functions with serial console
  */
 void serial_install_stdio();
 
+
+#if SERIAL_IMPLEMENT_RX_INT == 1
 /**
- * @brief check how many bytes are available to read
+ * @brief check how many bytes are available, pending to be read 
+ * (this only works if RX interrupts are installed)
  *
  * @return number of bytes received and waiting
  */
-#if SERIAL_IMPLEMENT_RX_INT == 1
 unsigned char serial_available();
+
 
 /**
  * @brief check if there is any data available pending 
- * (this only works if interrupts are installed)
+ * (this only works if RX interrupts are installed)
  *
  * @param a_data buffer to place any data in
  * @param a_size size of the buffer
@@ -109,6 +165,7 @@ unsigned char serial_available();
  * @return number of bytes available
  */
 unsigned char serial_peek(void *a_data, unsigned char a_size);
+
 
 /**
  * @brief receive data
@@ -121,6 +178,7 @@ unsigned char serial_peek(void *a_data, unsigned char a_size);
  */
 unsigned int serial_recv(void *a_data, unsigned int a_size, unsigned char a_waitall);
 
+
 /**
  * @brief read a single char from the port
  *
@@ -130,6 +188,7 @@ unsigned int serial_recv(void *a_data, unsigned int a_size, unsigned char a_wait
  */
 unsigned char serial_getc(unsigned char *a_data);
 #endif
+
 
 /**
  * @brief receive data (this function is blocking)
@@ -141,6 +200,7 @@ unsigned char serial_getc(unsigned char *a_data);
  */
 unsigned char serial_poll_recv(unsigned char *a_data, unsigned int a_size);
 
+
 /**
  * @brief get a character through polling. It will block until there is a byte available
  *
@@ -150,6 +210,8 @@ unsigned char serial_poll_recv(unsigned char *a_data, unsigned int a_size);
  */
 unsigned char serial_poll_getc(unsigned char *a_data);
 
+
+#if SERIAL_IMPLEMENT_TX_INT == 1
 /**
  * @brief send data using interrupts
  *
@@ -159,8 +221,8 @@ unsigned char serial_poll_getc(unsigned char *a_data);
  *
  * @return number of characters send
  */
-#if SERIAL_IMPLEMENT_TX_INT == 1
 unsigned char serial_send(void *a_data, unsigned int a_size, unsigned char a_waitall);
+
 
 /**
  * @brief send a character using interrupts
@@ -172,6 +234,7 @@ unsigned char serial_send(void *a_data, unsigned int a_size, unsigned char a_wai
 unsigned char serial_sendc(unsigned char a_data);
 #endif
 
+
 /**
  * @brief send data using serial port TX status polling (it will block until data is fully transmitted)
  *
@@ -182,6 +245,7 @@ unsigned char serial_sendc(unsigned char a_data);
  */
 unsigned int serial_poll_send(void *a_data, unsigned int a_size);
 
+
 /**
  * @brief transmit a single character (this is a wrapper for serial_poll_send)
  *
@@ -191,23 +255,26 @@ unsigned int serial_poll_send(void *a_data, unsigned int a_size);
  */
 unsigned int serial_poll_sendc(unsigned char a_char);
 
+
+#if SERIAL_IMPLEMENT_RX_INT == 1
 /**
  * @brief return serial buffer context for RX (information and statistics about serial port)
  *
  * @return serial buffer info
  */
-#if SERIAL_IMPLEMENT_RX_INT == 1
 volatile t_buffer* serial_get_rx_state();
 #endif
 
+
+#if SERIAL_IMPLEMENT_TX_INT == 1
 /**
  * @brief return serial buffer context for TX (information and statistics about serial port)
  *
  * @return serial buffer info
  */
-#if SERIAL_IMPLEMENT_TX_INT == 1
 volatile t_buffer* serial_get_tx_state();
 #endif
+
 
 /**
  * @brief flush data & rx fifo

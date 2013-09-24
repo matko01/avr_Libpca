@@ -19,24 +19,46 @@
  * 
  */
 
+
+/**
+ * @brief module version definition (just for internal use, to determine API incompatibilities)
+ */
 #define SLIP_VERSION "0.001"
 
+
+/**
+ * @brief if there are no SEND/RECV routine definitions already existing
+ *  use the default definitions provided bellow
+ */
 #if !defined(SLIP_CHAR_SEND) || !defined(SLIP_CHAR_RECV)
 
 #include "config.h"
 #include "serial.h"
 
-// redefine those two in your code to use different interface
+/// redefine it, in your code to use different implementation of SEND routine
 #define SLIP_CHAR_SEND(__x)	serial_poll_sendc(__x)
+
+/// redefine it, in your code to use different implementation of RECV routine
 #define SLIP_CHAR_RECV(__x) serial_getc(__x)
 
 #endif
 
-// escape markers + data END marker
+
+// ============================== SLIP specific characters ==============================
+
+/// transmission END marker - SLIP data block should be ended with this marker
 #define SLIP_END 0300
+
+/// SLIP escape character, this one will be placed just before a byte if it's value is either 0333 (0xdb) or 0300 (c0)
 #define SLIP_ESC 0333
+
+/// this byte will be placed in the data stream instead of the SLIP_END byte, preceded by a SLIP_ESC byte
 #define SLIP_ESC_END 0334
+
+/// this byte will be placed in the data stream instead of the SLIP_ESC byte, preceded by a SLIP_ESC byte
 #define SLIP_ESC_ESC 0335
+
+// ============================== SLIP specific characters ==============================
 
 
 /**
@@ -49,6 +71,7 @@
  */
 unsigned char slip_recv(unsigned char *a_buff, unsigned char a_buflen);
 
+
 /**
  * @brief send data using slip protocol
  *
@@ -59,6 +82,7 @@ unsigned char slip_recv(unsigned char *a_buff, unsigned char a_buflen);
  */
 unsigned char slip_send(unsigned char *a_buff, unsigned char a_buflen);
 
+
 /**
  * @brief append the CRC16 checksum to the end of the data buffer
  *
@@ -68,6 +92,7 @@ unsigned char slip_send(unsigned char *a_buff, unsigned char a_buflen);
  * @return buffer size with CRC16 (a_datalen +2)
  */
 unsigned char slip_append_crc16(unsigned char *a_buff, unsigned char a_datalen);
+
 
 /**
  * @brief verify the CRC of the data buffer
