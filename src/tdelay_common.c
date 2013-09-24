@@ -1,3 +1,29 @@
+/* Copyright (C) 
+ * 2013 - Tomasz Wisniewski
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * 
+ */
+
+
+/**
+ * @file tdelay_common.c
+ *
+ * @brief Timer Delay / Beeper common routines implementation
+ *
+ */
+
 #include "tdelay_common.h"
 
 #include <stdint.h>
@@ -7,14 +33,24 @@
 /* ================================================================================ */
 
 #if TDELAY_IMPLEMENT_T0_INT == 1 || TDELAY_IMPLEMENT_T1_INT == 1 || TDELAY_IMPLEMENT_T2_INT == 1
+
+/**
+ * @brief those variables hold the delay counters for every timer
+ */
 static volatile struct {
+	// how many cycles the delay/tone generation should last
 	volatile uint32_t duration;
+
+	// do we need to reset the CMPA pin ? (True if the timer used as a Beeper)
 	volatile uint8_t reset_cmpa_pin;
 } g_tc[E_TDELAY_TIMER_LAST];
 
 
 /**
  * @brief interrupt context structure
+ *
+ * A common routine is used for all 3 timers and corresponding ISR, this structure is declared
+ *  to help pass the parameters to it
  */
 struct regs {
 	volatile e_timer timer;
@@ -26,6 +62,11 @@ struct regs {
 
 /* ================================================================================ */
 
+/**
+ * @brief Common interrupt service routine for all 3 timers
+ *
+ * @param sregs timer specific register & parameters structure
+ */
 static void _isr_tdelay_handler(volatile struct regs *sregs) {
 
 	if (!g_tc[sregs->timer].duration) {
@@ -33,6 +74,7 @@ static void _isr_tdelay_handler(volatile struct regs *sregs) {
 		*(sregs->timsk) &= ~_BV(1); // OCIEXA
 		*(sregs->tccrb) &= 0xf8;
 
+		// inverted logic if reset_cmpa_pin == 0, the pin will be zeroed
 		if (!g_tc[sregs->timer].reset_cmpa_pin)
 			*(sregs->port) &= ~_BV(sregs->pin);
 	}
@@ -41,7 +83,19 @@ static void _isr_tdelay_handler(volatile struct regs *sregs) {
 	}
 }
 
-static uint8_t __tdc_block(e_timer a_timer, volatile uint8_t *timsk, uint8_t map) {
+/**
+ * @brief this function checks if the timer hasn't expired already
+ *
+ * The purpose is to protect the actual block function from blocking forever, once the
+ *  timer already has expired and disabled it's interrupt
+ *
+ * @param a_timer timer
+ * @param timsk timer interrupt mask register
+ * @param map which bit to check
+ *
+ * @return 1 - if the timer hasn't expired and we should block, 0 otherwise
+ */
+static uint8_t __tdc_block(e_timer a_timer, volatile uint8_t *timsk, uint8_t map) {	
 	if (bit_is_clear((*timsk), map)) {				
 		_tdc_set_duration(a_timer, 0x00);
 		return 0;

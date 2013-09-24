@@ -21,15 +21,16 @@
 
 
 /**
- * @file timer_common.h 
+ * @file tpwm.h 
  *
- * @brief Common API for timers. 
+ * @brief Common API for configuring timers as PWM generators
  *
- * This file provides a common API for timer based delays and beeper API. Some common parts of those two very similar implementations has been extracted in order
- *  to avoid code duplication. This file is based on the timer_common.h API which provides some convenient API over timers which obviously is common as well for both
- *  beeper/tdelay API.
+ * This file provides a common API for timer to provide a PWM functionality.
+ * At the moment this API is incomplete although functional
  * 
- * This file is mainly a private library interface and shouldn't really be used in the code outside the library
+ * @example timer_02.c
+ *
+ * Configure timer as PWM generator
  */
 
 
@@ -60,10 +61,42 @@ typedef enum _e_pwm_freq {
 	E_PWM_FREQ_61		// 8 bit timers
 } e_pwm_freq;
 
-void tpwm_pwm_init(e_timer a_timer);
+
+/**
+ * @brief Configure selected timer to single slope fast PWM mode
+ *
+ * @param a_timer timer to be configured
+ */
 void tpwm_fpwm_init(e_timer a_timer);
-	
+
+
+/**
+ * @brief Configure selected timer to double slope Phase Correct PWM mode
+ *
+ * @param a_timer timer to be configured
+ */
+void tpwm_pwm_init(e_timer a_timer);
+
+
+/**
+ * @brief setup timer, to provide a requested PWM resolution (frequency will be chosen automatically)
+ *
+ * @param a_timer timer to be configured (must be initialized first)
+ * @param a_bitres requested bit resolution
+ *
+ * @return frequency configured
+ */
 uint32_t tpwm_setup_for_bitres(e_timer a_timer, uint8_t a_bitres);
+
+
+/**
+ * @brief setup timer, to provide requested PWM frequency (bit resolution will be chosen automatically)
+ *
+ * @param a_timer timer to be configured (must be initialized first)
+ * @param a_freq requested frequency
+ *
+ * @return bit resolution configured
+ */
 uint8_t tpwm_setup_for_freq(e_timer a_timer, e_pwm_freq a_freq);
 
 #endif /* TPWM_H_IUK1KDC0 */

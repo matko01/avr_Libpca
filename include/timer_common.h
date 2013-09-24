@@ -21,15 +21,19 @@
 
 
 /**
- * @file tdelay_common.h 
+ * @file timer_common.h 
  *
- * @brief Private common API for timer delays & beeper. 
+ * @brief API over Arduino's Timers.
  *
- * This file provides a common API for timer based delays and beeper API. Some common parts of those two very similar implementations has been extracted in order
- *  to avoid code duplication. This file is based on the timer_common.h API which provides some convenient API over timers which obviously is common as well for both
- *  beeper/tdelay API.
- * 
- * This file is mainly a private library interface and shouldn't really be used in the code outside the library
+ * This file provides a simple interface to configure Arduino's timers in most common modes.
+ *
+ * @example timer_01.c
+ *
+ * Enable and Configure timer in CTC mode with custom interrupt service routine
+ *
+ * @example timer_02.c
+ *
+ * Enable and Configure timer for Fast PWM mode
  */
 
 #include "config.h"
@@ -55,7 +59,7 @@ typedef enum _e_timer {
 
 
 /**
- * @brief enable timer interrupt (start counting down)
+ * @brief enable timer interrupt (TIMERX_COMPA_vect)
  *
  * @param a_timer timer
  */
@@ -109,14 +113,14 @@ void _timer_en_oca(e_timer a_timer);
 void _timer_en_ocb(e_timer a_timer);
 
 /**
- * @brief configure given timer to fast pwm mode
+ * @brief configure given timer for fast pwm mode
  *
  * @param a_timer
  */
 void _timer_init_fpwm(e_timer a_timer);
 
 /**
- * @brief configure given timer to phase correct mode
+ * @brief configure given timer for phase correct pwm mode
  *
  * @param a_timer
  */

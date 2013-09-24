@@ -31,7 +31,8 @@
  * For details please refer to the documentation of config.h options
  *
  * This API works in general the same as beeper API. The only difference between those two is that beeper API in addition toggles the OCXA pin of the associated timer in order to
- * generate the requested frequency on the pin. tdelay API does not configure the OCXA pin as output.
+ * generate the requested frequency on the pin. tdelay API does not configure the OCXA pin as output. For all timers only TIMERX_COMPA_vect interrupt is implemented. This implementation
+ * does not take care about COMPB interrupts at all.
  *
  * @example tdelay_01.c
  *
