@@ -46,7 +46,59 @@
  * <li>Timer PWM support</li>
  * <li>ADC API - to be implemented</li>
  * </ul>
+ *
+ * @section Using the documentation
+ *
+ * For details regarding particular functionality please refer directly to a specific interface file.
+ *
+ * @section Compiling with your own project
+ *
+ * It is very simple to use this library with your own project. You can customize the config.h settings, pre-build it and then just simply link your project against
+ *  the static library. Or you can include it as a compilation target in your Makefile. Below is an example Makefile for a simple project haing only one file: main.c.
+ *  The following directory structure has been assumed:
+ *
+ * @verbatim
+ *  .
+ *  | -- project
+ *  | ---- Makefile
+ *  | ---- main.c
+ *  | -- pca
+ *  | ---- ...
+ *
+ * @endverbatim
+ *
+ * @code
+ *
+ * TARGET=project_executable
+ * SOURCES=main.c 
  * 
+ * DEPS=
+ * COBJ=$(SOURCES:.c=.o)
+ * PCA_PREFIX=../pca
+ * 
+ * CC=avr-gcc
+ * OBJC=avr-objcopy
+ * MCU=atmega328p
+ * CFLAGS=-I. -I$(PCA_PREFIX)/include/ -Wall -Os -DF_CPU=16000000UL -std=c99
+ * LDFLAGS=-lpca -L$(PCA_PREFIX)
+ * 
+ * all: $(TARGET)
+ * 
+ * %.o: %.c $(DEPS)
+ * 	@echo -e "\tCC" $<
+ * 	@$(CC) -mmcu=$(MCU) -c -o $@ $< $(CFLAGS)
+ * 
+ * libpca.a:
+ * 	@echo -e "\tBUILDING PURE C ARDUINO LIB"
+ * 	$(MAKE) -C $(PCA_PREFIX)
+ * 
+ * $(TARGET): $(COBJ) libpca.a
+ * 	@echo -e "\tLINKING CC" $<
+ * 	@$(CC) -mmcu=$(MCU) -o $(TARGET) $(COBJ) $(LDFLAGS)
+ * 	$(OBJC) -O ihex -R .eeprom $(TARGET) $(TARGET).hex
+ * 
+ * @endcode
+ *
  */
 
 // ================================================================================
