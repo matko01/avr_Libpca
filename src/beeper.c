@@ -31,6 +31,9 @@ void beeper_init(e_timer a_timer) {
 			break;
 	} // switch
 
+	/**
+	 * @brief inverted logic is used here, because checking for zero produces less code on AVR than for 1 
+	 */
 	_tdc_set_cmp_pin(_tdc_get_tdelay_timer(a_timer), 0x00);
 }
 
@@ -70,6 +73,7 @@ void beeper_beep(e_timer a_timer,
 	_timer_en_compa_int(a_timer);
 }
 
+
 void beeper_off(e_timer a_timer) {
 	switch (a_timer) {
 
@@ -102,6 +106,7 @@ void beeper_off(e_timer a_timer) {
 	} // switch
 	_tdc_set_duration(_tdc_get_tdelay_timer(a_timer), 0x00);
 }
+
 
 inline void beeper_block(e_timer a_timer) {
 	_tdc_block(_tdc_get_tdelay_timer(a_timer));

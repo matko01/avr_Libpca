@@ -87,6 +87,7 @@ typedef enum _e_return {
 
 // ================================================================================
 
+
 /**
  * @brief define NULL just for convenience
  */
@@ -124,6 +125,7 @@ typedef enum _e_return {
 
 // ================================================================================
 
+
 /**
  * @brief return maximum value out of two given
  *
@@ -147,6 +149,7 @@ typedef enum _e_return {
 #define MIN(__x, __y) \
 	( (__x) < (__y) ? (__x) : (__y))
 
+
 // ================================================================================
 
 
@@ -156,5 +159,6 @@ typedef enum _e_return {
  * @return number of bytes available
  */
 uint16_t common_memory_left();
+
 
 #endif /* __COMMON_H__ */

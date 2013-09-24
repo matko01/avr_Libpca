@@ -49,6 +49,8 @@
 /**
  * @brief block execution until the tone fades out
  *
+ * This function is a wrapper over _tdc_block()
+ *
  * @param a_timer timer used for tone generation
  *
  * @return void
