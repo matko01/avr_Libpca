@@ -1,5 +1,12 @@
 #include "common.h"
 
+/**
+ * @file common.c 
+ *
+ * @brief General purpose API's implementation
+ *
+ */
+
 uint16_t common_memory_left () {
   extern int __heap_start, *__brkval; 
   unsigned int v; 

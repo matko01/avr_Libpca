@@ -16,6 +16,14 @@
  * 
  */
 
+
+/**
+ * @file serial.c 
+ *
+ * @brief Serial API Implementation
+ *
+ */
+
 #include <avr/io.h>
 #include <avr/power.h>
 #include <avr/interrupt.h>
@@ -28,20 +36,30 @@
 /* ================================================================================ */
 
 #if SERIAL_IMPLEMENT_RX_INT == 1
-/// serial rx ring buffer
+
+/**
+ * @brief serial RX Ring Buffer definition
+ */
 static volatile t_buffer g_rx_buff;
 #endif
 
 #if SERIAL_IMPLEMENT_TX_INT == 1
-/// serial tx ring buffer
+
+/**
+ * @brief serial TX Ring Buffer definition
+ */
 static volatile t_buffer g_tx_buff;
 #endif
 
 /* ================================================================================ */
 
 #if SERIAL_IMPLEMENT_RX_INT == 1
+
 /**
  * @brief receive USART interrupt
+ *
+ * Data is received in this ISR and placed in the RX ring buffer - if there is still space available.
+ *  If statistics support is enabled those will be updated in this ISR as well
  *
  * @param USART_RX_vect
  */
@@ -50,12 +68,14 @@ ISR(USART_RX_vect, ISR_BLOCK) {
 	// no frame error
 	// UCSR0A must be read before UDR0 !!!
 	if (bit_is_clear(UCSR0A, FE0)) {
-		// must read the data in order to clear the interrupt flag
+		/// must read the data in order to clear the interrupt flag
 		volatile unsigned char data = UDR0;
+
+		/// calculate the next available ring buffer data bucket index
 		volatile unsigned char next =
 		   	((g_rx_buff.head + 1) % SERIAL_RX_RING_SIZE);
 
-		// do not overflow the buffer
+		/// do not overflow the buffer
 		if (next != g_rx_buff.tail) {
 			g_rx_buff.ring[g_rx_buff.head] = data;
 			g_rx_buff.head = next;			
@@ -64,31 +84,38 @@ ISR(USART_RX_vect, ISR_BLOCK) {
 #endif
 		}
 		else {
-			/// increase the dropped counter
 #if SERIAL_COLLECT_STATS == 1
+			/// increase the dropped counter
 			g_rx_buff.stats.dropped++;
 #endif
 		}
 	}
 	else {
-		// must read the data in order to clear the interrupt flag
+		/// must read the data in order to clear the interrupt flag
 		volatile unsigned char data __attribute__((unused)) = UDR0;
 
-		/// increase the frame error counter
 #if SERIAL_COLLECT_STATS == 1
+		/// increase the frame error counter
 		g_rx_buff.stats.frame_error++;
 #endif
 	}
 }
 #endif
 
+
 #if SERIAL_IMPLEMENT_TX_INT == 1
-// TODO implement me
+/// TODO implement me
 #error not yet implemented
 #endif
 
 /* ================================================================================ */
 
+/**
+ * @brief wrapper for stdio, just to make the serial API interface compatible
+ *
+ * @param c character to 'print'
+ * @param stream file stream
+ */
 static void _serial_putc(char c, FILE *stream) {
 	if ('\n' == c) {
 		_serial_putc('\r', stream);
@@ -104,6 +131,14 @@ static void _serial_putc(char c, FILE *stream) {
 
 }
 
+
+/**
+ * @brief wrapper for stdio, just to make the serial API interface compatible
+ *
+ * @param stream 
+ *
+ * @return character received
+ */
 static char _serial_getc(FILE *stream) {
 	unsigned char c = 0x00;
 
@@ -305,6 +340,7 @@ unsigned char serial_getc(unsigned char *a_data) {
 }
 #endif
 
+
 unsigned char serial_poll_recv(unsigned char *a_data, unsigned int a_size) {
 	unsigned int cnt = a_size;
 
@@ -325,6 +361,7 @@ unsigned char serial_poll_recv(unsigned char *a_data, unsigned int a_size) {
 unsigned char serial_poll_getc(unsigned char *a_data) {
 	return serial_poll_recv(a_data, 1);
 }
+
 
 #if SERIAL_IMPLEMENT_TX_INT == 1
 unsigned char serial_send(void *a_data, unsigned int a_size, unsigned char a_waitall) {

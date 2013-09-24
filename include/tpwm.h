@@ -19,6 +19,20 @@
  * 
  */
 
+
+/**
+ * @file timer_common.h 
+ *
+ * @brief Common API for timers. 
+ *
+ * This file provides a common API for timer based delays and beeper API. Some common parts of those two very similar implementations has been extracted in order
+ *  to avoid code duplication. This file is based on the timer_common.h API which provides some convenient API over timers which obviously is common as well for both
+ *  beeper/tdelay API.
+ * 
+ * This file is mainly a private library interface and shouldn't really be used in the code outside the library
+ */
+
+
 #include "config.h"
 #include "common.h"
 #include "timer_common.h"
@@ -46,8 +60,8 @@ typedef enum _e_pwm_freq {
 	E_PWM_FREQ_61		// 8 bit timers
 } e_pwm_freq;
 
-void tpwm_fpwm_init(e_timer a_timer);
 void tpwm_pwm_init(e_timer a_timer);
+void tpwm_fpwm_init(e_timer a_timer);
 	
 uint32_t tpwm_setup_for_bitres(e_timer a_timer, uint8_t a_bitres);
 uint8_t tpwm_setup_for_freq(e_timer a_timer, e_pwm_freq a_freq);

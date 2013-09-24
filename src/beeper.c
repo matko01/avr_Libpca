@@ -1,6 +1,13 @@
 #include "beeper.h"
 #include <avr/io.h>
 
+/**
+ * @file beeper.c 
+ *
+ * @brief Beeper - Tone Generation API implementation
+ *
+ */
+
 
 void beeper_init(e_timer a_timer) {
 

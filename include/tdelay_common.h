@@ -19,6 +19,18 @@
  * 
  */
 
+/**
+ * @file tdelay_common.h 
+ *
+ * @brief Private common API for timer delays & beeper. 
+ *
+ * This file provides a common API for timer based delays and beeper API. Some common parts of those two very similar implementations has been extracted in order
+ *  to avoid code duplication. This file is based on the timer_common.h API which provides some convenient API over timers which obviously is common as well for both
+ *  beeper/tdelay API.
+ * 
+ * This file is mainly a private library interface and shouldn't really be used in the code outside the library
+ */
+
 #include "config.h"
 #include "common.h"
 #include "timer_common.h"
@@ -27,7 +39,11 @@
 /**
  * @brief Since we do not have to use all timers for delays, there is
  *  no need to implement and declare interrupts and data structures for
- * 	every timer. That's why there is a need for tdelay specific denomination
+ * 	every timer. That's why there is a need for tdelay specific denomination.
+ *	
+ * Once can imagine a situation in which only implementation of interrupt for timer 1 has been enabled.
+ * This means that the subscript in the actual array holding the data for timer delays, for timer 1 will be equal to 0, which stands in
+ * contradiction to E_TIMER1 definition. That is why this special denomination has been introduce.
  */
 typedef enum _e_tdelay_timer {
 

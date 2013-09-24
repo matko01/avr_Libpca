@@ -21,6 +21,21 @@
 
 
 /**
+ * @file slip.h 
+ *
+ * @brief API to implement a SLIP protocol over serial line. 
+ *
+ * The reason behind this is to synchronize the receiver and transmitter, so receiver does not loose
+ *  any data send by the transmitter (start to listen a little after transmitter just sent the data) or doesn't receive any junk before the transmitter
+ *  started to send the data itself. For more information about SLIP protocol please refer to RFC 1055 http://www.ietf.org/rfc/rfc1055.txt
+ *
+ * @example serial_04.c
+ *
+ * Using serial port along with SLIP protocol for binary data IO synchronization
+ */
+
+
+/**
  * @brief module version definition (just for internal use, to determine API incompatibilities)
  */
 #define SLIP_VERSION "0.001"
@@ -99,9 +114,9 @@ unsigned char slip_append_crc16(unsigned char *a_buff, unsigned char a_datalen);
  *
  * @param a_buff buffer holding the data
  * @param a_buflen size of the buffer
- * @param a_crcpos position in the buffer where the checksum is located
+ * @param a_crcpos position in the buffer where the checksum is located. The CRC may reside at the end of the buffer (buflen - 2) or at the beginning (0)
  *
- * @return 
+ * @return crc if the checksum verification went successful or 0 if verification failed
  */
 unsigned char slip_verify_crc16(unsigned char *a_buff, unsigned char a_buflen, unsigned char a_crcpos);
 

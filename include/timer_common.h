@@ -19,25 +19,37 @@
  * 
  */
 
+
+/**
+ * @file tdelay_common.h 
+ *
+ * @brief Private common API for timer delays & beeper. 
+ *
+ * This file provides a common API for timer based delays and beeper API. Some common parts of those two very similar implementations has been extracted in order
+ *  to avoid code duplication. This file is based on the timer_common.h API which provides some convenient API over timers which obviously is common as well for both
+ *  beeper/tdelay API.
+ * 
+ * This file is mainly a private library interface and shouldn't really be used in the code outside the library
+ */
+
 #include "config.h"
 #include "common.h"
 
-/**
- * @brief timer prescalers bitmasks
- */
-#define TIMER_PRESCALER_1 0x01
-#define TIMER_PRESCALER_8 0x02
-#define TIMER_PRESCALER_64 0x03
-#define TIMER_PRESCALER_256 0x04
-#define TIMER_PRESCALER_1024 0x05
 
 /**
  * @brief available timers
  */
 typedef enum _e_timer {
+	// 8 bit timer 0
 	E_TIMER0,
+
+	// 16 bit timer 1
 	E_TIMER1,
+
+	// 8 bit timer 2
 	E_TIMER2,
+
+	// used for declaration purposes (denotes total number of timers)
 	E_TIMER_LAST
 } e_timer;
 
