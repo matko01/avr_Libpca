@@ -19,14 +19,37 @@
  * 
  */
 
+
 /**
  * @mainpage Introduction & Library overview
+
+ * The library is at the moment at a very early stage (alpha), but it is functional. The idea behind it is to simplify using Atmega328p peripherals, 
+ * by creating a set of simple routines in order to configure and use it quickly. At the moment it has been tested and developed mostly on Arduino UNO rev 3 board, and 
+ * for the time being is dedicated to this hardware.The library is written completely in C and is dedicated to speed up everyday C coding for Arduino platform without
+ * having a need to use the Arduino Library, which for the cost of simplifying development process (which is good), separates the user from the hardware quite mostly 
+ * (which isn't that good). 
  * 
- * @section TODO 
+ * @section Features
  *
- * @subsection TODO
+ * For the moment the following functionalities are implemented and tested:
+ *
+ * <ul>
+ * <li>Timer Delays (Arduino Library sleep/millis equivalent)</li>
+ * <li>Beeper - Tone generation (Arduino Library tone equiv.)</li>
+ * <li>Serial port support - Interrupt driven data reception, data reception by polling, data transmission by polling</li>
+ * <li>SLIP protocol - serial line data synchronization protocol, to support binary data transfers over serial line</li>
+ * </ul>
+ *
+ * Experimental features (development ongoing)
+ *
+ * <ul>
+ * <li>Timer PWM support</li>
+ * <li>ADC API - to be implemented</li>
+ * </ul>
  * 
  */
+
+// ================================================================================
 
 #include "config.h"
 #include "common.h"
@@ -40,6 +63,7 @@
 #include "beeper.h"
 #include "tpwm.h"
 
+// ================================================================================
 
 #endif /* PCA_H_YDRXPN0M */
 
