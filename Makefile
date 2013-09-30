@@ -16,7 +16,7 @@ CC=avr-gcc
 AR=avr-ar
 STRIP=avr-strip
 MCU=atmega328p
-CFLAGS=-I. -Iinclude/ -Wall -Os -DF_CPU=16000000UL -std=c99
+CFLAGS=-I. -Iinclude/ -Wall -Os -DF_CPU=16000000UL -std=c99 -ffunction-sections
 LDFLAGS=
 
 all: $(TARGET)
