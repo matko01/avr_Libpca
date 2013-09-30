@@ -31,3 +31,14 @@ uint16_t common_memory_left () {
   unsigned int v; 
   return (unsigned int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval); 
 }
+
+
+uint32_t common_abs(int32_t a_value) {
+	int32_t temp = 0x00;
+
+	temp = a_value >> 31;
+	a_value ^= temp;
+	a_value -= temp;
+	
+	return a_value;
+}

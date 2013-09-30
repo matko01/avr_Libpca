@@ -161,4 +161,13 @@ typedef enum _e_return {
 uint16_t common_memory_left();
 
 
+/**
+ * @brief calculate the absolute value of the number
+ *
+ * @param a_value positive/negative signed value
+ *
+ * @return absolute unsigned value
+ */
+uint32_t common_abs(int32_t a_value);
+
 #endif /* __COMMON_H__ */
