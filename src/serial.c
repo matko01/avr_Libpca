@@ -111,16 +111,20 @@ ISR(USART_RX_vect, ISR_BLOCK) {
  * @param USART_TX_vect
  * @param ISR_BLOCK
  */
-ISR(USART_TX_vect, ISR_BLOCK) {
+ISR(USART_UDRE_vect, ISR_BLOCK) {
 	
 	// proceed if there still is data to be send
 	if (g_tx_buff.head != g_tx_buff.tail) {
-		UDR0 = g_tx_buff[g_tx_buff.tail];
+		UDR0 = g_tx_buff.ring[g_tx_buff.tail];
 		g_tx_buff.tail = (g_tx_buff.tail + 1) % SERIAL_TX_RING_SIZE;
 
 #if SERIAL_COLLECT_STATS == 1
 		g_tx_buff.stats.ok++;
 #endif
+	}
+	else {
+		// mask the interrupt everything has been send
+		UCSR0B &= ~_BV(UDRIE0);
 	}
 }
 #endif
@@ -274,8 +278,8 @@ e_return serial_init(uint32_t a_speed) {
 
 void serial_install_interrupts(e_serial_flags a_flags) {
 
-	// disable data register empty interrupt
-	UCSR0B &= ~_BV(UDRIE0);
+	// disable transmission complete interrupt
+	UCSR0B &= ~_BV(TXCIE0);
 
 #if SERIAL_IMPLEMENT_RX_INT == 1
 	if (a_flags & E_FLAGS_SERIAL_RX_INTERRUPT) {
@@ -286,7 +290,8 @@ void serial_install_interrupts(e_serial_flags a_flags) {
 
 #if SERIAL_IMPLEMENT_TX_INT == 1
 	if (a_flags & E_FLAGS_SERIAL_TX_INTERRUPT) {
-		UCSR0B |= _BV(TXCIE0);
+		// do nothing, the interrupt will be enable whenever the characters are
+		// queued to send
 	}
 #endif
 
@@ -384,14 +389,65 @@ unsigned char serial_poll_getc(unsigned char *a_data) {
 
 #if SERIAL_IMPLEMENT_TX_INT == 1
 unsigned char serial_send(void *a_data, unsigned int a_size, unsigned char a_waitall) {
+	uint8_t n = 0x00;
+	uint8_t *data = (uint8_t *)a_data;
+	uint8_t initiated = 0x00;
 
-	return 0;
+	while (a_size) {
+		volatile unsigned char next =
+		   	((g_tx_buff.head + 1) % SERIAL_TX_RING_SIZE);
+
+		/// do not overflow the buffer
+		if (next != g_tx_buff.tail) {
+			g_tx_buff.ring[g_tx_buff.head] = *data;
+			g_tx_buff.head = next;			
+		}
+		else {
+			if (a_waitall) {
+				if (!initiated) {
+					initiated = 0x01;
+
+					// enable data register empty interrupt
+					UCSR0B |= _BV(UDRIE0);
+				}
+				continue;
+			}
+			else
+				break;
+		}
+
+		a_size--;
+		n++;
+		data++;
+	}
+
+	if (!a_waitall || !initiated) {
+		initiated = 0x01;
+		// enable data register empty interrupt
+		UCSR0B |= _BV(UDRIE0);
+	}
+
+	return n;
 }
 
 
 unsigned char serial_sendc(unsigned char a_data) {
-	// this is exact;y the same for a single character as in polling method
-	return serial_poll_send((void *)&a_char, 1);
+
+	uint8_t n = 0x00;
+	uint8_t next =
+		((g_tx_buff.head + 1) % SERIAL_TX_RING_SIZE);
+
+	/// do not overflow the buffer
+	if (next != g_tx_buff.tail) {
+		g_tx_buff.ring[g_tx_buff.head] = a_data;
+		g_tx_buff.head = next;
+		n = 1;
+
+		// enable data register empty interrupt
+		UCSR0B |= _BV(UDRIE0);
+	}
+
+	return n;
 }
 #endif
 
