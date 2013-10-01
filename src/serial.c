@@ -104,8 +104,25 @@ ISR(USART_RX_vect, ISR_BLOCK) {
 
 
 #if SERIAL_IMPLEMENT_TX_INT == 1
-/// TODO implement me
-#error not yet implemented
+
+/**
+ * @brief transmission complete interrupt
+ *
+ * @param USART_TX_vect
+ * @param ISR_BLOCK
+ */
+ISR(USART_TX_vect, ISR_BLOCK) {
+	
+	// proceed if there still is data to be send
+	if (g_tx_buff.head != g_tx_buff.tail) {
+		UDR0 = g_tx_buff[g_tx_buff.tail];
+		g_tx_buff.tail = (g_tx_buff.tail + 1) % SERIAL_TX_RING_SIZE;
+
+#if SERIAL_COLLECT_STATS == 1
+		g_tx_buff.stats.ok++;
+#endif
+	}
+}
 #endif
 
 /* ================================================================================ */
@@ -257,17 +274,19 @@ e_return serial_init(uint32_t a_speed) {
 
 void serial_install_interrupts(e_serial_flags a_flags) {
 
+	// disable data register empty interrupt
+	UCSR0B &= ~_BV(UDRIE0);
+
 #if SERIAL_IMPLEMENT_RX_INT == 1
 	if (a_flags & E_FLAGS_SERIAL_RX_INTERRUPT) {
 		// enable receive interrupt
 		UCSR0B |= _BV(RXCIE0);
-		UCSR0B &= ~_BV(UDRIE0);
 	}
 #endif
 
 #if SERIAL_IMPLEMENT_TX_INT == 1
 	if (a_flags & E_FLAGS_SERIAL_TX_INTERRUPT) {
-		// TODO implement me
+		UCSR0B |= _BV(TXCIE0);
 	}
 #endif
 
@@ -365,14 +384,14 @@ unsigned char serial_poll_getc(unsigned char *a_data) {
 
 #if SERIAL_IMPLEMENT_TX_INT == 1
 unsigned char serial_send(void *a_data, unsigned int a_size, unsigned char a_waitall) {
-// TODO implement me
+
 	return 0;
 }
 
 
 unsigned char serial_sendc(unsigned char a_data) {
-// TODO implement me
-	return 0;
+	// this is exact;y the same for a single character as in polling method
+	return serial_poll_send((void *)&a_char, 1);
 }
 #endif
 

@@ -52,7 +52,7 @@
  * Serial transmission will be only possible character by character without any buffering,
  * using only polling mechanisms
  */
-#define SERIAL_IMPLEMENT_TX_INT 0
+#define SERIAL_IMPLEMENT_TX_INT 1
 
 /**
  * @brief 1 - STDIN data will be received by polling, 0 - interrupts
@@ -62,7 +62,7 @@
 /**
  * @brief 1 - STDOUT data will be sent by polling, 0 - interrupts
  */
-#define SERIAL_STDOUT_POLL 1
+#define SERIAL_STDOUT_POLL 0
 
 /**
  * @brief RX ring buffer size if SERIAL_IMPLEMENT_RX_INT == 1
