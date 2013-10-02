@@ -45,9 +45,26 @@ typedef enum _e_adc_ref {
 } e_adc_ref;
 
 
-void adc_init();
+typedef enum _e_adc_mode {
+	E_SINGLE_SHOT = 0,
+	E_AT_FREERUN,
+	E_AT_AC,
+	E_AT_EINT0,
+	E_AT_TIMER0_COMPA,
+	E_AT_TIMER0_OVFL,
+	E_AT_TIMER1_COMPB,
+	E_AT_TIMER1_OVFL,
+	E_AT_TIMER1_CAPTURE_EVENT,
+
+	E_MODE_LAST
+} e_adc_mode;
+
+
+void adc_init(e_adc_mode a_mode);
 void adc_channel_set(uint8_t a_channel);
 void adc_reference_set(e_adc_ref a_ref);
+
+uint16_t adc_result_get();
 
 
 #endif /* end of include guard: ADC_H_W6GMC45G */
