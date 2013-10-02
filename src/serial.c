@@ -446,6 +446,11 @@ unsigned char serial_sendc(unsigned char a_data) {
 		// enable data register empty interrupt
 		UCSR0B |= _BV(UDRIE0);
 	}
+#if SERIAL_COLLECT_STATS == 1
+	else {
+		g_tx_buff.stats.dropped++;
+	}
+#endif
 
 	return n;
 }
