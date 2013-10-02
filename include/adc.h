@@ -34,27 +34,58 @@
 #include "common.h"
 
 
+/**
+ * @brief assemble the measurements results in the ADC registers
+ * into a single 16 bit value
+ *
+ * @param __data measurement result
+ *
+ */
 #define _adc_result_assemble(__data) \
 	__data = ADCL; \
 	__data |= (ADCH << 8)
 
 
+/**
+ * @brief enable digital input buffer on the ADC port
+ *
+ * @param __input port number
+ *
+ */
 #define adc_di_enable(__input) \
 	DIDR0 &= ~_BV(__input)
 
 
+/**
+ * @brief disable digital input buffer on the ADC port
+ *
+ * @param __input input port number
+ *
+ */
 #define adc_di_disable(__input) \
 	DIDR0 |= _BV(__input)
 
 
+/**
+ * @brief Configure the ADCs prescaler
+ *
+ * @param __prescaler prescaler
+ *
+ */
 #define adc_prescaler_set(__prescaler) \
 	ADCSRA = ((__prescaler & 0x07) | (ADCSRA & 0xf8))
 
 
+/**
+ * @brief Enable ADC interrupt 
+ */
 #define adc_interrupt_enable() \
 	ADCSRA |= _BV(ADIE)
 	
 
+/**
+ * @brief Disable ADC interrupt
+ */
 #define adc_interrupt_disable() \
 	ADCSRA &= ~_BV(ADIE)
 
@@ -117,11 +148,41 @@ typedef enum _e_adc_mode {
 void adc_init(e_adc_mode a_mode);
 
 
+/**
+ * @brief set ADC multiplexer to a specified channel
+ *
+ * @param a_channel channel (0-8)
+ */
 void adc_channel_set(uint8_t a_channel);
+
+
+/**
+ * @brief set ADC analog reference voltage source
+ *
+ * @param a_ref reference voltage source
+ */
 void adc_reference_set(e_adc_ref a_ref);
+
+
+/**
+ * @brief configure ADC to take measurements out of internal
+ *  ADC temperature sensor
+ */
 void adc_temperature_sensor_enable();
 
+
+/**
+ * @brief trigger the conversion in manual mode or trigger the first conversion when
+ *  free running mode is enabled
+ */
 void adc_conversion_trigger();
+
+
+/**
+ * @brief read the convertion result from ADC
+ *
+ * @return ADC conversion result
+ */
 uint16_t adc_result_get();
 
 
