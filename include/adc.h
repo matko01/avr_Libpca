@@ -54,8 +54,12 @@
  * @brief enumeration defining possible analog reference voltage sources
  */
 typedef enum _e_adc_ref {
-	E_ADC_INTERNAL_AREF = 0x00,
+	// voltage provided to external AREF pin
+	E_ADC_EXTERNAL_AREF = 0x00,
+
+	// use analog voltage Vcc as reference (5V)
 	E_ADC_EXTERNAL_AVCC,
+	
 	/// internal 1.1 analog reference will be used
 	E_ADC_REF_INTERNAL_11 = 0x03
 } e_adc_ref;

@@ -26,6 +26,7 @@ void adc_init(e_adc_mode a_mode) {
 		ADCSRB = 0x00;			
 	}
 	else {
+		// set the appropriate mode
 		ADCSRB = (a_mode - 1);
 		// enable auto-trigger mode
 		ADCSRA = _BV(ADATE);
