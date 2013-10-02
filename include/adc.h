@@ -28,6 +28,8 @@
  *
  * This file provides a basic API to use the Atmega328p analog to digital converter
  *
+ * @example adc_01.c
+ *
  */
 
 
