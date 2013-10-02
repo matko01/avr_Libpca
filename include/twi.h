@@ -20,5 +20,16 @@
  */
 
 
+/**
+ * @file twi.h 
+ *
+ * @brief API for configure Atmega's TWI peripheral
+ *
+ * @example twi_01.c
+ *
+ * Using the twi interface to communicate with i2c device
+ */
+
+
 #endif /* end of include guard: TWI_H_V8WDZFBC */
 
