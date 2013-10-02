@@ -59,29 +59,64 @@
 	ADCSRA &= ~_BV(ADIE)
 
 
+/**
+ * @brief enumeration defining possible analog reference voltage sources
+ */
 typedef enum _e_adc_ref {
 	E_ADC_INTERNAL_AREF = 0x00,
 	E_ADC_EXTERNAL_AVCC,
+	/// internal 1.1 analog reference will be used
 	E_ADC_REF_INTERNAL_11 = 0x03
 } e_adc_ref;
 
 
+/**
+ * @brief possible ADC operational modes
+ */
 typedef enum _e_adc_mode {
+	/// single shot mode, ADC won't be re-triggered
 	E_SINGLE_SHOT = 0,
+
+	/// free running mode. ADC will be re-triggered constantly after every conversion
 	E_AT_FREERUN,
+
+	/// analog comparator re-trigger
 	E_AT_AC,
+
+	/// external interrupt re-trigger
 	E_AT_EINT0,
+
+	/// Timer0 Compare A re-trigger
 	E_AT_TIMER0_COMPA,
+
+	/// Timer0 Overflow re-trigger
 	E_AT_TIMER0_OVFL,
+
+	/// Timer1 Compare B re-trigger
 	E_AT_TIMER1_COMPB,
+
+	/// Timer1 Overflow re-trigger
 	E_AT_TIMER1_OVFL,
+
+	/// Timer1 Capture event re-trigger
 	E_AT_TIMER1_CAPTURE_EVENT,
 
-	E_MODE_LAST
+	/// enumeration counter
+	E_AT_MODE_LAST
 } e_adc_mode;
 
 
+/**
+ * @brief initialize ADC to most generic settings
+ *
+ * Enables power to ADC peripheral, selects channel 0,
+ * disables ADC interrupt and selects the F_CPU/128 prescaler
+ *
+ * @param a_mode mode to which ADC will be configured
+ */
 void adc_init(e_adc_mode a_mode);
+
+
 void adc_channel_set(uint8_t a_channel);
 void adc_reference_set(e_adc_ref a_ref);
 void adc_temperature_sensor_enable();

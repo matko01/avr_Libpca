@@ -52,10 +52,12 @@ uint16_t adc_result_get() {
 	return res;	
 }
 
+
 void adc_conversion_trigger() {
 	ADCSRA |= _BV(ADSC);
 	while ((ADCSRA & _BV(ADSC)));
 }
+
 
 void adc_temperature_sensor_enable() {
 	adc_channel_set(0x08);
