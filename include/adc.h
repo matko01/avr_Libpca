@@ -31,6 +31,14 @@
  */
 
 
+#include "common.h"
+
+
+#define _adc_result_assemble(__data) \
+	__data = ADCL; \
+	__data |= (ADCH << 8)
+
+
 #define adc_di_enable(__input) \
 	DIDR0 &= ~_BV(__input)
 
@@ -39,9 +47,22 @@
 	DIDR0 |= _BV(__input)
 
 
+#define adc_prescaler_set(__prescaler) \
+	ADCSRA = ((__prescaler & 0x07) | (ADCSRA & 0xf8))
+
+
+#define adc_interrupt_enable() \
+	ADCSRA |= _BV(ADIE)
+	
+
+#define adc_interrupt_disable() \
+	ADCSRA &= ~_BV(ADIE)
+
+
 typedef enum _e_adc_ref {
-	E_ADC_EXTERNAL_AREF,
-	E_ADC_REF_INTERNAL_11
+	E_ADC_INTERNAL_AREF = 0x00,
+	E_ADC_EXTERNAL_AVCC,
+	E_ADC_REF_INTERNAL_11 = 0x03
 } e_adc_ref;
 
 
@@ -63,8 +84,11 @@ typedef enum _e_adc_mode {
 void adc_init(e_adc_mode a_mode);
 void adc_channel_set(uint8_t a_channel);
 void adc_reference_set(e_adc_ref a_ref);
+void adc_temperature_sensor_enable();
 
+void adc_conversion_trigger();
 uint16_t adc_result_get();
+
 
 
 #endif /* end of include guard: ADC_H_W6GMC45G */

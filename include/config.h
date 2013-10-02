@@ -103,16 +103,6 @@
  */
 #define TDELAY_IMPLEMENT_T2_INT 0
 
-// ===================================== ADC ======================================
-
-/**
- * @brief change to 0 if to disable the implementation of Conversion Complete interrupt
- *
- * If it's defined as 1, the results will be updated by the interrupt routine, otherwise, the ADSC flag
- * will be polled in order to determine if the conversion has been completed
- */
-#define ADC_IMPLEMENT_CONV_COMPLETE_INT 1
-
 // ================================================================================
 
 
