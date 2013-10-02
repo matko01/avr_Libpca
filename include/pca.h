@@ -114,6 +114,7 @@
 #include "tdelay.h"
 #include "beeper.h"
 #include "tpwm.h"
+#include "adc.h"
 
 // ================================================================================
 

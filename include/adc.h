@@ -31,6 +31,14 @@
  */
 
 
+#define adc_di_enable(__input) \
+	DIDR0 &= ~_BV(__input)
+
+
+#define adc_di_disable(__input) \
+	DIDR0 |= _BV(__input)
+
+
 typedef enum _e_adc_ref {
 	E_ADC_EXTERNAL_AREF,
 	E_ADC_REF_INTERNAL_11
