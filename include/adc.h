@@ -31,8 +31,15 @@
  */
 
 
+typedef enum _e_adc_ref {
+	E_ADC_EXTERNAL_AREF,
+	E_ADC_REF_INTERNAL_11
+} e_adc_ref;
+
+
 void adc_init();
-void adc_select_channel(uint8_t a_channel);
+void adc_channel_set(uint8_t a_channel);
+void adc_reference_set(e_adc_ref a_ref);
 
 
 #endif /* end of include guard: ADC_H_W6GMC45G */

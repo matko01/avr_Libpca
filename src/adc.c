@@ -1,5 +1,6 @@
 #include "adc.h"
 
+#include <avr/power.h>
 
 /**
  * @file adc.c 
@@ -13,10 +14,17 @@
 
 void adc_init() {
 
+	power_adc_enable();
+
 }
 
 
 
-void adc_select_channel(uint8_t a_channel) {
+void adc_channel_set(uint8_t a_channel) {
 
+}
+
+
+void adc_reference_set(e_adc_ref a_ref) {
+	
 }
