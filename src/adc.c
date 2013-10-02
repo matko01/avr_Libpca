@@ -2,6 +2,7 @@
 
 #include <avr/power.h>
 
+
 /**
  * @file adc.c 
  *
@@ -33,29 +34,6 @@ void adc_init(e_adc_mode a_mode) {
 	// set data format, internal reference and channel zero by default
 	ADMUX = 0x00;
 	ADMUX &= ~_BV(ADLAR);
-}
-
-
-void adc_channel_set(uint8_t a_channel) {
-	ADMUX = (a_channel & 0x0f) | (ADMUX & 0xf0);
-}
-
-
-void adc_reference_set(e_adc_ref a_ref) {
-	ADMUX = (ADMUX & 0x3f) | a_ref;
-}
-
-
-uint16_t adc_result_get() {
-	uint16_t res = 0x00;
-	_adc_result_assemble(res);
-	return res;	
-}
-
-
-void adc_conversion_trigger() {
-	ADCSRA |= _BV(ADSC);
-	while ((ADCSRA & _BV(ADSC)));
 }
 
 

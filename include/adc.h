@@ -46,48 +46,6 @@
 	__data |= (ADCH << 8)
 
 
-/**
- * @brief enable digital input buffer on the ADC port
- *
- * @param __input port number
- *
- */
-#define adc_di_enable(__input) \
-	DIDR0 &= ~_BV(__input)
-
-
-/**
- * @brief disable digital input buffer on the ADC port
- *
- * @param __input input port number
- *
- */
-#define adc_di_disable(__input) \
-	DIDR0 |= _BV(__input)
-
-
-/**
- * @brief Configure the ADCs prescaler
- *
- * @param __prescaler prescaler
- *
- */
-#define adc_prescaler_set(__prescaler) \
-	ADCSRA = ((__prescaler & 0x07) | (ADCSRA & 0xf8))
-
-
-/**
- * @brief Enable ADC interrupt 
- */
-#define adc_interrupt_enable() \
-	ADCSRA |= _BV(ADIE)
-	
-
-/**
- * @brief Disable ADC interrupt
- */
-#define adc_interrupt_disable() \
-	ADCSRA &= ~_BV(ADIE)
 
 
 /**
@@ -153,7 +111,8 @@ void adc_init(e_adc_mode a_mode);
  *
  * @param a_channel channel (0-8)
  */
-void adc_channel_set(uint8_t a_channel);
+#define adc_channel_set(__channel) \
+	ADMUX = ((__channel & 0x0f) | (ADMUX & 0xf0))
 
 
 /**
@@ -161,7 +120,8 @@ void adc_channel_set(uint8_t a_channel);
  *
  * @param a_ref reference voltage source
  */
-void adc_reference_set(e_adc_ref a_ref);
+#define adc_reference_set(__ref) \
+	ADMUX = ((ADMUX & 0x3f) | __ref)
 
 
 /**
@@ -172,10 +132,65 @@ void adc_temperature_sensor_enable();
 
 
 /**
+ * @brief enable digital input buffer on the ADC port
+ *
+ * @param __input port number
+ *
+ */
+#define adc_di_enable(__input) \
+	DIDR0 &= ~_BV(__input)
+
+
+/**
+ * @brief disable digital input buffer on the ADC port
+ *
+ * @param __input input port number
+ *
+ */
+#define adc_di_disable(__input) \
+	DIDR0 |= _BV(__input)
+
+
+/**
+ * @brief Configure the ADCs prescaler
+ *
+ * @param __prescaler prescaler
+ *
+ */
+#define adc_prescaler_set(__prescaler) \
+	ADCSRA = ((__prescaler & 0x07) | (ADCSRA & 0xf8))
+
+
+/**
+ * @brief Enable ADC interrupt 
+ */
+#define adc_interrupt_enable() \
+	ADCSRA |= _BV(ADIE)
+	
+
+/**
+ * @brief Disable ADC interrupt
+ */
+#define adc_interrupt_disable() \
+	ADCSRA &= ~_BV(ADIE)
+
+
+/**
  * @brief trigger the conversion in manual mode or trigger the first conversion when
  *  free running mode is enabled
  */
-void adc_conversion_trigger();
+#define adc_conversion_trigger() \
+	ADCSRA |= _BV(ADSC)
+
+
+/**
+ * @brief read the convertion result from ADC. Wait until ADSC flag becomes 0
+ *
+ * @return ADC conversion result
+ */
+#define adc_result_poll_get(__result) \
+	while ((ADCSRA & _BV(ADSC))); \
+	_adc_result_assemble(__result)
 
 
 /**
@@ -183,7 +198,8 @@ void adc_conversion_trigger();
  *
  * @return ADC conversion result
  */
-uint16_t adc_result_get();
+#define adc_result_get(__result) \
+	_adc_result_assemble(__result)
 
 
 
