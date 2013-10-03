@@ -1,5 +1,6 @@
 TARGET=libpca.a
 SOURCES= \
+		adc.c \
 		serial.c \
 		common.c \
 		slip.c \
