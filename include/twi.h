@@ -31,5 +31,12 @@
  */
 
 
+#define TWI_STATUS_START 			0x08
+#define TWI_STATUS_REPEATED_START 	0x10
+#define TWI_STATUS_MT_SLA_ACK 		0x18
+#define TWI_STATUS_MT_DATA_ACK 		0x28
+#define TWI_STATUS_MR_SLA_ACK 		0x40
+
+
 #endif /* end of include guard: TWI_H_V8WDZFBC */
 
