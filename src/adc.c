@@ -32,9 +32,10 @@ void adc_init(e_adc_mode a_mode) {
 		ADCSRA = _BV(ADATE);
 	}
 
-	// set data format, internal reference and channel zero by default
+	// set data format, Vcc reference and channel zero by default
 	ADMUX = 0x00;
 	ADMUX &= ~_BV(ADLAR);
+	adc_reference_set(E_ADC_EXTERNAL_AVCC);
 }
 
 

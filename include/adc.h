@@ -34,7 +34,8 @@
 
 
 #include "common.h"
-
+#include <avr/io.h>
+#include <stdio.h>
 
 /**
  * @brief assemble the measurements results in the ADC registers
@@ -118,7 +119,8 @@ void adc_init(e_adc_mode a_mode);
  * @param a_channel channel (0-8)
  */
 #define adc_channel_set(__channel) \
-	ADMUX = ((__channel & 0x0f) | (ADMUX & 0xf0))
+	ADMUX &= 0xf0; \
+	ADMUX |= (__channel & 0x0f)
 
 
 /**
@@ -127,7 +129,8 @@ void adc_init(e_adc_mode a_mode);
  * @param a_ref reference voltage source
  */
 #define adc_reference_set(__ref) \
-	ADMUX = ((ADMUX & 0x3f) | __ref)
+	ADMUX &= 0x3f; \
+	ADMUX |= ((__ref & 0x03) << 6)
 
 
 /**
@@ -164,7 +167,8 @@ void adc_temperature_sensor_enable();
  *
  */
 #define adc_prescaler_set(__prescaler) \
-	ADCSRA = ((__prescaler & 0x07) | (ADCSRA & 0xf8))
+	ADCSRA &= 0xf8; \
+	ADCSRA |= (__prescaler & 0x07)
 
 
 /**
