@@ -84,7 +84,7 @@
  *
  * @return number of characters received
  */
-unsigned char slip_recv(unsigned char *a_buff, unsigned char a_buflen);
+uint8_t slip_recv(uint8_t *a_buff, uint8_t a_buflen);
 
 
 /**
@@ -95,7 +95,7 @@ unsigned char slip_recv(unsigned char *a_buff, unsigned char a_buflen);
  *
  * @return number of bytes sent
  */
-unsigned char slip_send(unsigned char *a_buff, unsigned char a_buflen);
+uint8_t slip_send(uint8_t *a_buff, uint8_t a_buflen);
 
 
 /**
@@ -106,7 +106,7 @@ unsigned char slip_send(unsigned char *a_buff, unsigned char a_buflen);
  *
  * @return buffer size with CRC16 (a_datalen +2)
  */
-unsigned char slip_append_crc16(unsigned char *a_buff, unsigned char a_datalen);
+uint8_t slip_append_crc16(uint8_t *a_buff, uint8_t a_datalen);
 
 
 /**
@@ -118,7 +118,7 @@ unsigned char slip_append_crc16(unsigned char *a_buff, unsigned char a_datalen);
  *
  * @return crc if the checksum verification went successful or 0 if verification failed
  */
-unsigned char slip_verify_crc16(unsigned char *a_buff, unsigned char a_buflen, unsigned char a_crcpos);
+uint8_t slip_verify_crc16(uint8_t *a_buff, uint8_t a_buflen, uint8_t a_crcpos);
 
 
 #endif /* __SLIP_H__ */

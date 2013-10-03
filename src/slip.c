@@ -28,11 +28,11 @@
 #include <util/crc16.h>
 #include <string.h>
 
-unsigned char slip_recv(unsigned char *a_buff, unsigned char a_buflen) {
+uint8_t slip_recv(uint8_t *a_buff, uint8_t a_buflen) {
 	
-	unsigned char c = 0x00;
-	unsigned int recv = 0x00;
-	unsigned char mode = 0x00;
+	uint8_t c = 0x00;
+	uint16_t recv = 0x00;
+	uint8_t mode = 0x00;
 
 	// collect a full slip packet
 	while (1) {
@@ -77,9 +77,9 @@ unsigned char slip_recv(unsigned char *a_buff, unsigned char a_buflen) {
 }
 
 
-unsigned char slip_send(unsigned char *a_buff, unsigned char a_buflen) {
+uint8_t slip_send(uint8_t *a_buff, uint8_t a_buflen) {
 
-	unsigned char send = a_buflen;
+	uint8_t send = a_buflen;
 
 	// flush buffers at the receiving side
 	SLIP_CHAR_SEND(SLIP_END);
@@ -114,7 +114,7 @@ unsigned char slip_send(unsigned char *a_buff, unsigned char a_buflen) {
 }
 
 
-unsigned char slip_verify_crc16(unsigned char *a_buff, unsigned char a_buflen, unsigned char a_crcpos) {
+uint8_t slip_verify_crc16(uint8_t *a_buff, uint8_t a_buflen, uint8_t a_crcpos) {
 	
 	uint16_t crc_recv = 0x00;
 	uint16_t crc_calcd = 0x00;
@@ -139,7 +139,7 @@ unsigned char slip_verify_crc16(unsigned char *a_buff, unsigned char a_buflen, u
 }
 
 
-unsigned char slip_append_crc16(unsigned char *a_buff, unsigned char a_datalen) {
+uint8_t slip_append_crc16(uint8_t *a_buff, uint8_t a_datalen) {
 
 	uint16_t crc_calcd = 0x00;
 	
