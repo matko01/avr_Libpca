@@ -16,7 +16,13 @@ struct soft_ow {
 
 void sow_init(struct soft_ow *a_bus);
 void sow_string_pullup(struct soft_ow *a_bus, uint8_t a_enable);
+
 uint8_t sow_reset(struct soft_ow *a_bus);
+
+uint8_t sow_read_byte(struct soft_ow *a_bus);
+uint8_t sow_write_byte(struct soft_ow *a_bus, uint8_t a_byte);
+uint8_t sow_read_data(struct soft_ow *a_bus, uint8_t *a_data, uint8_t a_maxlen);
+uint8_t sow_write_data(struct soft_ow *a_bus, uint8_t *a_data, uint8_t a_len);
 
 #endif /* end of include guard: SOFT_ONEWIRE_H_ZBD6VGNS */
 

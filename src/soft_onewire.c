@@ -20,6 +20,15 @@
 	*__port &= ~_BV(__pin)
 
 
+/* ================================================================================ */
+
+
+static uint8_t _sow_write_bit(struct soft_ow *a_bus, uint8_t a_bit);
+static uint8_t _sow_read_bit(struct soft_ow *a_bus);
+
+
+/* ================================================================================ */
+
 
 void sow_init(struct soft_ow *a_bus) {
 
@@ -70,33 +79,86 @@ uint8_t sow_reset(struct soft_ow *a_bus) {
 }
 
 
-static uint8_t ow_write_bit(uint8_t a_bit) {
+uint8_t sow_write_byte(struct soft_ow *a_bus, uint8_t a_byte) {
+	uint8_t n = 0;
+
+	for (; n<8; n++) {
+		_sow_write_bit(a_bus, ((a_byte >> n) & 0x01));
+	}
+	
+	return 1;
+}
+
+
+uint8_t sow_read_byte(struct soft_ow *a_bus) {
+	uint8_t n = 0;
+	uint8_t data = 0x00;
+
+	for (; n<8; n++) {
+		if (_sow_read_bit(a_bus)) data |= (0x01 << n);
+	}
+	
+	return data;
+}
+
+
+uint8_t sow_write_data(struct soft_ow *a_bus, uint8_t *a_data, uint8_t a_len) {
+	uint8_t n = a_len;
+
+	while (a_len--) {
+		sow_write_byte(a_bus, *a_data);
+		a_data++;
+	}
+
+	return n;
+}
+
+
+uint8_t sow_read_data(struct soft_ow *a_bus, uint8_t *a_data, uint8_t a_maxlen) {
+	uint8_t n = a_maxlen;
+
+	while (a_maxlen--) {
+		*a_data = sow_read_byte(a_bus);
+		a_data++;
+	}
+
+	return n;
+}
+
+
+/* ================================================================================ */
+
+
+static uint8_t _sow_write_bit(struct soft_ow *a_bus, uint8_t a_bit) {
 	
 	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-		OW_OUTPUT;
-		OW_LOW;
+		SOW_OUTPUT(a_bus->ddr, a_bus->pin);
+		SOW_LOW(a_bus->outp, a_bus->pin);
+
 		_delay_us(5); // max 15
+		
 		if (a_bit & 0x01)
-			OW_INPUT;
+			SOW_INPUT(a_bus->ddr, a_bus->pin);
 
 		_delay_us(80);
-		OW_INPUT;
+		SOW_INPUT(a_bus->ddr, a_bus->pin);
 	}
 	return 1;
 }
 
 
-static uint8_t ow_read_bit() {
+static uint8_t _sow_read_bit(struct soft_ow *a_bus) {
 	uint8_t bit = 0;
 
 	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-		OW_OUTPUT;
-		OW_LOW;
+		SOW_OUTPUT(a_bus->ddr, a_bus->pin);
+		SOW_LOW(a_bus->outp, a_bus->pin);
+
 		_delay_us(1); // >= 1
-		OW_INPUT;
+		SOW_INPUT(a_bus->ddr, a_bus->pin);
 
 		_delay_us(12); // sample within 15u slot
-		if (bit_is_set(OW_PORTI, OW_PIN))
+		if (bit_is_set(a_bus->inp, a_bus->pin))
 			bit = 1;
 
 		// time slot duration
@@ -108,3 +170,4 @@ static uint8_t ow_read_bit() {
 	return bit;
 }
 
+/* ================================================================================ */
