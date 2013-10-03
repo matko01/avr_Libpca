@@ -115,6 +115,8 @@
 #include "beeper.h"
 #include "tpwm.h"
 
+#include "soft_onewire.h"
+
 // ================================================================================
 
 #endif /* PCA_H_YDRXPN0M */
