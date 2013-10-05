@@ -9,9 +9,9 @@
  */
 struct soft_ow {
 	uint8_t pin; // the pin number
-	uint8_t *ddr; // DDRX
-	uint8_t *inp; // PINX
-	uint8_t *outp; // PORTX
+	volatile uint8_t *ddr; // DDRX
+	volatile uint8_t *inp; // PINX
+	volatile uint8_t *outp; // PORTX
 };
 
 
@@ -32,7 +32,7 @@ void sow_init(struct soft_ow *a_bus);
  * @param a_bus bus descriptor
  * @param a_enable 1 - enable pull-up, 0 - disable
  */
-void sow_string_pullup(struct soft_ow *a_bus, uint8_t a_enable);
+void sow_strong_pullup(struct soft_ow *a_bus, uint8_t a_enable);
 
 
 /**

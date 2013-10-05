@@ -5,19 +5,19 @@
 
 
 #define SOW_OUTPUT(__ddr, __pin) \
-	*__ddr |= _BV(__pin)
+	(*__ddr) |= _BV(__pin)
 
 
 #define SOW_INPUT(__ddr, __pin) \
-	*__ddr &= ~_BV(__pin)
+	(*__ddr) &= ~_BV(__pin)
 
 
 #define SOW_HIGH(__port, __pin) \
-	*__port |= _BV(__pin)
+	(*__port) |= _BV(__pin)
 
 
 #define SOW_LOW(__port, __pin) \
-	*__port &= ~_BV(__pin)
+	(*__port) &= ~_BV(__pin)
 
 
 /* ================================================================================ */
@@ -43,7 +43,7 @@ void sow_init(struct soft_ow *a_bus) {
 }
 
 
-void sow_string_pullup(struct soft_ow *a_bus, uint8_t a_enable) {
+void sow_strong_pullup(struct soft_ow *a_bus, uint8_t a_enable) {
 	if (a_enable) {
 		SOW_OUTPUT(a_bus->ddr, a_bus->pin);
 		SOW_HIGH(a_bus->outp, a_bus->pin);
@@ -66,10 +66,10 @@ uint8_t sow_reset(struct soft_ow *a_bus) {
 		SOW_INPUT(a_bus->ddr, a_bus->pin);
 		_delay_us(50); // 15 - 60
 
-		if (bit_is_clear(a_bus->inp, a_bus->pin)) {
+		if (bit_is_clear(*(a_bus->inp), a_bus->pin)) {
 			// after 60 - 240
 			_delay_us(300); 
-			if (bit_is_set(a_bus->inp, a_bus->pin)) {
+			if (bit_is_set(*(a_bus->inp), a_bus->pin)) {
 				presence = 1;
 			}
 		} // bit is clear
@@ -158,7 +158,7 @@ static uint8_t _sow_read_bit(struct soft_ow *a_bus) {
 		SOW_INPUT(a_bus->ddr, a_bus->pin);
 
 		_delay_us(12); // sample within 15u slot
-		if (bit_is_set(a_bus->inp, a_bus->pin))
+		if (bit_is_set(*(a_bus->inp), a_bus->pin))
 			bit = 1;
 
 		// time slot duration
