@@ -2,6 +2,7 @@ TARGET=libpca.a
 SOURCES= \
 		adc.c \
 		serial.c \
+		soft_onewire.c \
 		common.c \
 		slip.c \
 		tdelay.c \
