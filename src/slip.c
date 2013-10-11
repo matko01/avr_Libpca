@@ -25,7 +25,11 @@
  */
 
 #include "slip.h"
+
+#if SLIP_IMPLEMENT_CRC16 == 1
 #include <util/crc16.h>
+#endif
+
 #include <string.h>
 
 uint8_t slip_recv(uint8_t *a_buff, uint8_t a_buflen) {
@@ -114,6 +118,7 @@ uint8_t slip_send(uint8_t *a_buff, uint8_t a_buflen) {
 }
 
 
+#if SLIP_IMPLEMENT_CRC16 == 1
 uint8_t slip_verify_crc16(uint8_t *a_buff, uint8_t a_buflen, uint8_t a_crcpos) {
 	
 	uint16_t crc_recv = 0x00;
@@ -151,3 +156,4 @@ uint8_t slip_append_crc16(uint8_t *a_buff, uint8_t a_datalen) {
 	memcpy(&a_buff[a_datalen], &crc_calcd, 2);
 	return a_datalen + 2;
 }
+#endif

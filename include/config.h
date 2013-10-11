@@ -103,6 +103,13 @@
  */
 #define TDELAY_IMPLEMENT_T2_INT 0
 
+// =========================== SLIP IMPLEMENTATION ================================
+
+/**
+ * @brief change to 0 if to disable the crc16 SLIP implementation
+ */
+#define SLIP_IMPLEMENT_CRC16 1
+
 // ================================================================================
 
 
