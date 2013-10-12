@@ -31,50 +31,65 @@
 #endif
 
 #include <string.h>
+#include <stdint.h>
+
+/* ================================================================================ */
+
+#if SLIP_IMPLEMENT_CRC16 == 1
+/**
+ * @brief universal implementation calculating the crc of the data in the buffer
+ *
+ * The result is either appended to the end of the buffer or inserted in the very begining
+ *
+ * @param a_buff buffer of which the sum should be calculated
+ * @param a_datalen datalenght of the buffer
+ * @param a_ap whether to append (1) or prepend (0)
+ */
+static uint8_t _slip_insert_crc16(uint8_t *a_buff, uint8_t a_datalen, uint8_t a_ap);
+#endif
+	
+/* ================================================================================ */
+
 
 uint8_t slip_recv(uint8_t *a_buff, uint8_t a_buflen) {
 	
 	uint8_t c = 0x00;
 	uint16_t recv = 0x00;
-	uint8_t mode = 0x00;
 
-	// collect a full slip packet
+	// inverted logic since negative conditional produces less code
+	uint8_t escape = 0xff;
+
+	// collect a full SLIP packet
 	while (1) {
+
 		if (!SLIP_CHAR_RECV(&c)) {
 			continue;
 		}
 
 		// no escape character detected
-		if (!mode) {
-			switch(c) {
-				case SLIP_END:
-					if (recv) return recv;
-					break;
+		switch(c) {
+			case SLIP_END:
+				if (recv) return recv;
+				break;
 
-				case SLIP_ESC:
-					// escape character detected set mode variable
-					mode = 0x01;
-					break;
+			case SLIP_ESC:
+				// escape character detected set 'escape' variable
+				escape = 0x00;
+				break;
 
-				default:
+			default:
+				// translate escaped character to it's original value
+				if (!escape) {
+					c = (c == SLIP_ESC_END ? SLIP_END : 
+							(c == SLIP_ESC_ESC ? SLIP_ESC : c));
+					escape = 0xff;
+				}
+
+				if (recv < a_buflen) {
 					a_buff[recv++] = c;
-					break;
-
-			} // switch
-		}
-		else {
-			// translate escaped character to it's original value
-			a_buff[recv++] = 
-				(c == SLIP_ESC_END ? SLIP_END : (c == SLIP_ESC_ESC ? SLIP_ESC : c));
-			mode = 0;
-		}
-
-		// if buffer is full abort further reception
-		// this may cause problems - one should always provide big enough buffer for the
-		// whole SLIP frame to fit
-		if (recv >= a_buflen) {
-			return recv;
-		}
+				}
+				break;
+		} // switch
 	} // while
 
 	return 0;
@@ -145,15 +160,36 @@ uint8_t slip_verify_crc16(uint8_t *a_buff, uint8_t a_buflen, uint8_t a_crcpos) {
 
 
 uint8_t slip_append_crc16(uint8_t *a_buff, uint8_t a_datalen) {
+	return _slip_insert_crc16(a_buff, a_datalen, 1);
+}
+
+
+uint8_t slip_prepend_crc16(uint8_t *a_buff, uint8_t a_datalen) {
+	return _slip_insert_crc16(a_buff, a_datalen, 0);
+}
+
+
+
+/* ================================================================================ */
+
+
+static uint8_t _slip_insert_crc16(uint8_t *a_buff, uint8_t a_datalen, uint8_t a_ap) {
 
 	uint16_t crc_calcd = 0x00;
+
+	uint8_t crc_pos = (a_ap == 1 ? a_datalen : 0);
+	uint8_t crc_offs = (a_ap == 1 ? 2 : 0);
 	
-	memset(&a_buff[a_datalen], 0x00, 2);
-	for (uint8_t i = 0; i<(a_datalen + 2); i++) {
+	memset(&a_buff[crc_pos], 0x00, 2);
+	for (uint8_t i = 0; i<(a_datalen + crc_offs); i++) {
 		crc_calcd = _crc16_update(crc_calcd, a_buff[i]);
 	}
 
-	memcpy(&a_buff[a_datalen], &crc_calcd, 2);
-	return a_datalen + 2;
+	memcpy(&a_buff[crc_pos], &crc_calcd, 2);
+	return (a_datalen + crc_offs);
 }
+
+
+/* ================================================================================ */
+
 #endif

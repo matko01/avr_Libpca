@@ -35,6 +35,7 @@
  */
 
 #include "config.h"
+#include "common.h"
 
 /**
  * @brief module version definition (just for internal use, to determine API incompatibilities)
@@ -107,6 +108,17 @@ uint8_t slip_send(uint8_t *a_buff, uint8_t a_buflen);
  * @return buffer size with CRC16 (a_datalen +2)
  */
 uint8_t slip_append_crc16(uint8_t *a_buff, uint8_t a_datalen);
+
+
+/**
+ * @brief prepend the CRC16 checksum to the beginning of the data buffer
+ *
+ * @param a_buff buffer holding the data (it must have an uint16_t variable as first field - for the crc, otherwise the data inside will be corrupted)
+ * @param a_datalen length of the data in the buffer
+ *
+ * @return buffer size
+ */
+uint8_t slip_prepend_crc16(uint8_t *a_buff, uint8_t a_datalen);
 
 
 /**
