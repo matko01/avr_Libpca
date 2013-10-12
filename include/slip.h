@@ -34,6 +34,7 @@
  * Using serial port along with SLIP protocol for binary data IO synchronization
  */
 
+#include "config.h"
 
 /**
  * @brief module version definition (just for internal use, to determine API incompatibilities)
@@ -47,7 +48,6 @@
  */
 #if !defined(SLIP_CHAR_SEND) || !defined(SLIP_CHAR_RECV)
 
-#include "config.h"
 #include "serial.h"
 
 /// redefine it, in your code to use different implementation of SEND routine
@@ -97,7 +97,7 @@ uint8_t slip_recv(uint8_t *a_buff, uint8_t a_buflen);
  */
 uint8_t slip_send(uint8_t *a_buff, uint8_t a_buflen);
 
-
+#if SLIP_IMPLEMENT_CRC16 == 1
 /**
  * @brief append the CRC16 checksum to the end of the data buffer
  *
@@ -119,6 +119,7 @@ uint8_t slip_append_crc16(uint8_t *a_buff, uint8_t a_datalen);
  * @return crc if the checksum verification went successful or 0 if verification failed
  */
 uint8_t slip_verify_crc16(uint8_t *a_buff, uint8_t a_buflen, uint8_t a_crcpos);
+#endif
 
 
 #endif /* __SLIP_H__ */
