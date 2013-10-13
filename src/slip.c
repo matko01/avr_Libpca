@@ -24,7 +24,7 @@
  *
  */
 
-#include "slip.h"
+#include <slip.h>
 
 #if SLIP_IMPLEMENT_CRC16 == 1
 #include <util/crc16.h>

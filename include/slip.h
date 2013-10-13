@@ -34,8 +34,8 @@
  * Using serial port along with SLIP protocol for binary data IO synchronization
  */
 
-#include "config.h"
-#include "common.h"
+#include <config.h>
+#include <common.h>
 
 /**
  * @brief module version definition (just for internal use, to determine API incompatibilities)
@@ -49,7 +49,7 @@
  */
 #if !defined(SLIP_CHAR_SEND) || !defined(SLIP_CHAR_RECV)
 
-#include "serial.h"
+#include <serial.h>
 
 /// redefine it, in your code to use different implementation of SEND routine
 #define SLIP_CHAR_SEND(__x)	serial_poll_sendc(__x)

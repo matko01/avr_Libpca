@@ -24,7 +24,7 @@
  *
  */
 
-#include "tdelay.h"
+#include <tdelay.h>
 
 #include <avr/power.h>
 #include <avr/interrupt.h>

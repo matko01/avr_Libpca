@@ -43,8 +43,8 @@
  * Using beeper_block() and beeper_off() functions
  */
 
-#include "config.h"
-#include "tdelay.h"
+#include <config.h>
+#include <tdelay.h>
 
 
 /**

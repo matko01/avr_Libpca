@@ -31,9 +31,9 @@
  * This file is mainly a private library interface and shouldn't really be used in the code outside the library
  */
 
-#include "config.h"
-#include "common.h"
-#include "timer_common.h"
+#include <config.h>
+#include <common.h>
+#include <timer_common.h>
 
 
 /**

@@ -24,7 +24,7 @@
  *
  */
 
-#include "tdelay_common.h"
+#include <tdelay_common.h>
 
 #include <stdint.h>
 #include <avr/io.h>

@@ -1,7 +1,7 @@
 #ifndef SOFT_ONEWIRE_H_ZBD6VGNS
 #define SOFT_ONEWIRE_H_ZBD6VGNS
 
-#include "common.h"
+#include <common.h>
 
 
 /**

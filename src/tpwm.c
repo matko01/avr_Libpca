@@ -24,7 +24,7 @@
  *
  */
 
-#include "tpwm.h"
+#include <tpwm.h>
 
 #include <avr/io.h>
 #include <avr/power.h>

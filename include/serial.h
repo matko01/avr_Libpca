@@ -46,8 +46,8 @@
  * Using serial port along with SLIP protocol for binary data IO synchronization
  */
 
-#include "config.h"
-#include "common.h"
+#include <config.h>
+#include <common.h>
 
 
 /**

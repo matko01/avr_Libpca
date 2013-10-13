@@ -43,9 +43,9 @@
  * Using tdelay API in conjunction with beeper API
  */
 
-#include "config.h"
-#include "common.h"
-#include "tdelay_common.h"
+#include <config.h>
+#include <common.h>
+#include <tdelay_common.h>
 
 
 /**

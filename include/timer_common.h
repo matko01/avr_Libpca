@@ -36,8 +36,8 @@
  * Enable and Configure timer for Fast PWM mode
  */
 
-#include "config.h"
-#include "common.h"
+#include <config.h>
+#include <common.h>
 
 
 /**

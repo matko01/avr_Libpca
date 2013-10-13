@@ -25,7 +25,7 @@
  */
 
 
-#include "beeper.h"
+#include <beeper.h>
 #include <avr/io.h>
 
 

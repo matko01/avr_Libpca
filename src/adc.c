@@ -1,4 +1,4 @@
-#include "adc.h"
+#include <adc.h>
 
 #include <avr/power.h>
 

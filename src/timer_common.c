@@ -24,7 +24,7 @@
  *
  */
 
-#include "timer_common.h"
+#include <timer_common.h>
 #include <avr/interrupt.h>
 #include <avr/power.h>
 

@@ -103,20 +103,20 @@
 
 // ================================================================================
 
-#include "config.h"
-#include "common.h"
+#include <config.h>
+#include <common.h>
 
-#include "serial.h"
-#include "slip.h"
-#include "timer_common.h"
-#include "tdelay_common.h"
+#include <serial.h>
+#include <slip.h>
+#include <timer_common.h>
+#include <tdelay_common.h>
 
-#include "tdelay.h"
-#include "beeper.h"
-#include "tpwm.h"
-#include "adc.h"
+#include <tdelay.h>
+#include <beeper.h>
+#include <tpwm.h>
+#include <adc.h>
 
-#include "soft_onewire.h"
+#include <soft_onewire.h>
 
 // ================================================================================
 
