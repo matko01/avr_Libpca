@@ -235,6 +235,27 @@ e_return serial_init(uint32_t a_speed) {
 			UCSR0A |= _BV(U2X0);
 			baud_value = 16;
 			break;
+#if SERIAL_SUPPORT_HIGH_SPEEDS == 1
+		case E_BAUD_230400:
+			UCSR0A |= _BV(U2X0);
+			baud_value = 8;
+			break;
+
+		case E_BAUD_250000:
+			baud_value = 3;
+			break;
+
+		case E_BAUD_500000:
+			UCSR0A |= _BV(U2X0);
+			baud_value = 3;
+			break;
+
+		case E_BAUD_1000000:
+			UCSR0A |= _BV(U2X0);
+			baud_value = 1;
+			break;
+#endif
+
 #endif
 
 		default:

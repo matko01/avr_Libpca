@@ -63,11 +63,25 @@ typedef enum _e_pwm_freq {
 
 
 /**
+ * @brief defines the PWM modes, 
+ */
+typedef enum _e_pwm_quantity {
+
+	/// SINGLE for single channel (only OCXA output will be used)
+	E_PWM_SINGLE = 0,
+
+	/// DOUBLE for double channel (OCXA and OCXB outputs will be used)
+	E_PWM_DOUBLE
+
+} e_pwm_quantity;
+
+
+/**
  * @brief Configure selected timer to single slope fast PWM mode
  *
  * @param a_timer timer to be configured
  */
-void tpwm_fpwm_init(e_timer a_timer);
+void tpwm_fpwm_init(e_timer a_timer, e_pwm_quantity a_qty);
 
 
 /**
@@ -75,7 +89,7 @@ void tpwm_fpwm_init(e_timer a_timer);
  *
  * @param a_timer timer to be configured
  */
-void tpwm_pwm_init(e_timer a_timer);
+void tpwm_pwm_init(e_timer a_timer, e_pwm_quantity a_qty);
 
 
 /**

@@ -35,7 +35,7 @@
 /**
  * @brief change to 0 and rebuild if you do not need stats information
  */
-#define SERIAL_COLLECT_STATS 1
+#define SERIAL_COLLECT_STATS 0
 
 /**
  * @brief change to 0 and rebuild if you do not wish to include serial RX interrupt
@@ -55,6 +55,11 @@
 #define SERIAL_IMPLEMENT_TX_INT 0
 
 /**
+ * @brief if set to "1" the high speed pre-calculated baud rate settings will be included
+ */
+#define SERIAL_SUPPORT_HIGH_SPEEDS 1
+
+/**
  * @brief 1 - STDIN data will be received by polling, 0 - interrupts
  */
 #define SERIAL_STDIN_POLL 0
@@ -70,7 +75,7 @@
  * For high speeds and very busy applications one may consider increasing the RX ring buffer size
  * This variable has any useful meaning only if SERIAL_IMPLEMENT_RX_INT == 1
  */
-#define SERIAL_RX_RING_SIZE 32
+#define SERIAL_RX_RING_SIZE 64
 
 /**
  * @brief TX ring buffer size if SERIAL_IMPLEMENT_TX_INT == 1
@@ -78,7 +83,7 @@
  * For high speeds and very busy applications one may consider increasing the TX ring buffer size
  * This variable has any useful meaning only if SERIAL_IMPLEMENT_TX_INT == 1
  */
-#define SERIAL_TX_RING_SIZE 32
+#define SERIAL_TX_RING_SIZE 64
 
 // ============================ TIMERS/BEEPER =====================================
 
@@ -87,7 +92,7 @@
  *
  * In case user wants to define his own ISR for TIMER0_COMPA_vect, he should disable the library implementation
  */
-#define TDELAY_IMPLEMENT_T0_INT 0
+#define TDELAY_IMPLEMENT_T0_INT 1
 
 /**
  * @brief change to 0 if to disable timer 1 delay and beeper interrupts and routines

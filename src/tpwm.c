@@ -31,23 +31,20 @@
 #include <avr/interrupt.h>
 
 
-void tpwm_fpwm_init(e_timer a_timer) {
-	_timer_init_fpwm(a_timer);
-
+static void _tpwm_pwm_init(e_timer a_timer, e_pwm_quantity a_qty) {
 	switch(a_timer) {
 		case E_TIMER0:
-			TCCR0A = 0x80;
+			TCCR0A |= (0x80 | (a_qty << 5));
 			OCR0A = 0x00;
 			break;
 
 		case E_TIMER1:
-			power_timer1_enable();
-			TCCR1A |= 0x80;
+			TCCR1A |= (0x80 | (a_qty << 5));
 			OCR1AH = OCR1AL = 0x00;
 			break;
 
 		case E_TIMER2:
-			TCCR2A |= 0x80;
+			TCCR2A |= (0x80 | (a_qty << 5));
 			OCR2A = 0x00;
 			break;
 
@@ -56,41 +53,25 @@ void tpwm_fpwm_init(e_timer a_timer) {
 
 	} // switch
 
-
 	_timer_en_oca(a_timer);
+	if (a_qty) _timer_en_ocb(a_timer);
 }
 
 
-void tpwm_pwm_init(e_timer a_timer) {
+void tpwm_fpwm_init(e_timer a_timer, e_pwm_quantity a_qty) {
+	_timer_init_fpwm(a_timer);
+	_tpwm_pwm_init(a_timer, a_qty);
+}
+
+
+void tpwm_pwm_init(e_timer a_timer, e_pwm_quantity a_qty) {
 	_timer_init_pwm(a_timer);
-	
-	switch(a_timer) {
-		case E_TIMER0:
-			TCCR0A |= 0x80;			
-			OCR0A = 0x00;
-			break;
-
-		case E_TIMER1:
-			TCCR1A |= 0x80;
-			OCR1AH = OCR1AL = 0x00;
-			break;
-
-		case E_TIMER2:
-			TCCR2A |= 0x80;
-			OCR2A = 0x00;
-			break;
-
-		default:
-			break;
-
-	} // switch
-
-	_timer_en_oca(a_timer);
+	_tpwm_pwm_init(a_timer, a_qty);
 }
 
 
 uint32_t tpwm_setup_for_bitres(e_timer a_timer, uint8_t a_bitres) {
-	if (E_TIMER1 == a_timer) {
+if (E_TIMER1 == a_timer) {
 		uint16_t presc = ((1 << a_bitres) - 1);
 
 		// prescaler 1

@@ -78,7 +78,17 @@ typedef enum _e_serial_speed {
 	E_BAUD_38400 = 38400,
 	E_BAUD_57600 = 57600,
 	E_BAUD_76800 = 76800,
-	E_BAUD_115200 = 115200
+	E_BAUD_115200 = 115200,
+
+#if SERIAL_SUPPORT_HIGH_SPEEDS == 1
+	// bellow speed definitions may be not supported by all hardware
+	E_BAUD_230400 = 230400,
+	E_BAUD_250000 = 250000,
+	E_BAUD_500000 = 500000,
+	E_BAUD_1000000 = 1000000,
+#endif
+
+	E_BAUD_LAST
 } e_serial_speed;
 
 
