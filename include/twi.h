@@ -30,34 +30,15 @@
  * Using the twi interface to communicate with i2c device
  */
 
+#include "config.h"
+#include "common.h"
 
-// general
-#define TWI_STATUS_START 				0x08
-#define TWI_STATUS_REPEATED_START 		0x10
-#define TWI_STATUS_ARBITRATION_LOST		0x38
+void twi_master_init(void);
 
-// master transmitter mode
-#define TWI_STATUS_MT_SLA_ACK 			0x18
-#define TWI_STATUS_MT_SLA_NACK 			0x20
-#define TWI_STATUS_MT_DATA_ACK 			0x28
-#define TWI_STATUS_MT_DATA_NACK 		0x30
+#if TWI_SLAVE_SUPPORT == 1
+void twi_slave_init(uint8_t a_address);
+#endif
 
-// master receiver mode
-#define TWI_STATUS_MR_SLA_ACK 			0x40
-#define TWI_STATUS_MR_SLA_NACK 			0x48
-#define TWI_STATUS_MR_DATA_ACK 			0x50
-#define TWI_STATUS_MR_DATA_NACK 		0x58
-
-// slave receiver mode
-#define TWI_STATUS_SR_SLA_ACK			0x60
-#define TWI_STATUS_SR_GENC_ACK			0x70
-#define TWI_STATUS_SR_SLA_DATA_ACK		0x80
-#define TWI_STATUS_SR_SLA_DATA_NACK		0x88
-#define TWI_STATUS_SR_GENC_DATA_ACK 	0x90
-#define TWI_STATUS_SR_GENC_DATA_NACK	0x98
-#define TWI_STATUS_SR_STOP				0xa0
-
-// slave transmitter mode
 
 #endif /* end of include guard: TWI_H_V8WDZFBC */
 

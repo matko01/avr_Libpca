@@ -2,6 +2,7 @@
 
 #include <avr/power.h>
 #include <avr/io.h>
+#include <util/twi.h>
 
 
 #define _twi_start \
@@ -20,7 +21,7 @@
 	TWCR = (_BV(TWSTO) | _BV(TWINT) | _BV(TWEN))
 
 
-#define _twi_status_get \
-	(TWSR & 0xf8)
+#define _twi_slave_address_set(__address) \
+	TWAR = __address << 1
 
 
