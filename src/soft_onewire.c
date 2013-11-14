@@ -23,13 +23,6 @@
 /* ================================================================================ */
 
 
-static uint8_t _sow_write_bit(struct soft_ow *a_bus, uint8_t a_bit);
-static uint8_t _sow_read_bit(struct soft_ow *a_bus);
-
-
-/* ================================================================================ */
-
-
 void sow_init(struct soft_ow *a_bus) {
 
 	// disable pull-ups
@@ -129,7 +122,7 @@ uint8_t sow_read_data(struct soft_ow *a_bus, uint8_t *a_data, uint8_t a_maxlen) 
 /* ================================================================================ */
 
 
-static uint8_t _sow_write_bit(struct soft_ow *a_bus, uint8_t a_bit) {
+uint8_t _sow_write_bit(struct soft_ow *a_bus, uint8_t a_bit) {
 	
 	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
 		SOW_OUTPUT(a_bus->ddr, a_bus->pin);
@@ -147,7 +140,7 @@ static uint8_t _sow_write_bit(struct soft_ow *a_bus, uint8_t a_bit) {
 }
 
 
-static uint8_t _sow_read_bit(struct soft_ow *a_bus) {
+uint8_t _sow_read_bit(struct soft_ow *a_bus) {
 	uint8_t bit = 0;
 
 	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
