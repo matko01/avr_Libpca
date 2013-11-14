@@ -3,6 +3,16 @@
 
 #include <common.h>
 
+/**
+ * @brief defines power mode of the one wire device as a parasite (feed from data line) or external
+ */
+typedef enum _soft_ow_power_mode {
+	OW_POWER_PARASITE = 0,
+	OW_POWER_EXTERNAL,
+
+	OW_POWER_LAST
+} soft_ow_power_mode;
+
 
 /**
  * @brief software one-wire bus declaration
