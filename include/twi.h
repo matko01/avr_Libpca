@@ -33,12 +33,72 @@
 #include "config.h"
 #include "common.h"
 
-void twi_master_init(void);
 
-#if TWI_SLAVE_SUPPORT == 1
-void twi_slave_init(uint8_t a_address);
+/**
+ * @brief standard i2c frequencies enumeration
+ */
+typedef enum _e_twi_scl_freq {
+	E_TWI_SCL_100K = 0,
+	E_TWI_SCL_250K,
+	E_TWI_SCL_400K
+} e_twi_scl_freq;
+
+
+/**
+ * @brief general TWI interface initialization
+ */
+void twi_init();
+
+#if TWI_MASTER_TRANSMITTER == 1 || TWI_MASTER_RECEIVER == 1
+/**
+ * @brief initialize the MCU as TWI master
+ *
+ * @param a_freq SCL frequency
+ */
+void twi_setup_master(e_twi_scl_freq a_freq);
 #endif
 
+#if TWI_SLAVE_TRANSMITTER == 1 || TWI_SLAVE_RECEIVER == 1
+/**
+ * @brief initialize MCU as a TWI slave with given address
+ *
+ * @param a_address
+ */
+void twi_setup_slave(uint8_t a_address, uint8_t a_mask);
+#endif
+
+#if TWI_MASTER_TRANSMITTER == 1
+
+/**
+ * @brief sends data in master transmitter mode
+ *
+ * @param a_address I2C address of the slave
+ * @param a_data data buffer
+ * @param a_len length of the data
+ */
+void twi_mtx(uint8_t a_address, uint8_t *a_data, uint16_t a_len);
+#endif
+
+#if TWI_MASTER_RECEIVER == 1
+
+/**
+ * @brief receives data in master receiver mode
+ *
+ * @param a_address I2C address
+ * @param a_data buffer for the data
+ * @param a_maxlen maximum data length
+ *
+ * @return 
+ */
+uint8_t twi_mrx(uint8_t a_address, uint8_t *a_data, uint16_t a_maxlen);
+#endif
+
+/**
+ * @brief checks if the TWI hardware is busy
+ *
+ * @return 1 if busy
+ */
+uint8_t twi_busy();
 
 #endif /* end of include guard: TWI_H_V8WDZFBC */
 

@@ -113,6 +113,28 @@
  */
 #define ADC_IMPLEMENT_CONV_COMPLETE_INT 1
 
+// =================================== TWI ========================================
+
+/**
+ * @brief change to 0 to disable master transmitter support
+ */
+#define TWI_MASTER_TRANSMITTER 1
+
+/**
+ * @brief change to 0 to disable master receiver support
+ */
+#define TWI_MASTER_RECEIVER 1
+
+/**
+ * @brief change to 0 to disable slave transmitter support
+ */
+#define TWI_SLAVE_TRANSMITTER 1
+
+/**
+ * @brief change to 0 to disable slave receiver support
+ */
+#define TWI_SLAVE_RECEIVER 1
+
 // ================================================================================
 
 
