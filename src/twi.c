@@ -49,7 +49,8 @@ volatile static struct {
  * @param TWI_vect
  */
 ISR(TWI_vect) {
-	switch(TWSR >> 3) {
+	// mask out the prescaler bits
+	switch(TWSR & 0xf8) {
 		case TW_START:
 		case TW_REP_START:
 			TWDR = g_bus_ctx.slarw;
@@ -58,6 +59,7 @@ ISR(TWI_vect) {
 			TWCR = g_bus_ctx.twcr | _BV(TWINT);
 			break;
 
+#if TWI_MASTER_TRANSMITTER == 1			
 		case TW_MT_SLA_ACK:
 		case TW_MT_DATA_ACK:
 			if (!g_bus_ctx.len) {
@@ -71,6 +73,61 @@ ISR(TWI_vect) {
 			}
 			break;
 
+		case TW_MT_SLA_NACK:
+			break;
+
+		case TW_MT_DATA_NACK:
+			break;
+
+		case TW_MT_ARB_LOST:
+			break;
+#endif
+
+#if TWI_MASTER_RECEIVER == 1			
+		case TW_MR_SLA_ACK:
+			break;
+
+		case TW_MR_SLA_NACK:
+			break;
+
+		case TW_MR_DATA_ACK:
+			break;
+
+		case TW_MR_DATA_NACK:
+			break;
+#endif
+
+#if TWI_SLAVE_TRANSMITTER == 1
+		case TW_ST_SLA_ACK:
+		case TW_ST_ARB_LOST_SLA_ACK:
+			break;
+
+		case TW_ST_DATA_ACK:
+			break;
+
+		case TW_ST_DATA_NACK:
+		case TW_ST_LAST_DATA:
+			break;
+#endif
+
+#if TWI_SLAVE_RECEIVER == 1
+		case TW_SR_SLA_ACK:
+		case TW_SR_GCALL_ACK:
+		case TW_SR_ARB_LOST_SLA_ACK:
+		case TW_SR_ARB_LOST_GCALL_ACK:
+			break;
+
+		case TW_SR_DATA_ACK:
+		case TW_SR_GCALL_DATA_ACK:
+			break;
+
+		case TW_SR_DATA_NACK:
+		case TW_SR_GCALL_DATA_NACK:
+			break;
+
+		case TW_SR_STOP:
+			break;
+#endif
 
 		default:
 			break;
