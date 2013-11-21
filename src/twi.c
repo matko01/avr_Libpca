@@ -74,26 +74,46 @@ ISR(TWI_vect) {
 			break;
 
 		case TW_MT_SLA_NACK:
+			// send stop
+			TWCR = g_bus_ctx.twcr | _BV(TWISTO) | _BV(TWINT);
 			break;
 
 		case TW_MT_DATA_NACK:
+			// send stop
+			TWCR = g_bus_ctx.twcr | _BV(TWISTO) | _BV(TWINT);
 			break;
 
 		case TW_MT_ARB_LOST:
+			// release the bus
+			TWCR = g_bus_ctx.twcr | _BV(TWINT);
 			break;
 #endif
 
 #if TWI_MASTER_RECEIVER == 1			
+		case TW_MR_DATA_ACK:
+			(*g_bus_ctx.xdata) = TWDR;
+			g_bus_ctx.len--;
+			// fall through deliberately
+
 		case TW_MR_SLA_ACK:
+			/* NACK if no further data expected */
+			if (!g_bus_ctx.len) {
+				TWCR = (g_bus_ctx.twcr & ~_BV(TWEA)) | _BV(TWINT);
+			}
+			else {
+				/* ACK and wait for the data */
+				TWCR = g_bus_ctx.twcr | _BV(TWINT);
+			}			
 			break;
 
 		case TW_MR_SLA_NACK:
-			break;
-
-		case TW_MR_DATA_ACK:
+			// send stop
+			TWCR = g_bus_ctx.twcr | _BV(TWISTO) | _BV(TWINT);
 			break;
 
 		case TW_MR_DATA_NACK:
+			// send stop
+			TWCR = g_bus_ctx.twcr | _BV(TWISTO) | _BV(TWINT);
 			break;
 #endif
 
