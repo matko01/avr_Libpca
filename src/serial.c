@@ -190,6 +190,9 @@ e_return serial_init(uint32_t a_speed) {
 
 	// choose predefined value or calculate
 	switch (a_speed) { 
+
+// hard coded defines if the clock is equal to 16 MHz		
+#if F_CPU == 16000000UL
 		case E_BAUD_2400:
 			UCSR0A |= _BV(U2X0);
 			baud_value = 832;
@@ -232,6 +235,7 @@ e_return serial_init(uint32_t a_speed) {
 			UCSR0A |= _BV(U2X0);
 			baud_value = 16;
 			break;
+#endif
 
 		default:
 			// manual calculation
@@ -446,6 +450,11 @@ unsigned char serial_sendc(unsigned char a_data) {
 		// enable data register empty interrupt
 		UCSR0B |= _BV(UDRIE0);
 	}
+#if SERIAL_COLLECT_STATS == 1
+	else {
+		g_tx_buff.stats.dropped++;
+	}
+#endif
 
 	return n;
 }
