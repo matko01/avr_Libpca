@@ -22,7 +22,7 @@
 #include <avr/io.h>
 #include <util/twi.h>
 #include <avr/interrupt.h>
-#include <string.h>
+/* #include <string.h> */
 
 /* ================================================================================ */
 
@@ -30,15 +30,38 @@
  * @brief global transmission buffer
  */
 volatile static struct {
+	/// slave R/W address
 	volatile uint8_t slarw;
-	volatile uint8_t g_twi_status; 
+
+	/**
+	 *  +-------------- transaction flag
+	 *  |	+---------- unused
+	 *  |	|   +------ unused
+     *  |   |   |   +-- unused
+	 *  |   |   |   |
+	 *  v | v | v | v | bus status	
+	 * ---+---+---+---+--------
+	 *  7 | 6 | 5 | 4 |  3 - 0
+	 */
+	volatile uint8_t status; 
+
+	/// pointer to the data buffer
 	volatile uint8_t *xdata;
+
+	/// data length
 	volatile uint16_t len;
+
+	/// default copy of the twcr
 	volatile uint8_t twcr;
 } g_bus_ctx;
 
 
 /* ================================================================================ */
+
+#define _twi_stop(__rep_start) \
+	TWCR = g_bus_ctx.twcr | \
+		_BV(TWINT) | \
+		(__rep_start ? 0x00 : _BV(TWSTO))
 
 /**
  * @brief TWI wire interface interrupt handler
@@ -54,66 +77,54 @@ ISR(TWI_vect) {
 		case TW_START:
 		case TW_REP_START:
 			TWDR = g_bus_ctx.slarw;
-			
-			// clear STA, clear interrupt flag
-			TWCR = g_bus_ctx.twcr | _BV(TWINT);
+			// clear STA, clear interrupt flag and continue
+			_twi_stop(1);
 			break;
 
 #if TWI_MASTER_TRANSMITTER == 1			
 		case TW_MT_SLA_ACK:
 		case TW_MT_DATA_ACK:
-			if (!g_bus_ctx.len) {
-				TWCR = g_bus_ctx.twcr | _BV(TWINT) | _BV(TWSTO);
-			}
-			else {
-				TWDR = *g_bus_ctx.xdata;
-				g_bus_ctx.xdata++;
-				g_bus_ctx.len--;
-				TWCR = g_bus_ctx.twcr | _BV(TWINT);
+			{
+				uint8_t x = g_bus_ctx.len;
+				if (g_bus_ctx.len--) {
+					TWDR = *g_bus_ctx.xdata++;
+				}
+				_twi_stop(x);
 			}
 			break;
 
 		case TW_MT_SLA_NACK:
-			// send stop
-			TWCR = g_bus_ctx.twcr | _BV(TWISTO) | _BV(TWINT);
-			break;
-
 		case TW_MT_DATA_NACK:
-			// send stop
-			TWCR = g_bus_ctx.twcr | _BV(TWISTO) | _BV(TWINT);
+			// send stop or exit interrupt next the repeated start will be sent
+			_twi_stop(g_bus_ctx.status & 0x80);
 			break;
 
 		case TW_MT_ARB_LOST:
-			// release the bus
-			TWCR = g_bus_ctx.twcr | _BV(TWINT);
+			// release the bus			
+			_twi_stop(1);
 			break;
 #endif
 
 #if TWI_MASTER_RECEIVER == 1			
 		case TW_MR_DATA_ACK:
-			(*g_bus_ctx.xdata) = TWDR;
-			g_bus_ctx.len--;
+			(*g_bus_ctx.xdata++) = TWDR;
 			// fall through deliberately
 
 		case TW_MR_SLA_ACK:
-			/* NACK if no further data expected */
-			if (!g_bus_ctx.len) {
-				TWCR = (g_bus_ctx.twcr & ~_BV(TWEA)) | _BV(TWINT);
-			}
-			else {
-				/* ACK and wait for the data */
-				TWCR = g_bus_ctx.twcr | _BV(TWINT);
-			}			
-			break;
-
-		case TW_MR_SLA_NACK:
-			// send stop
-			TWCR = g_bus_ctx.twcr | _BV(TWISTO) | _BV(TWINT);
+			/* ACK and wait for the data */
+			TWCR = (g_bus_ctx.twcr & 
+					((1 == g_bus_ctx.len--) ? ~_BV(TWEA) : 0xff) ) 
+				| _BV(TWINT);
 			break;
 
 		case TW_MR_DATA_NACK:
-			// send stop
-			TWCR = g_bus_ctx.twcr | _BV(TWISTO) | _BV(TWINT);
+			// fetch the final byte of data
+			(*g_bus_ctx.xdata) = TWDR;
+			// fall through deliberately
+
+		case TW_MR_SLA_NACK:
+			// send stop or exit interrupt next the repeated start will be sent
+			_twi_stop(g_bus_ctx.status & 0x80);
 			break;
 #endif
 
@@ -157,25 +168,22 @@ ISR(TWI_vect) {
 /* ================================================================================ */
 
 void twi_init() {
-	sei();
+	uint8_t x = sizeof(g_bus_ctx);
 	power_twi_enable();		
-	memset((void *)&g_bus_ctx, 0x00, sizeof(g_bus_ctx));
 
+	while (x) {
+		*(char *)&g_bus_ctx = 0x00;
+	}
+	
 	// enable interrupt, twi interface and acknowledge bit
-	g_bus_ctx.twcr = _BV(TWEN) | _BV(TWIE) | _BV(TWEA);
-	TWCR = g_bus_ctx.twcr;
+	TWCR = g_bus_ctx.twcr = _BV(TWEN) | _BV(TWIE) | _BV(TWEA);
+	sei();
 }
 
 
 #if TWI_MASTER_TRANSMITTER == 1 || TWI_MASTER_RECEIVER == 1
 void twi_setup_master(e_twi_scl_freq a_freq) {
 	switch(a_freq) {
-		case E_TWI_SCL_100K:
-			// prescaler = 4
-			TWSR = 0x01;
-			TWBR = 0x12;
-			break;
-
 		case E_TWI_SCL_250K:
 			// prescaler = 4
 			TWSR = 0x01;
@@ -189,11 +197,26 @@ void twi_setup_master(e_twi_scl_freq a_freq) {
 			break;
 
 		default:
+		case E_TWI_SCL_100K:
+			// prescaler = 4
+			TWSR = 0x01;
+			TWBR = 0x12;
 			break;
 	}
-
-
 }
+
+
+void twi_master_begin_transaction() {
+	// set the transaction bit
+	g_bus_ctx.status |= 0x80;
+}
+
+
+void twi_master_end_transation() {
+	// clear the transaction bit
+	g_bus_ctx.status &= 0x7f;
+}
+
 #endif
 
 
@@ -214,7 +237,7 @@ void twi_setup_slave(uint8_t a_address, uint8_t a_mask) {
 void twi_mtx(uint8_t a_address, uint8_t *a_data, uint16_t a_len) {
 	g_bus_ctx.xdata = a_data;
 	g_bus_ctx.len = a_len;
-	g_bus_ctx.slarw = (a_address << 1) & 0xfe;
+	g_bus_ctx.slarw = (a_address << 1);
 	
 	// start transmission
 	TWCR = g_bus_ctx.twcr | (_BV(TWINT) | _BV(TWSTA));
@@ -223,16 +246,14 @@ void twi_mtx(uint8_t a_address, uint8_t *a_data, uint16_t a_len) {
 
 
 #if TWI_MASTER_RECEIVER == 1
-uint8_t twi_mrx(uint8_t a_address, uint8_t *a_data, uint16_t a_maxlen) {
-	// TODO implement me
+uint8_t twi_mrx(uint8_t a_address, uint8_t *a_data, uint16_t a_len) {
+	g_bus_ctx.xdata = a_data;
+	g_bus_ctx.len = a_len;
+	g_bus_ctx.slarw = (a_address << 1) | 0x01;
+
 	return 0;
 }
 #endif
 
-
-__inline__
-uint8_t twi_busy() {
-	return (!(TWCR & _BV(TWINT)));
-}
 
 /* ================================================================================ */

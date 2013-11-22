@@ -44,6 +44,14 @@ typedef enum _e_twi_scl_freq {
 } e_twi_scl_freq;
 
 
+typedef enum _e_twi_status {
+	E_TWI_STATUS_IDLE = 0x00,
+	
+	E_TWI_STATUS_LAST
+} e_twi_status;
+
+
+
 /**
  * @brief general TWI interface initialization
  */
@@ -90,7 +98,7 @@ void twi_mtx(uint8_t a_address, uint8_t *a_data, uint16_t a_len);
  *
  * @return 
  */
-uint8_t twi_mrx(uint8_t a_address, uint8_t *a_data, uint16_t a_maxlen);
+uint8_t twi_mrx(uint8_t a_address, uint8_t *a_data, uint16_t a_len);
 #endif
 
 /**
@@ -98,7 +106,7 @@ uint8_t twi_mrx(uint8_t a_address, uint8_t *a_data, uint16_t a_maxlen);
  *
  * @return 1 if busy
  */
-uint8_t twi_busy();
+#define twi_busy() (!(TWCR & _BV(TWINT)))
 
 #endif /* end of include guard: TWI_H_V8WDZFBC */
 
