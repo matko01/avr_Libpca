@@ -16,7 +16,7 @@ int main(void)
 		/* char received */
 
 		// send the character back. This call is blocking - it will block until the UART is ready to send
-		serial_poll_send(c);
+		serial_poll_sendc(c);
 	}
 	
 	return 0;

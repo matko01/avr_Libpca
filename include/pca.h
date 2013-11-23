@@ -117,6 +117,8 @@
 #include "adc.h"
 #include "twi.h"
 
+#include "soft_onewire.h"
+
 // ================================================================================
 
 #endif /* PCA_H_YDRXPN0M */
