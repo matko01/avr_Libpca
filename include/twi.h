@@ -88,7 +88,7 @@ void twi_mtx(uint8_t a_address, uint8_t *a_data, uint16_t a_len);
  * @param a_data buffer for the data
  * @param a_maxlen maximum data length
  *
- * @return 
+ * @return received data
  */
 uint8_t twi_mrx(uint8_t a_address, uint8_t *a_data, uint16_t a_maxlen);
 #endif
