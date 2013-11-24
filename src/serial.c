@@ -28,7 +28,6 @@
 #include <avr/power.h>
 #include <avr/interrupt.h>
 #include <stdio.h>
-#include <string.h>
 
 #include <serial.h>
 
@@ -174,6 +173,7 @@ static char _serial_getc(FILE *stream) {
 	return (char)c;
 }
 
+
 /* ================================================================================ */
 
 
@@ -281,12 +281,15 @@ e_return serial_init(uint32_t a_speed) {
 	UBRR0L = baud_value & 0xff;
 
 #if SERIAL_IMPLEMENT_RX_INT == 1
-	// clear the ring
-	memset((unsigned char *)&g_rx_buff, 0x00, sizeof(g_rx_buff));
+	// clear the ring, reuse the bad_value variable
+	baud_value = sizeof(g_rx_buff);
+	common_zero_mem(&g_rx_buff, baud_value);
 #endif
 
 #if SERIAL_IMPLEMENT_TX_INT == 1
-	memset((unsigned char *)&g_tx_buff, 0x00, sizeof(g_tx_buff));
+	// reuse the bad_value variable 
+	baud_value = sizeof(g_tx_buff);
+	common_zero_mem(&g_tx_buff, baud_value);
 #endif
 
 	// asynchronous, 8N1 mode

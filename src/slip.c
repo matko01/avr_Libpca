@@ -30,7 +30,6 @@
 #include <util/crc16.h>
 #endif
 
-#include <string.h>
 #include <stdint.h>
 
 /* ================================================================================ */
@@ -146,8 +145,8 @@ uint8_t slip_verify_crc16(uint8_t *a_buff, uint8_t a_buflen, uint8_t a_crcpos) {
 	// the transmitter calculated the CRC the same way
 	// marking the memory being a CRC placeholder with zeroes
 	// and then copying the CRC inside
-	memcpy(&crc_recv, &a_buff[a_crcpos], 2);
-	memset(&a_buff[a_crcpos], 0x00, 2);
+	crc_recv = (*(uint16_t *)&a_buff[a_crcpos]);
+	(*(uint16_t *)&a_buff[a_crcpos]) = 0x0000;
 
 	while (a_buflen) {
 		crc_calcd = _crc16_update(crc_calcd, *a_buff);
@@ -180,12 +179,14 @@ static uint8_t _slip_insert_crc16(uint8_t *a_buff, uint8_t a_datalen, uint8_t a_
 	uint8_t crc_pos = (a_ap == 1 ? a_datalen : 0);
 	uint8_t crc_offs = (a_ap == 1 ? 2 : 0);
 	
-	memset(&a_buff[crc_pos], 0x00, 2);
+	// zero the crc first
+	*(uint16_t *)&a_buff[crc_pos] = 0x00;
+
 	for (uint8_t i = 0; i<(a_datalen + crc_offs); i++) {
 		crc_calcd = _crc16_update(crc_calcd, a_buff[i]);
 	}
 
-	memcpy(&a_buff[crc_pos], &crc_calcd, 2);
+	*(uint16_t *)&a_buff[crc_pos] = crc_calcd;
 	return (a_datalen + crc_offs);
 }
 

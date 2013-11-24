@@ -192,4 +192,7 @@ uint16_t common_memory_left();
  */
 uint32_t common_abs(int32_t a_value);
 
+
+#define common_zero_mem(__ptr, __len) while (__len--) (*(char *)(__ptr)) = 0x00
+
 #endif /* __COMMON_H__ */
