@@ -19,44 +19,19 @@
 #include "twi.h"
 
 #include <avr/power.h>
-#include <avr/io.h>
 #include <util/twi.h>
 #include <avr/interrupt.h>
-/* #include <string.h> */
+
+/* ================================================================================ */
+
+static void _twi_mx(uint8_t a_address, uint8_t *a_data, uint16_t a_len, uint8_t a_flag);
 
 /* ================================================================================ */
 
 /**
- * @brief global transmission buffer
+ * @brief global bus context
  */
-volatile static struct {
-	/// slave R/W address
-	volatile uint8_t slarw;
-
-	/**
-	 *  +-------------- send_stop
-	 *  |	+---------- state (IDLE/BUSY)
-	 *  |	|   +------ repeated_start_send
-     *  |   |   |   +-- unused
-	 *  |   |   |   |
-	 *  v | v | v | v | error
-	 * ---+---+---+---+--------
-	 *  7 | 6 | 5 | 4 | 3 - 0
-	 */
-	volatile uint8_t status; 
-
-	/// pointer to the data buffer
-	volatile uint8_t *xdata;
-
-	/// data length
-	volatile uint16_t len;
-
-#ifdef TWI_DEBUG
-	void (*debug_hook)(void);
-#endif
-
-} g_bus_ctx;
-
+static volatile struct twi_ctx g_bus_ctx;
 
 /* ================================================================================ */
 
@@ -76,13 +51,28 @@ volatile static struct {
 #define _twi_nack() \
 	TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWINT)
 
+
 // bus status manipulation
-#define _twi_set_idle(__status) __status &= ~0x40
-#define _twi_set_busy(__status) __status |= 0x40
+#define _twi_set_idle(__status) __status &= ~(E_TWI_BIT_BUSY)
+#define _twi_set_busy(__status) __status |= E_TWI_BIT_BUSY
 
 // set clear the repeated start bit
-#define _twi_set_repeated_start(__status) __status |= 0x20
-#define _twi_clear_repeated_start(__status) __status &= ~0x20
+#define _twi_set_repeated_start(__status) __status |= E_TWI_BIT_REPEATED_START
+#define _twi_clear_repeated_start(__status) __status &= ~(E_TWI_BIT_REPEATED_START)
+
+
+/**
+ * @brief send stop or repeated start
+ */
+#define _twi_stop_rs() \
+	if (g_bus_ctx.status & E_TWI_BIT_SEND_STOP) { \
+		_twi_stop(); \
+	} \
+	else { \
+		_twi_set_repeated_start(g_bus_ctx.status); \
+		_twi_repeated_start(); \
+	} \
+	_twi_set_idle(g_bus_ctx.status)
 
 
 #ifdef TWI_DEBUG
@@ -97,6 +87,7 @@ void twi_debug_hook_install(void (*a_dbg)(void)) {
 #endif
 
 
+
 /**
  * @brief TWI wire interface interrupt handler
  *
@@ -109,8 +100,7 @@ ISR(TWI_vect) {
 
 #ifdef TWI_DEBUG
 	// debug hook
-	if (g_bus_ctx.debug_hook)
-		g_bus_ctx.debug_hook();
+	if (g_bus_ctx.debug_hook) g_bus_ctx.debug_hook();
 #endif
 
 	// mask out the prescaler bits
@@ -126,26 +116,12 @@ ISR(TWI_vect) {
 #if TWI_MASTER_TRANSMITTER == 1			
 		case TW_MT_SLA_ACK: // 0x18
 		case TW_MT_DATA_ACK: // 0x28
-			if (g_bus_ctx.len) {
+			if (g_bus_ctx.len--) {
 				TWDR = *g_bus_ctx.xdata++;
-				g_bus_ctx.len--;
 				_twi_ack();
 			}
 			else {
-				if (g_bus_ctx.status & 0x80) {
-					_twi_stop();
-				}
-				/* else if (g_bus_ctx.status & 0x20) { */
-				/* 	// disable int */
-				/* 	TWCR = _BV(TWINT); */
-				/* } */
-				else {
-					_twi_set_repeated_start(g_bus_ctx.status);
-					_twi_repeated_start();
-				}
-
-				// bus is no longer busy
-				g_bus_ctx.status &= ~E_TWI_STATE_BUSY;
+				_twi_stop_rs();
 			}
 
 			break;
@@ -153,19 +129,12 @@ ISR(TWI_vect) {
 		case TW_MT_SLA_NACK: // 0x20
 		case TW_MT_DATA_NACK:
 			// send stop or exit interrupt, next the repeated start will be sent
-			if (g_bus_ctx.status & 0x80) {
-				_twi_stop();
-				
-			}
-			else {
-				_twi_repeated_start();
-				_twi_set_repeated_start(g_bus_ctx.status);
-			}
+			_twi_stop_rs();
 			break;
 
 		case TW_MT_ARB_LOST:
 			// release the bus			
-			_twi_stop();
+			_twi_stop_rs();
 			break;
 #endif
 
@@ -175,13 +144,7 @@ ISR(TWI_vect) {
 			// fall through deliberately
 
 		case TW_MR_SLA_ACK:
-			/* ACK and wait for the data */
-			if (1==g_bus_ctx.len--) {
-				_twi_nack();
-			}
-			else {
-				_twi_ack();
-			}
+			_twi_nack() | ((--g_bus_ctx.len) ? _BV(TWEA) : 0x00);
 			break;
 
 		case TW_MR_DATA_NACK:
@@ -190,16 +153,8 @@ ISR(TWI_vect) {
 			// fall through deliberately
 
 		case TW_MR_SLA_NACK:
-			// the BUS is idle again
-			g_bus_ctx.status &= ~E_TWI_STATE_BUSY;
-
 			// send stop or exit interrupt next the repeated start will be sent
-			if (g_bus_ctx.status & 0x80) {
-				
-				_twi_stop();
-			}
-			else
-				_twi_repeated_start();
+			_twi_stop_rs();
 			break;
 #endif
 
@@ -244,19 +199,19 @@ ISR(TWI_vect) {
 
 /* ================================================================================ */
 
-void twi_init() {
-	uint8_t x = sizeof(g_bus_ctx);
+volatile struct twi_ctx* twi_init() {
+	uint8_t x = sizeof(struct twi_ctx);
 	power_twi_enable();		
 	common_zero_mem(&g_bus_ctx, x);
-	
 	// enable interrupt, twi interface and acknowledge bit
 	TWCR = (_BV(TWEN) | _BV(TWIE) | _BV(TWEA));
 	sei();
+	return &g_bus_ctx;
 }
 
 
 #if TWI_MASTER_TRANSMITTER == 1 || TWI_MASTER_RECEIVER == 1
-void twi_setup_master(e_twi_scl_freq a_freq) {
+void twi_setup_master(uint8_t a_freq) {
 	switch(a_freq) {
 		case E_TWI_SCL_250K:
 			// prescaler = 4
@@ -282,18 +237,7 @@ void twi_setup_master(e_twi_scl_freq a_freq) {
 #endif
 
 
-uint8_t twi_get_status() {
-	return (g_bus_ctx.status & E_TWI_STATE_BUSY);
-}
-
-
-uint8_t twi_get_error() {
-	return (g_bus_ctx.status & 0x0f);
-}
-
-
 #if TWI_SLAVE_TRANSMITTER == 1 || TWI_SLAVE_RECEIVER == 1
-
 void twi_setup_slave(uint8_t a_address, uint8_t a_mask) {
 	
 	// respond to general query address
@@ -302,44 +246,43 @@ void twi_setup_slave(uint8_t a_address, uint8_t a_mask) {
 	// set the slave address mask
 	TWAMR = (a_mask << 1);
 }
-
 #endif
+
 
 #if TWI_MASTER_TRANSMITTER == 1
 void twi_mtx(uint8_t a_address, uint8_t *a_data, uint16_t a_len, uint8_t a_flag) {
-	g_bus_ctx.xdata = a_data;
-	g_bus_ctx.len = a_len;
-	g_bus_ctx.slarw = (a_address << 1);
-
-
-	g_bus_ctx.status |= E_TWI_STATE_BUSY;	
-	
-	// generate start or repeated start
-	if (g_bus_ctx.status & 0x20) {
-		// repeated start has been send -> reenable int only
-		_twi_clear_repeated_start(g_bus_ctx.status);
-		TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA);
-	}
-	else {
-		TWCR = _BV(TWINT) | _BV(TWEN) | _BV(TWIE) | _BV(TWEA) | _BV(TWSTA);
-	}
+	_twi_mx((a_address << 1), a_data, a_len, a_flag);
 }
 #endif
 
 
 #if TWI_MASTER_RECEIVER == 1
 void twi_mrx(uint8_t a_address, uint8_t *a_data, uint16_t a_len, uint8_t a_flag) {
-	g_bus_ctx.xdata = a_data;
-	g_bus_ctx.len = a_len;
-	g_bus_ctx.slarw = (a_address << 1) | 0x01;
-
-	g_bus_ctx.status |= (a_flag | E_TWI_STATE_BUSY);
-
-	// generate start or repeated start
-	/* TWCR = | (_BV(TWINT) |  */
-	/* 		(g_bus_ctx.status & 0x20 ? 0x00 : _BV(TWSTA))); */
+	_twi_mx((a_address << 1) | 0x01, a_data, a_len, a_flag);
 }
 #endif
 
+
+/* ================================================================================ */
+
+static void _twi_mx(uint8_t a_address, uint8_t *a_data, uint16_t a_len, uint8_t a_flag) {
+	g_bus_ctx.xdata = a_data;
+	g_bus_ctx.len = a_len;
+	g_bus_ctx.slarw = a_address;
+
+	_twi_set_busy(g_bus_ctx.status);
+	g_bus_ctx.status &= 0x3f;
+	g_bus_ctx.status |= a_flag;
+	
+	// generate start or repeated start
+	if (!(g_bus_ctx.status & E_TWI_BIT_REPEATED_START)) {
+		TWCR = _BV(TWINT) | _BV(TWEN) | _BV(TWIE) | _BV(TWEA) | _BV(TWSTA);
+	}
+	else {
+		// repeated start has been send -> reenable int only
+		_twi_clear_repeated_start(g_bus_ctx.status);
+		TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA);
+	}
+}
 
 /* ================================================================================ */

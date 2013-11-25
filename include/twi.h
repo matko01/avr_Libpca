@@ -50,15 +50,9 @@ typedef enum _e_twi_scl_freq {
 /**
  * @brief whether to send stop bit or not
  */
-#define E_TWI_FLAG_NO_FLAGS 0x00
-#define E_TWI_FLAG_SEND_STOP 0x80
-
-
-/**
- * @brief possible bus states
- */
-#define E_TWI_STATE_IDLE 0x00
-#define	E_TWI_STATE_BUSY 0x40
+#define	E_TWI_BIT_BUSY 0x10
+#define E_TWI_BIT_REPEATED_START 0x20
+#define E_TWI_BIT_SEND_STOP 0x40
 
 
 /**
@@ -71,9 +65,41 @@ typedef enum _e_twi_scl_freq {
 
 
 /**
+ * @brief TWI bus context structure
+ */
+struct twi_ctx {
+	/// slave R/W address
+	volatile uint8_t slarw;
+
+	/**
+	 *  +-------------- unused
+	 *  |	+---------- user_send_stop
+	 *  |	|   +------ repeated_start status
+     *  |   |   |   +-- state (IDLE/BUSY)
+	 *  |   |   |   |
+	 *  v | v | v | v | error
+	 * ---+---+---+---+--------
+	 *  7 | 6 | 5 | 4 | 3 - 0
+	 */
+	volatile uint8_t status; 
+
+	/// pointer to the data buffer
+	volatile uint8_t *xdata;
+
+	/// data length
+	volatile uint16_t len;
+
+#ifdef TWI_DEBUG
+	void (*debug_hook)(void);
+#endif
+
+};
+
+
+/**
  * @brief general TWI interface initialization
  */
-void twi_init();
+volatile struct twi_ctx* twi_init(void);
 
 
 #if TWI_MASTER_TRANSMITTER == 1 || TWI_MASTER_RECEIVER == 1
@@ -82,7 +108,7 @@ void twi_init();
  *
  * @param a_freq SCL frequency
  */
-void twi_setup_master(e_twi_scl_freq a_freq);
+void twi_setup_master(uint8_t a_freq);
 #endif
 
 #if TWI_SLAVE_TRANSMITTER == 1 || TWI_SLAVE_RECEIVER == 1
@@ -130,9 +156,6 @@ void twi_mrx(uint8_t a_address, uint8_t *a_data, uint16_t a_len, uint8_t a_flag)
 void twi_debug_hook_install(void (*a_dbg)(void));
 #endif
 
-
-uint8_t twi_get_status();
-uint8_t twi_get_error();
 
 #endif /* end of include guard: TWI_H_V8WDZFBC */
 
