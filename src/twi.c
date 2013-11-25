@@ -247,11 +247,7 @@ ISR(TWI_vect) {
 void twi_init() {
 	uint8_t x = sizeof(g_bus_ctx);
 	power_twi_enable();		
-
-
-	while (x--) {
-		*(char *)&g_bus_ctx = 0x00;
-	}
+	common_zero_mem(&g_bus_ctx, x);
 	
 	// enable interrupt, twi interface and acknowledge bit
 	TWCR = (_BV(TWEN) | _BV(TWIE) | _BV(TWEA));

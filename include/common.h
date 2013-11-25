@@ -150,6 +150,28 @@ typedef enum _e_return {
 	( (__x) < (__y) ? (__x) : (__y))
 
 
+/**
+ * @brief converts binary value to BCD representation
+ *
+ * @param __val value to be converted
+ *
+ * @return BCD converted value
+ */
+#define BCD2BIN(__val) \
+	((__val & 0x0f) + (__val >> 4) * 10)
+
+
+/**
+ * @brief converts BCD value to binary representation
+ *
+ * @param __val value to be converted
+ *
+ * @return binary converted value
+ */
+#define BIN2BCD(__val) \
+	(((__val / 10) << 4) + __val % 10)
+
+
 // ================================================================================
 
 
@@ -169,5 +191,8 @@ uint16_t common_memory_left();
  * @return absolute unsigned value
  */
 uint32_t common_abs(int32_t a_value);
+
+
+#define common_zero_mem(__ptr, __len) while (__len--) (*(char *)(__ptr)) = 0x00
 
 #endif /* __COMMON_H__ */
