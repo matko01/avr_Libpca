@@ -123,18 +123,23 @@ ISR(TWI_vect) {
 			else {
 				_twi_stop_rs();
 			}
-
 			break;
 
-		case TW_MT_SLA_NACK: // 0x20
+		case TW_MT_SLA_NACK: // 0x20			
 		case TW_MT_DATA_NACK:
 			// send stop or exit interrupt, next the repeated start will be sent
+#if TWI_SUPPORT_BUS_STATUS == 1
+			g_bus_ctx.status |= (TWSR >> 4);
+#endif
 			_twi_stop_rs();
 			break;
 
 		case TW_MT_ARB_LOST:
 			// release the bus			
-			_twi_stop_rs();
+#if TWI_SUPPORT_BUS_STATUS == 1
+			g_bus_ctx.status |= E_TWI_ERROR_ARB_LOST;
+#endif
+			_twi_stop();
 			break;
 #endif
 
@@ -153,6 +158,11 @@ ISR(TWI_vect) {
 			// fall through deliberately
 
 		case TW_MR_SLA_NACK:
+
+#if TWI_SUPPORT_BUS_STATUS == 1
+			g_bus_ctx.status |= (TWSR >> 4);
+#endif
+
 			// send stop or exit interrupt next the repeated start will be sent
 			_twi_stop_rs();
 			break;
@@ -195,7 +205,8 @@ ISR(TWI_vect) {
 			_twi_ack();
 			break;
 	} // switch(TWSR)
-}
+} // ISR(TWI_vect)
+
 
 /* ================================================================================ */
 
@@ -258,10 +269,30 @@ void twi_mtx(uint8_t a_address, uint8_t *a_data, uint16_t a_len, uint8_t a_flag)
 
 #if TWI_MASTER_RECEIVER == 1
 void twi_mrx(uint8_t a_address, uint8_t *a_data, uint16_t a_len, uint8_t a_flag) {
-	_twi_mx((a_address << 1) | 0x01, a_data, a_len, a_flag);
+	_twi_mx(((a_address << 1) | 0x01), a_data, a_len, a_flag);
 }
 #endif
 
+
+#if TWI_SUPPORT_BUS_STATUS == 1
+uint8_t twi_search_devices(uint8_t *a_dev) {
+	uint8_t i = 0x60;
+	uint8_t cnt = 0x00;
+	if (NULL == a_dev) 
+		return 0;
+
+	for (; i < 0x70; i++) {
+		twi_mtx(i, 0x00, 0x00, E_TWI_BIT_SEND_STOP);
+		while (g_bus_ctx.status & E_TWI_BIT_BUSY);
+		if (E_TWI_ERROR_NO_ERROR == (g_bus_ctx.status & 0x0f)) {
+			*a_dev++ = i;
+			cnt++;
+		}
+	}
+
+	return cnt;
+}
+#endif
 
 /* ================================================================================ */
 
@@ -271,7 +302,7 @@ static void _twi_mx(uint8_t a_address, uint8_t *a_data, uint16_t a_len, uint8_t 
 	g_bus_ctx.slarw = a_address;
 
 	_twi_set_busy(g_bus_ctx.status);
-	g_bus_ctx.status &= 0x3f;
+	g_bus_ctx.status &= (E_TWI_BIT_REPEATED_START | E_TWI_BIT_BUSY);
 	g_bus_ctx.status |= a_flag;
 	
 	// generate start or repeated start

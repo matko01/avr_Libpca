@@ -135,6 +135,11 @@
  */
 #define TWI_SLAVE_RECEIVER 1
 
+/**
+ * @brief change to 0 to disable bus status collection after each transaction
+ */
+#define TWI_SUPPORT_BUS_STATUS 1
+
 // ================================================================================
 
 

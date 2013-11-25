@@ -62,6 +62,8 @@ typedef enum _e_twi_scl_freq {
 #define E_TWI_ERROR_ARB_LOST 0x01
 #define E_TWI_ERROR_MT_SLA_NACK 0x02
 #define E_TWI_ERROR_MT_DATA_NACK 0x03
+#define E_TWI_ERROR_MR_SLA_NACK 0x04
+#define E_TWI_ERROR_MR_DATA_NACK 0x05
 
 
 /**
@@ -156,6 +158,17 @@ void twi_mrx(uint8_t a_address, uint8_t *a_data, uint16_t a_len, uint8_t a_flag)
 void twi_debug_hook_install(void (*a_dbg)(void));
 #endif
 
+
+#if TWI_SUPPORT_BUS_STATUS == 1
+/**
+ * @brief search for all the devices connected to the bus
+ *
+ * @param a_dev a table to hold each 7 bit device address
+ *
+ * @return number of devices found
+ */
+uint8_t twi_search_devices(uint8_t *a_dev);
+#endif
 
 #endif /* end of include guard: TWI_H_V8WDZFBC */
 
