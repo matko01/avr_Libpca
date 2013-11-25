@@ -34,6 +34,9 @@
 #include "common.h"
 
 
+#define TWI_DEBUG 1
+// #undef TWI_DEBUG
+
 /**
  * @brief standard i2c frequencies enumeration
  */
@@ -44,18 +47,34 @@ typedef enum _e_twi_scl_freq {
 } e_twi_scl_freq;
 
 
-typedef enum _e_twi_status {
-	E_TWI_STATUS_IDLE = 0x00,
-	
-	E_TWI_STATUS_LAST
-} e_twi_status;
+/**
+ * @brief whether to send stop bit or not
+ */
+#define E_TWI_FLAG_NO_FLAGS 0x00
+#define E_TWI_FLAG_SEND_STOP 0x80
 
+
+/**
+ * @brief possible bus states
+ */
+#define E_TWI_STATE_IDLE 0x00
+#define	E_TWI_STATE_BUSY 0x40
+
+
+/**
+ * @brief possible bus errors
+ */
+#define E_TWI_ERROR_NO_ERROR 0x00
+#define E_TWI_ERROR_ARB_LOST 0x01
+#define E_TWI_ERROR_MT_SLA_NACK 0x02
+#define E_TWI_ERROR_MT_DATA_NACK 0x03
 
 
 /**
  * @brief general TWI interface initialization
  */
 void twi_init();
+
 
 #if TWI_MASTER_TRANSMITTER == 1 || TWI_MASTER_RECEIVER == 1
 /**
@@ -84,7 +103,7 @@ void twi_setup_slave(uint8_t a_address, uint8_t a_mask);
  * @param a_data data buffer
  * @param a_len length of the data
  */
-void twi_mtx(uint8_t a_address, uint8_t *a_data, uint16_t a_len);
+void twi_mtx(uint8_t a_address, uint8_t *a_data, uint16_t a_len, uint8_t a_flag);
 #endif
 
 #if TWI_MASTER_RECEIVER == 1
@@ -96,17 +115,24 @@ void twi_mtx(uint8_t a_address, uint8_t *a_data, uint16_t a_len);
  * @param a_data buffer for the data
  * @param a_maxlen maximum data length
  *
- * @return received data
  */
-uint8_t twi_mrx(uint8_t a_address, uint8_t *a_data, uint16_t a_len);
+void twi_mrx(uint8_t a_address, uint8_t *a_data, uint16_t a_len, uint8_t a_flag);
 #endif
 
+
+#ifdef TWI_DEBUG
+
 /**
- * @brief checks if the TWI hardware is busy
+ * @brief install debug hook which will be called in the interrupt
  *
- * @return 1 if busy
+ * @param a_dbg debug hook to be called
  */
-#define twi_busy() (!(TWCR & _BV(TWINT)))
+void twi_debug_hook_install(void (*a_dbg)(void));
+#endif
+
+
+uint8_t twi_get_status();
+uint8_t twi_get_error();
 
 #endif /* end of include guard: TWI_H_V8WDZFBC */
 
