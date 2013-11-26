@@ -23,13 +23,6 @@
 /* ================================================================================ */
 
 
-static uint8_t _sow_write_bit(struct soft_ow *a_bus, uint8_t a_bit);
-static uint8_t _sow_read_bit(struct soft_ow *a_bus);
-
-
-/* ================================================================================ */
-
-
 void sow_init(struct soft_ow *a_bus) {
 
 	// disable pull-ups
@@ -66,12 +59,10 @@ uint8_t sow_reset(struct soft_ow *a_bus) {
 		SOW_INPUT(a_bus->ddr, a_bus->pin);
 		_delay_us(50); // 15 - 60
 
-		if (bit_is_clear(*(a_bus->inp), a_bus->pin)) {
+		if (!bit_is_clear(*(a_bus->inp), a_bus->pin)) {
 			// after 60 - 240
 			_delay_us(300); 
-			if (bit_is_set(*(a_bus->inp), a_bus->pin)) {
-				presence = 1;
-			}
+			presence = (bit_is_set(*(a_bus->inp), a_bus->pin) ? 0x01 : 0x00);
 		} // bit is clear
 	} // ATOMIC_BLOCK
 	
@@ -95,7 +86,7 @@ uint8_t sow_read_byte(struct soft_ow *a_bus) {
 	uint8_t data = 0x00;
 
 	for (; n<8; n++) {
-		if (_sow_read_bit(a_bus)) data |= (0x01 << n);
+		data |= (_sow_read_bit(a_bus) << n);
 	}
 	
 	return data;
@@ -106,8 +97,7 @@ uint8_t sow_write_data(struct soft_ow *a_bus, uint8_t *a_data, uint8_t a_len) {
 	uint8_t n = a_len;
 
 	while (a_len--) {
-		sow_write_byte(a_bus, *a_data);
-		a_data++;
+		sow_write_byte(a_bus, (*a_data++));
 	}
 
 	return n;
@@ -118,8 +108,7 @@ uint8_t sow_read_data(struct soft_ow *a_bus, uint8_t *a_data, uint8_t a_maxlen) 
 	uint8_t n = a_maxlen;
 
 	while (a_maxlen--) {
-		*a_data = sow_read_byte(a_bus);
-		a_data++;
+		(*a_data++) = sow_read_byte(a_bus);
 	}
 
 	return n;
@@ -129,7 +118,7 @@ uint8_t sow_read_data(struct soft_ow *a_bus, uint8_t *a_data, uint8_t a_maxlen) 
 /* ================================================================================ */
 
 
-static uint8_t _sow_write_bit(struct soft_ow *a_bus, uint8_t a_bit) {
+uint8_t _sow_write_bit(struct soft_ow *a_bus, uint8_t a_bit) {
 	
 	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
 		SOW_OUTPUT(a_bus->ddr, a_bus->pin);
@@ -147,7 +136,7 @@ static uint8_t _sow_write_bit(struct soft_ow *a_bus, uint8_t a_bit) {
 }
 
 
-static uint8_t _sow_read_bit(struct soft_ow *a_bus) {
+uint8_t _sow_read_bit(struct soft_ow *a_bus) {
 	uint8_t bit = 0;
 
 	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
@@ -158,14 +147,10 @@ static uint8_t _sow_read_bit(struct soft_ow *a_bus) {
 		SOW_INPUT(a_bus->ddr, a_bus->pin);
 
 		_delay_us(12); // sample within 15u slot
-		if (bit_is_set(*(a_bus->inp), a_bus->pin))
-			bit = 1;
+		bit = (bit_is_set(*(a_bus->inp), a_bus->pin)) ? 0x01 : 0x00;
 
-		// time slot duration
-		_delay_us(60);
-
-		// recovery time
-		_delay_us(1); 
+		// time slot duration + recovery time
+		_delay_us(60 + 1);
 	}
 	return bit;
 }

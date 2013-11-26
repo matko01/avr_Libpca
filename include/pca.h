@@ -115,6 +115,7 @@
 #include <beeper.h>
 #include <tpwm.h>
 #include <adc.h>
+#include <twi.h>
 
 #include <soft_onewire.h>
 
