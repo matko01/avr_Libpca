@@ -32,20 +32,10 @@
 
 #include "config.h"
 #include "common.h"
-
+#include "twi_common.h"
 
 #define TWI_DEBUG 1
 // #undef TWI_DEBUG
-
-/**
- * @brief standard i2c frequencies enumeration
- */
-typedef enum _e_twi_scl_freq {
-	E_TWI_SCL_100K = 0,
-	E_TWI_SCL_250K,
-	E_TWI_SCL_400K
-} e_twi_scl_freq;
-
 
 /**
  * @brief whether to send stop bit or not
@@ -100,18 +90,12 @@ struct twi_ctx {
 
 /**
  * @brief general TWI interface initialization
- */
-volatile struct twi_ctx* twi_init(void);
-
-
-#if TWI_MASTER_TRANSMITTER == 1 || TWI_MASTER_RECEIVER == 1
-/**
- * @brief initialize the MCU as TWI master
  *
  * @param a_freq SCL frequency
+ *
  */
-void twi_setup_master(uint8_t a_freq);
-#endif
+volatile struct twi_ctx* twi_init(uint8_t a_freq);
+
 
 #if TWI_SLAVE_TRANSMITTER == 1 || TWI_SLAVE_RECEIVER == 1
 /**
@@ -122,8 +106,8 @@ void twi_setup_master(uint8_t a_freq);
 void twi_setup_slave(uint8_t a_address, uint8_t a_mask);
 #endif
 
-#if TWI_MASTER_TRANSMITTER == 1
 
+#if TWI_MASTER_TRANSMITTER == 1
 /**
  * @brief sends data in master transmitter mode
  *
@@ -133,6 +117,7 @@ void twi_setup_slave(uint8_t a_address, uint8_t a_mask);
  */
 void twi_mtx(uint8_t a_address, uint8_t *a_data, uint16_t a_len, uint8_t a_flag);
 #endif
+
 
 #if TWI_MASTER_RECEIVER == 1
 

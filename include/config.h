@@ -130,17 +130,22 @@
 /**
  * @brief change to 0 to disable slave transmitter support
  */
-#define TWI_SLAVE_TRANSMITTER 1
+#define TWI_SLAVE_TRANSMITTER 0
 
 /**
  * @brief change to 0 to disable slave receiver support
  */
-#define TWI_SLAVE_RECEIVER 1
+#define TWI_SLAVE_RECEIVER 0
 
 /**
  * @brief change to 0 to disable bus status collection after each transaction
  */
 #define TWI_SUPPORT_BUS_STATUS 1
+
+/**
+ * @brief change to 0 to disable repeated start support (good for single master buses)
+ */
+#define TWI_SUPPORT_REPEATED_START 0
 
 // ================================================================================
 

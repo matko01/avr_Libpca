@@ -121,7 +121,12 @@ ISR(TWI_vect) {
 				_twi_ack();
 			}
 			else {
+
+#if TWI_SUPPORT_REPEATED_START == 1
 				_twi_stop_rs();
+#else
+				_twi_stop();
+#endif
 			}
 			break;
 
@@ -131,7 +136,12 @@ ISR(TWI_vect) {
 #if TWI_SUPPORT_BUS_STATUS == 1
 			g_bus_ctx.status |= (TWSR >> 4);
 #endif
+
+#if TWI_SUPPORT_REPEATED_START == 1
 			_twi_stop_rs();
+#else
+			_twi_stop();
+#endif
 			break;
 
 		case TW_MT_ARB_LOST:
@@ -163,8 +173,12 @@ ISR(TWI_vect) {
 			g_bus_ctx.status |= (TWSR >> 4);
 #endif
 
+#if TWI_SUPPORT_REPEATED_START == 1
 			// send stop or exit interrupt next the repeated start will be sent
 			_twi_stop_rs();
+#else
+			_twi_stop();
+#endif
 			break;
 #endif
 
@@ -210,19 +224,17 @@ ISR(TWI_vect) {
 
 /* ================================================================================ */
 
-volatile struct twi_ctx* twi_init() {
+volatile struct twi_ctx* twi_init(uint8_t a_freq) {
 	uint8_t x = sizeof(struct twi_ctx);
+
 	power_twi_enable();		
 	common_zero_mem(&g_bus_ctx, x);
+
 	// enable interrupt, twi interface and acknowledge bit
 	TWCR = (_BV(TWEN) | _BV(TWIE) | _BV(TWEA));
-	sei();
-	return &g_bus_ctx;
-}
-
 
 #if TWI_MASTER_TRANSMITTER == 1 || TWI_MASTER_RECEIVER == 1
-void twi_setup_master(uint8_t a_freq) {
+	// setup frequency
 	switch(a_freq) {
 		case E_TWI_SCL_250K:
 			// prescaler = 4
@@ -243,9 +255,11 @@ void twi_setup_master(uint8_t a_freq) {
 			TWBR = 0x12;
 			break;
 	}
-}
-
 #endif
+
+	sei();
+	return &g_bus_ctx;
+}
 
 
 #if TWI_SLAVE_TRANSMITTER == 1 || TWI_SLAVE_RECEIVER == 1
@@ -306,14 +320,20 @@ static void _twi_mx(uint8_t a_address, uint8_t *a_data, uint16_t a_len, uint8_t 
 	g_bus_ctx.status |= a_flag;
 	
 	// generate start or repeated start
-	if (!(g_bus_ctx.status & E_TWI_BIT_REPEATED_START)) {
+#if TWI_SUPPORT_REPEATED_START == 1
+	if (!(g_bus_ctx.status & E_TWI_BIT_REPEATED_START)) 
+	{
+#endif
 		TWCR = _BV(TWINT) | _BV(TWEN) | _BV(TWIE) | _BV(TWEA) | _BV(TWSTA);
+#if TWI_SUPPORT_REPEATED_START == 1
 	}
-	else {
+	else
+   	{
 		// repeated start has been send -> reenable int only
 		_twi_clear_repeated_start(g_bus_ctx.status);
 		TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA);
 	}
+#endif
 }
 
 /* ================================================================================ */

@@ -116,8 +116,11 @@
 #include <tpwm.h>
 #include <adc.h>
 #include <twi.h>
-
 #include <soft_onewire.h>
+
+#include <dev_ds1307.h>
+#include <dev_ds18b20.h>
+
 
 // ================================================================================
 

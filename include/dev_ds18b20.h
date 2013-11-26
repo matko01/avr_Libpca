@@ -1,0 +1,14 @@
+#ifndef DEV_DS18B20_H_1QHHIDKK
+#define DEV_DS18B20_H_1QHHIDKK
+
+// ds18b20 specific commands
+#define DS18B20_CMD_ALARM_SEARCH 0xec
+#define DS18B20_CMD_CONVERT_T 0x44
+#define DS18B20_CMD_WRITE_SP 0x4e
+#define DS18B20_CMD_READ_SP 0xbe
+#define DS18B20_CMD_COPY_SP 0x48
+#define DS18B20_CMD_RECALL_EE 0xb8
+#define DS18B20_CMD_READ_POWER 0xb4
+
+#endif /* end of include guard: DEV_DS18B20_H_1QHHIDKK */
+
