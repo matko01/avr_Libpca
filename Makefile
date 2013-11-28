@@ -16,10 +16,17 @@ DEPS=
 COBJ=$(SOURCES:.c=.o)
 
 CC=avr-gcc
+AS=avr-as
 AR=avr-ar
 STRIP=avr-strip
 MCU=atmega328p
-CFLAGS=-I. -Iinclude/ -Wall -Os -DF_CPU=16000000UL -std=c99 -ffunction-sections -fdata-sections 
+CFLAGS=-I. -Iinclude/ -Wall -Os -DF_CPU=16000000UL -std=gnu99 \
+	   -ffunction-sections \
+	   -fdata-sections \
+	   -fpack-struct \
+	   -fno-tree-scev-cprop \
+	   -funsigned-bitfields \
+	   -fno-inline-small-functions
 LDFLAGS=
 
 all: $(TARGET)
@@ -35,4 +42,4 @@ $(TARGET): $(COBJ)
 
 clean:
 	@echo ========== cleanup ========== 
-	rm -rf *.o $(TARGET)	
+	rm -rf *.s *.o $(TARGET)	

@@ -172,6 +172,28 @@ typedef enum _e_return {
 	(((__val / 10) << 4) + __val % 10)
 
 
+/**
+ * @brief get pointer to DDR register from PORT register
+ *
+ * @param __val pointer to PORT register 
+ *
+ * @return pointer to DDR register
+ */
+#define GET_DDRX_FROM_PORTX(__portx) \
+	(__portx - 1)	
+
+
+/**
+ * @brief get pointer to PIN register from PORT register
+ *
+ * @param __val pointer to PORT register 
+ *
+ * @return pointer to PIN register
+ */
+#define GET_PINX_FROM_PORTX(__portx) \
+	(__portx - 2)	
+
+
 // ================================================================================
 
 
