@@ -117,9 +117,11 @@
 #include <adc.h>
 #include <twi.h>
 #include <soft_onewire.h>
+#include <gpio.h>
 
 #include <dev_ds1307.h>
 #include <dev_ds18b20.h>
+#include <dev_hd44780.h>
 
 
 // ================================================================================

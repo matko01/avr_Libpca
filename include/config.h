@@ -145,7 +145,19 @@
 /**
  * @brief change to 0 to disable repeated start support (good for single master buses)
  */
-#define TWI_SUPPORT_REPEATED_START 0
+#define TWI_SUPPORT_REPEATED_START 1
+
+// ================================================================================
+
+/**
+ * @brief change to 1 to use the lcd in 8 bit data bus mode
+ */
+#define HD44780_8BIT_MODE 0
+
+/**
+ * @brief change to 1 to use the lcd rw line and enable support for read operation
+ */
+#define HD44780_USE_RW_LINE 0 
 
 // ================================================================================
 

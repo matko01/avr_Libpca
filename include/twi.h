@@ -98,6 +98,7 @@ volatile struct twi_ctx* twi_init(uint8_t a_freq);
 
 
 #if TWI_SLAVE_TRANSMITTER == 1 || TWI_SLAVE_RECEIVER == 1
+#error TWI SLAVE MODE NOT SUPPORTED AT THE MOMENT
 /**
  * @brief initialize MCU as a TWI slave with given address
  *

@@ -10,7 +10,8 @@ SOURCES= \
 		tpwm.c \
 		twi.c \
 		timer_common.c \
-		tdelay_common.c
+		tdelay_common.c \
+		dev_hd44780.c
 
 DEPS=
 COBJ=$(SOURCES:.c=.o)
