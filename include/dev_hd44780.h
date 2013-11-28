@@ -12,16 +12,20 @@
 #define HD44780_DATALINES 4
 #endif
 
+// ================================================================================
 
 /**
  * @brief waiting time for the display reset
  */
 #define HD44780_RESET_DELAY_MS 50
 
+// ================================================================================
+
 /// available fonts
 #define HD44780_FONT_5X8 0
 #define HD44780_FONT_5X10 1
 
+// ================================================================================
 
 // commands
 #define HD44780_CMD_CLRSCR() 0x01
@@ -45,6 +49,7 @@
 #define HD44780_CMD_SET_DDRAM(__add) \
 	(0x80 | __add)
 
+// ================================================================================
 
 /**
  * @brief display context
@@ -67,35 +72,90 @@ struct dev_hd44780_ctx {
 };
 
 
+// ================================================================================
 
 
+/**
+ * @brief Send a command to the display
+ *
+ * @param __disp display context
+ * @param __cmd a command byte
+ */
 #define hd44780_cmd(__disp, __cmd) \
 	hd44780_write(__disp, __cmd, 0); \
 	_delay_us(40)
 
 
+/**
+ * @brief Send a data (display RAM) to the display
+ *
+ * @param __disp display context
+ * @param __data the data itself
+ */
 #define hd44780_data(__disp, __data) \
 	hd44780_write(__disp, __data, 1); \
 	_delay_us(40)
 
 
+/**
+ * @brief helper macro to send a clear-screen command
+ *
+ * @param Display context
+ */
 #define hd44780_clrscr(__disp) \
 	hd44780_cmd(a_disp, HD44780_CMD_CLRSCR()); \
 	_delay_us(1600)
 
 
+/**
+ * @brief Send a single character to the display
+ *
+ * @param __disp display context
+ * @param __pos character
+ */
 #define hd44780_putc(__disp, __char) \
 	hd44780_data(__disp, __char)
 
 
+/**
+ * @brief Place a cursor at specified position
+ *
+ * @param __disp display context
+ * @param __pos position
+ */
 #define hd44780_goto(__disp, __pos) \
 	hd44780_cmd(__disp, HD44780_CMD_SET_DDRAM(__pos))
 
 
+/**
+ * @brief initialize the display described by the given context
+ *
+ * The context should define which lines are used by the display
+ *
+ * @param a_disp display context
+ */
 void hd44780_init(struct dev_hd44780_ctx *a_disp);
+
+
+/**
+ * @brief Write data to the display
+ *
+ * @param a_disp display context
+ * @param a_data data byte
+ * @param a_rs register select value, 0 - instruction register, 1 - data register
+ */
 void hd44780_write(struct dev_hd44780_ctx *a_disp, uint8_t a_data, uint8_t a_rs);
+
+
+/**
+ * @brief put a string on the display
+ *
+ * @param a_disp display context
+ * @param a_str string to display
+ */
 void hd44780_puts(struct dev_hd44780_ctx *a_disp, const char *a_str);
 
+// ================================================================================
 
 #if HD44780_USE_RW_LINE == 1
 #error HD44780 RW LINE NOT SUPPORTED AT THE MOMENT

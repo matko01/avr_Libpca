@@ -34,9 +34,7 @@ void hd44780_init(struct dev_hd44780_ctx *a_disp) {
 	// wait for at least 4.1 ms + 2 * 200 us
 	_delay_ms(10);
 
-#if HD44780_8BIT_MODE == 1
-	GPIO_SET_LOW(&a_disp->data[4]);
-#else
+#if HD44780_8BIT_MODE == 0
 	GPIO_SET_LOW(&a_disp->data[0]);
 #endif
 
@@ -61,43 +59,38 @@ void hd44780_init(struct dev_hd44780_ctx *a_disp) {
 void hd44780_write(struct dev_hd44780_ctx *a_disp, uint8_t a_data, uint8_t a_rs) {	
 
 	uint8_t x = HD44780_DATALINES;
-	uint8_t offset = 0;
+
+#if HD44780_8BIT_MODE == 1
+	uint8_t nibbles = 1;
+#else
+	uint8_t nibbles = 3;
+#endif
 
 	if (a_rs)
 		GPIO_SET_HIGH(&a_disp->rs);
 	else
 		GPIO_SET_LOW(&a_disp->rs);
 
-	offset = 4;
-	while (x--) {
-		if (a_data & (0x01 << (x + offset)))
-			GPIO_SET_HIGH(&a_disp->data[x]);
-		else
-			GPIO_SET_LOW(&a_disp->data[x]);
+#if HD44780_8BIT_MODE == 0
+	while (--nibbles) {
+#endif
+
+		x = HD44780_DATALINES;
+		while (x--) {
+			if (a_data & (0x01 << (x + 4*(nibbles-1))))
+				GPIO_SET_HIGH(&a_disp->data[x]);
+			else
+				GPIO_SET_LOW(&a_disp->data[x]);
+		}
+
+		GPIO_SET_LOW(&a_disp->e);
+		_delay_us(1);
+		GPIO_SET_HIGH(&a_disp->e);
+		_delay_us(1);
+		GPIO_SET_LOW(&a_disp->e);
+#if HD44780_8BIT_MODE == 0
 	}
-
-	GPIO_SET_LOW(&a_disp->e);
-	_delay_us(1);
-	GPIO_SET_HIGH(&a_disp->e);
-	_delay_us(1);
-	GPIO_SET_LOW(&a_disp->e);
-
-
-	offset = 0;
-	x = HD44780_DATALINES;
-	while (x--) {
-		if (a_data & (0x01 << (x + offset)))
-			GPIO_SET_HIGH(&a_disp->data[x]);
-		else
-			GPIO_SET_LOW(&a_disp->data[x]);
-	}
-
-	GPIO_SET_LOW(&a_disp->e);
-	_delay_us(1);
-	GPIO_SET_HIGH(&a_disp->e);
-	_delay_us(1);
-	GPIO_SET_LOW(&a_disp->e);
-
+#endif
 }
 
 
