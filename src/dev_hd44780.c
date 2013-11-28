@@ -1,6 +1,11 @@
 #include <dev_hd44780.h>
 #include <util/delay.h>
 
+/* ================================================================================ */
+
+static void _hd44780_data_latch(struct dev_hd44780_ctx *a_disp);
+
+/* ================================================================================ */
 
 void hd44780_init(struct dev_hd44780_ctx *a_disp) {
 	
@@ -8,6 +13,11 @@ void hd44780_init(struct dev_hd44780_ctx *a_disp) {
 
 	GPIO_CONFIGURE_AS_OUTPUT(&a_disp->rs);
 	GPIO_CONFIGURE_AS_OUTPUT(&a_disp->e);
+
+#if HD44780_USE_RW_LINE == 1
+	GPIO_CONFIGURE_AS_OUTPUT(&a_disp->rw);
+	GPIO_SET_LOW(&a_disp->rw);
+#endif
 
 	// set control lines low
 	GPIO_SET_LOW(&a_disp->rs);
@@ -22,7 +32,6 @@ void hd44780_init(struct dev_hd44780_ctx *a_disp) {
 	// wait for the display
 	_delay_ms(HD44780_RESET_DELAY_MS);
 
-
 #if HD44780_8BIT_MODE == 1
 	GPIO_SET_LOW(&a_disp->data[7]);
 	GPIO_SET_LOW(&a_disp->data[6]);
@@ -31,16 +40,23 @@ void hd44780_init(struct dev_hd44780_ctx *a_disp) {
 	GPIO_SET_LOW(&a_disp->data[2]);
 #endif
 
-	// wait for at least 4.1 ms + 2 * 200 us
-	_delay_ms(10);
+	_hd44780_data_latch(a_disp);
+	_delay_ms(5);
+
+	x=4;
+	while (--x) {
+		_hd44780_data_latch(a_disp);
+		_delay_us(200);
+	}
 
 #if HD44780_8BIT_MODE == 0
 	GPIO_SET_LOW(&a_disp->data[0]);
 #endif
 
+	_hd44780_data_latch(a_disp);
+
 	// wait for a while before sending the "real" commands
 	_delay_us(10);
-
 
 	// set font and display lines
 #if HD44780_8BIT_MODE == 1
@@ -87,11 +103,9 @@ void hd44780_write(struct dev_hd44780_ctx *a_disp, uint8_t a_data, uint8_t a_rs)
 				GPIO_SET_LOW(&a_disp->data[x]);
 		}
 
-		GPIO_SET_LOW(&a_disp->e);
-		_delay_us(1);
-		GPIO_SET_HIGH(&a_disp->e);
-		_delay_us(1);
-		GPIO_SET_LOW(&a_disp->e);
+		// latch the data
+		_hd44780_data_latch(a_disp);
+
 #if HD44780_8BIT_MODE == 0
 	}
 #endif
@@ -101,3 +115,22 @@ void hd44780_write(struct dev_hd44780_ctx *a_disp, uint8_t a_data, uint8_t a_rs)
 void hd44780_puts(struct dev_hd44780_ctx *a_disp, const char *a_str) {
 	while (*a_str) hd44780_putc(a_disp, *a_str++);
 }
+
+
+#if HD44780_USE_RW_LINE == 1
+uint8_t hd44780_read(struct dev_hd44780_ctx *a_disp, uint8_t a_rs) {
+
+}
+#endif
+
+/* ================================================================================ */
+
+static void _hd44780_data_latch(struct dev_hd44780_ctx *a_disp) {
+		GPIO_SET_LOW(&a_disp->e);
+		_delay_us(1);
+		GPIO_SET_HIGH(&a_disp->e);
+		_delay_us(1);
+		GPIO_SET_LOW(&a_disp->e);
+}
+
+/* ================================================================================ */

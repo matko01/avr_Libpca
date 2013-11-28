@@ -104,7 +104,7 @@ struct dev_hd44780_ctx {
  */
 #define hd44780_clrscr(__disp) \
 	hd44780_cmd(a_disp, HD44780_CMD_CLRSCR()); \
-	_delay_us(1600)
+	_delay_us(1700)
 
 
 /**
@@ -158,8 +158,7 @@ void hd44780_puts(struct dev_hd44780_ctx *a_disp, const char *a_str);
 // ================================================================================
 
 #if HD44780_USE_RW_LINE == 1
-#error HD44780 RW LINE NOT SUPPORTED AT THE MOMENT
-void hd44780_read(struct dev_hd44780_ctx *a_disp, uint8_t *a_data, uint8_t a_len);
+uint8_t hd44780_read(struct dev_hd44780_ctx *a_disp, uint8_t a_rs);
 #endif
 
 
