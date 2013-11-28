@@ -43,7 +43,11 @@ void hd44780_init(struct dev_hd44780_ctx *a_disp) {
 
 
 	// set font and display lines
+#if HD44780_8BIT_MODE == 1
+	hd44780_cmd(a_disp, HD44780_CMD_FUNCTION_SET(1, (a_disp->lines >= 2), a_disp->font));
+#else
 	hd44780_cmd(a_disp, HD44780_CMD_FUNCTION_SET(0, (a_disp->lines >= 2), a_disp->font));
+#endif
 
 	// display on, cursor off, blink off
 	hd44780_cmd(a_disp, HD44780_CMD_DISPLAY_CONTROL(1, 0, 0));
