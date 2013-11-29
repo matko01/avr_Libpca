@@ -9,6 +9,7 @@ SOURCES= \
 		beeper.c \
 		tpwm.c \
 		twi.c \
+		twi_poll.c \
 		timer_common.c \
 		tdelay_common.c \
 		dev_hd44780.c

@@ -34,8 +34,8 @@
 #include "common.h"
 #include "twi_common.h"
 
-#define TWI_DEBUG 1
-// #undef TWI_DEBUG
+// #define TWI_DEBUG 1
+#undef TWI_DEBUG
 
 /**
  * @brief whether to send stop bit or not
