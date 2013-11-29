@@ -81,11 +81,10 @@ static volatile struct twi_ctx g_bus_ctx;
  *
  * @param a_dbg
  */
-void twi_debug_hook_install(void (*a_dbg)(void)) {
+void twi_debug_hook_install(twi_debug_hook_t a_dbg) {
 	g_bus_ctx.debug_hook = a_dbg;
 }
 #endif
-
 
 
 /**
@@ -234,44 +233,12 @@ volatile struct twi_ctx* twi_init(uint8_t a_freq) {
 	TWCR = (_BV(TWEN) | _BV(TWIE) | _BV(TWEA));
 
 #if TWI_MASTER_TRANSMITTER == 1 || TWI_MASTER_RECEIVER == 1
-	// setup frequency
-	switch(a_freq) {
-		case E_TWI_SCL_250K:
-			// prescaler = 4
-			TWSR = 0x01;
-			TWBR = 0x06;
-			break;
-
-		case E_TWI_SCL_400K:
-			// prescaler = 4
-			TWSR = 0x01;
-			TWBR = 0x03;
-			break;
-
-		default:
-		case E_TWI_SCL_100K:
-			// prescaler = 4
-			TWSR = 0x01;
-			TWBR = 0x12;
-			break;
-	}
+	_twi_common_frequency_setup(a_freq);
 #endif
 
 	sei();
 	return &g_bus_ctx;
 }
-
-
-#if TWI_SLAVE_TRANSMITTER == 1 || TWI_SLAVE_RECEIVER == 1
-void twi_setup_slave(uint8_t a_address, uint8_t a_mask) {
-	
-	// respond to general query address
-	TWAR = (a_address << 1) | 0x01;
-
-	// set the slave address mask
-	TWAMR = (a_mask << 1);
-}
-#endif
 
 
 #if TWI_MASTER_TRANSMITTER == 1

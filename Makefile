@@ -10,6 +10,7 @@ SOURCES= \
 		tpwm.c \
 		twi.c \
 		twi_poll.c \
+		twi_common.c \
 		timer_common.c \
 		tdelay_common.c \
 		dev_hd44780.c

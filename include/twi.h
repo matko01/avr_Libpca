@@ -34,15 +34,14 @@
 #include "common.h"
 #include "twi_common.h"
 
-// #define TWI_DEBUG 1
-#undef TWI_DEBUG
 
-/**
- * @brief whether to send stop bit or not
+/** 
+ * @brief internal repeated start bit definition 
+ *
+ * When set it means that the system already 
+ * sent a repeated start bin
  */
-#define	E_TWI_BIT_BUSY 0x10
 #define E_TWI_BIT_REPEATED_START 0x20
-#define E_TWI_BIT_SEND_STOP 0x40
 
 
 /**
@@ -63,17 +62,8 @@ struct twi_ctx {
 	/// slave R/W address
 	volatile uint8_t slarw;
 
-	/**
-	 *  +-------------- unused
-	 *  |	+---------- user_send_stop
-	 *  |	|   +------ repeated_start status
-     *  |   |   |   +-- state (IDLE/BUSY)
-	 *  |   |   |   |
-	 *  v | v | v | v | error
-	 * ---+---+---+---+--------
-	 *  7 | 6 | 5 | 4 | 3 - 0
-	 */
-	volatile uint8_t status; 
+	/// status
+	twi_status_t status; 
 
 	/// pointer to the data buffer
 	volatile uint8_t *xdata;
@@ -82,7 +72,7 @@ struct twi_ctx {
 	volatile uint16_t len;
 
 #ifdef TWI_DEBUG
-	void (*debug_hook)(void);
+	twi_debug_hook_t debug_hook;
 #endif
 
 };
@@ -95,17 +85,6 @@ struct twi_ctx {
  *
  */
 volatile struct twi_ctx* twi_init(uint8_t a_freq);
-
-
-#if TWI_SLAVE_TRANSMITTER == 1 || TWI_SLAVE_RECEIVER == 1
-#error TWI SLAVE MODE NOT SUPPORTED AT THE MOMENT
-/**
- * @brief initialize MCU as a TWI slave with given address
- *
- * @param a_address
- */
-void twi_setup_slave(uint8_t a_address, uint8_t a_mask);
-#endif
 
 
 #if TWI_MASTER_TRANSMITTER == 1
@@ -121,7 +100,6 @@ void twi_mtx(uint8_t a_address, uint8_t *a_data, uint16_t a_len, uint8_t a_flag)
 
 
 #if TWI_MASTER_RECEIVER == 1
-
 /**
  * @brief receives data in master receiver mode
  *
@@ -134,17 +112,6 @@ void twi_mrx(uint8_t a_address, uint8_t *a_data, uint16_t a_len, uint8_t a_flag)
 #endif
 
 
-#ifdef TWI_DEBUG
-
-/**
- * @brief install debug hook which will be called in the interrupt
- *
- * @param a_dbg debug hook to be called
- */
-void twi_debug_hook_install(void (*a_dbg)(void));
-#endif
-
-
 #if TWI_SUPPORT_BUS_STATUS == 1
 /**
  * @brief search for all the devices connected to the bus
@@ -154,6 +121,16 @@ void twi_debug_hook_install(void (*a_dbg)(void));
  * @return number of devices found
  */
 uint8_t twi_search_devices(uint8_t *a_dev);
+#endif
+
+
+#ifdef TWI_DEBUG
+/**
+ * @brief install debug hook which will be called in the interrupt
+ *
+ * @param a_dbg debug hook to be called
+ */
+void twi_debug_hook_install(twi_debug_hook_t);
 #endif
 
 #endif /* end of include guard: TWI_H_V8WDZFBC */
