@@ -24,6 +24,10 @@ typedef struct _gpio_pin {
 	*(GET_DDRX_FROM_PORTX((__gpio)->port)) &= ~_BV((__gpio)->pin)
 
 
+#define GPIO_GET(__gpio) \
+	(*(GET_PINX_FROM_PORTX((__gpio)->port)) & _BV((__gpio)->pin))
+
+
 #define GPIO_SET_LOW(__gpio) \
 	*(__gpio)->port &= ~_BV((__gpio)->pin)
 
