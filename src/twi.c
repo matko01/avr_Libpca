@@ -52,15 +52,6 @@ static volatile struct twi_ctx g_bus_ctx;
 	TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWINT)
 
 
-// bus status manipulation
-#define _twi_set_idle(__status) __status &= ~(E_TWI_BIT_BUSY)
-#define _twi_set_busy(__status) __status |= E_TWI_BIT_BUSY
-
-// set clear the repeated start bit
-#define _twi_set_repeated_start(__status) __status |= E_TWI_BIT_REPEATED_START
-#define _twi_clear_repeated_start(__status) __status &= ~(E_TWI_BIT_REPEATED_START)
-
-
 /**
  * @brief send stop or repeated start
  */
@@ -69,10 +60,10 @@ static volatile struct twi_ctx g_bus_ctx;
 		_twi_stop(); \
 	} \
 	else { \
-		_twi_set_repeated_start(g_bus_ctx.status); \
+		_twi_common_set_repeated_start(g_bus_ctx.status); \
 		_twi_repeated_start(); \
 	} \
-	_twi_set_idle(g_bus_ctx.status)
+	_twi_common_set_idle(g_bus_ctx.status)
 
 
 #ifdef TWI_DEBUG
@@ -282,7 +273,7 @@ static void _twi_mx(uint8_t a_address, uint8_t *a_data, uint16_t a_len, uint8_t 
 	g_bus_ctx.len = a_len;
 	g_bus_ctx.slarw = a_address;
 
-	_twi_set_busy(g_bus_ctx.status);
+	_twi_common_set_busy(g_bus_ctx.status);
 	g_bus_ctx.status &= (E_TWI_BIT_REPEATED_START | E_TWI_BIT_BUSY);
 	g_bus_ctx.status |= a_flag;
 	
@@ -297,7 +288,7 @@ static void _twi_mx(uint8_t a_address, uint8_t *a_data, uint16_t a_len, uint8_t 
 	else
    	{
 		// repeated start has been send -> reenable int only
-		_twi_clear_repeated_start(g_bus_ctx.status);
+		_twi_common_clear_repeated_start(g_bus_ctx.status);
 		TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA);
 	}
 #endif

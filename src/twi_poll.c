@@ -50,6 +50,26 @@ void twi_poll_init(uint8_t a_freq) {
 
 
 void twi_poll_mtx(uint8_t a_address, uint8_t *a_data, uint16_t a_len, uint8_t a_flag) {
+	
+	_twi_common_set_busy(g_bus_ctx.status);
+	g_bus_ctx.status &= (E_TWI_BIT_REPEATED_START | E_TWI_BIT_BUSY);
+	g_bus_ctx.status |= a_flag;
+
+	// generate start or repeated start
+#if TWI_SUPPORT_REPEATED_START == 1
+	if (!(g_bus_ctx.status & E_TWI_BIT_REPEATED_START)) 
+	{
+#endif
+		TWCR = _BV(TWINT) | _BV(TWEN) | _BV(TWEA) | _BV(TWSTA);
+#if TWI_SUPPORT_REPEATED_START == 1
+	}
+	else
+   	{
+		// repeated start has been send
+		_twi_common_clear_repeated_start(g_bus_ctx.status);
+		TWCR = _BV(TWEN) | _BV(TWEA);
+	}
+#endif
 }
 
 

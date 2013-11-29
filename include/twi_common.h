@@ -9,16 +9,25 @@
 #undef TWI_DEBUG
 
 
-/** 
- * @brief defines if the transaction should end with sending the STOP bit
- */
-#define E_TWI_BIT_SEND_STOP 0x40
-
-
 /**
  * @brief if set indicates that the TWI HW is in the middle of operation
  */
 #define	E_TWI_BIT_BUSY 0x10
+
+
+/** 
+ * @brief internal repeated start bit definition 
+ *
+ * When set it means that the system already 
+ * sent a repeated start bin
+ */
+#define E_TWI_BIT_REPEATED_START 0x20
+
+
+/** 
+ * @brief defines if the transaction should end with sending the STOP bit
+ */
+#define E_TWI_BIT_SEND_STOP 0x40
 
 
 /**
@@ -42,6 +51,17 @@ typedef enum _e_twi_scl_freq {
  *  7 | 6 | 5 | 4 | 3 - 0
  */
 typedef volatile uint8_t twi_status_t;
+
+
+// bus status manipulation
+#define _twi_common_set_idle(__status) __status &= ~(E_TWI_BIT_BUSY)
+#define _twi_common_set_busy(__status) __status |= E_TWI_BIT_BUSY
+
+
+// set clear the repeated start bit
+#define _twi_common_set_repeated_start(__status) __status |= E_TWI_BIT_REPEATED_START
+#define _twi_common_clear_repeated_start(__status) __status &= ~(E_TWI_BIT_REPEATED_START)
+
 
 
 /**

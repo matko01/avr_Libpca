@@ -35,15 +35,6 @@
 #include "twi_common.h"
 
 
-/** 
- * @brief internal repeated start bit definition 
- *
- * When set it means that the system already 
- * sent a repeated start bin
- */
-#define E_TWI_BIT_REPEATED_START 0x20
-
-
 /**
  * @brief possible bus errors
  */
