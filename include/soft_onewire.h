@@ -62,13 +62,11 @@ struct soft_ow {
 	// 0 - power_mode
 	// 1 - topology
 
+	volatile uint8_t *port; // PORTX
 	//  ----------- | x | x
 	// -------------+---+---
 	//  7 6 5 4 3 2 | 1 | 0
 	uint8_t conf;
-	volatile uint8_t *ddr; // DDRX
-	volatile uint8_t *inp; // PINX
-	volatile uint8_t *outp; // PORTX
 };
 
 
@@ -124,6 +122,7 @@ uint8_t _sow_read_bit(struct soft_ow *a_bus);
  *
  * @param a_bus bus descriptor
  * @param a_bit bit to be written
+ *
  */
 void _sow_write_bit(struct soft_ow *a_bus, uint8_t a_bit);
 
@@ -147,6 +146,7 @@ uint8_t sow_read_byte(struct soft_ow *a_bus);
  *
  * @param a_bus bus descriptor
  * @param a_byte byte to written
+ *
  */
 void sow_write_byte(struct soft_ow *a_bus, uint8_t a_byte);
 
@@ -160,9 +160,8 @@ void sow_write_byte(struct soft_ow *a_bus, uint8_t a_byte);
  * @param a_data buffer for incoming data
  * @param a_maxlen how much data to read
  *
- * @return number of bytes read
  */
-uint8_t sow_read_data(struct soft_ow *a_bus, uint8_t *a_data, uint8_t a_maxlen);
+void sow_read_data(struct soft_ow *a_bus, uint8_t *a_data, uint8_t a_maxlen);
 
 
 /**
@@ -172,9 +171,8 @@ uint8_t sow_read_data(struct soft_ow *a_bus, uint8_t *a_data, uint8_t a_maxlen);
  * @param a_data data buffer holding the data
  * @param a_len how many bytes to write
  *
- * @return number of bytes written
  */
-uint8_t sow_write_data(struct soft_ow *a_bus, uint8_t *a_data, uint8_t a_len);
+void sow_write_data(struct soft_ow *a_bus, uint8_t *a_data, uint8_t a_len);
 
 
 #endif /* end of include guard: SOFT_ONEWIRE_H_ZBD6VGNS */

@@ -25,6 +25,8 @@
 // global bus context
 static struct twi_poll_ctx g_bus_ctx;
 
+#define _twi_poll_twint_wait() \
+	while (!(TWCR & _BV(TWINT)))
 
 #ifdef TWI_DEBUG
 /**
@@ -70,6 +72,9 @@ void twi_poll_mtx(uint8_t a_address, uint8_t *a_data, uint16_t a_len, uint8_t a_
 		TWCR = _BV(TWEN) | _BV(TWEA);
 	}
 #endif
+
+	_twi_poll_twint_wait();
+	
 }
 
 
