@@ -124,10 +124,8 @@ uint8_t _sow_read_bit(struct soft_ow *a_bus);
  *
  * @param a_bus bus descriptor
  * @param a_bit bit to be written
- *
- * @return 
  */
-uint8_t _sow_write_bit(struct soft_ow *a_bus, uint8_t a_bit);
+void _sow_write_bit(struct soft_ow *a_bus, uint8_t a_bit);
 
 
 /**
@@ -149,10 +147,8 @@ uint8_t sow_read_byte(struct soft_ow *a_bus);
  *
  * @param a_bus bus descriptor
  * @param a_byte byte to written
- *
- * @return 1 one success
  */
-uint8_t sow_write_byte(struct soft_ow *a_bus, uint8_t a_byte);
+void sow_write_byte(struct soft_ow *a_bus, uint8_t a_byte);
 
 
 /**

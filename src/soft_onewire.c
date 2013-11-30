@@ -5,19 +5,19 @@
 
 
 #define SOW_OUTPUT(__ddr, __pin) \
-	(*__ddr) |= _BV(__pin)
+	(*(__ddr)) |= _BV(__pin)
 
 
 #define SOW_INPUT(__ddr, __pin) \
-	(*__ddr) &= ~_BV(__pin)
+	(*(__ddr)) &= ~_BV(__pin)
 
 
 #define SOW_HIGH(__port, __pin) \
-	(*__port) |= _BV(__pin)
+	(*(__port)) |= _BV(__pin)
 
 
 #define SOW_LOW(__port, __pin) \
-	(*__port) &= ~_BV(__pin)
+	(*(__port)) &= ~_BV(__pin)
 
 
 /* ================================================================================ */
@@ -59,7 +59,7 @@ uint8_t sow_reset(struct soft_ow *a_bus) {
 		SOW_INPUT(a_bus->ddr, a_bus->pin);
 		_delay_us(50); // 15 - 60
 
-		if (!bit_is_clear(*(a_bus->inp), a_bus->pin)) {
+		if (bit_is_clear(*(a_bus->inp), a_bus->pin)) {
 			// after 60 - 240
 			_delay_us(300); 
 			presence = (bit_is_set(*(a_bus->inp), a_bus->pin) ? 0x01 : 0x00);
@@ -70,14 +70,12 @@ uint8_t sow_reset(struct soft_ow *a_bus) {
 }
 
 
-uint8_t sow_write_byte(struct soft_ow *a_bus, uint8_t a_byte) {
+void sow_write_byte(struct soft_ow *a_bus, uint8_t a_byte) {
 	uint8_t n = 0;
 
 	for (; n<8; n++) {
 		_sow_write_bit(a_bus, ((a_byte >> n) & 0x01));
 	}
-	
-	return 1;
 }
 
 
@@ -118,7 +116,7 @@ uint8_t sow_read_data(struct soft_ow *a_bus, uint8_t *a_data, uint8_t a_maxlen) 
 /* ================================================================================ */
 
 
-uint8_t _sow_write_bit(struct soft_ow *a_bus, uint8_t a_bit) {
+void _sow_write_bit(struct soft_ow *a_bus, uint8_t a_bit) {
 	
 	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
 		SOW_OUTPUT(a_bus->ddr, a_bus->pin);
@@ -132,7 +130,6 @@ uint8_t _sow_write_bit(struct soft_ow *a_bus, uint8_t a_bit) {
 		_delay_us(80);
 		SOW_INPUT(a_bus->ddr, a_bus->pin);
 	}
-	return 1;
 }
 
 
