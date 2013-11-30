@@ -55,6 +55,8 @@ typedef enum _soft_ow_topology {
 	OW_MULTIDROP
 } soft_ow_topology;
 
+#define SOFT_OW_POWER_MODE_GET(__conf) (__conf & 0x01)
+#define SOFT_OW_TOPOLOGY_GET(__conf) ((__conf & 0x02) >> 1)
 
 /**
  * @brief software one-wire bus declaration

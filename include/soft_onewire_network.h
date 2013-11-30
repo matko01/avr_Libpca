@@ -19,7 +19,7 @@ typedef uint64_t ow_romcode_t;
  *
  * @return 
  */
-uint16_t ow_net_search_rom(soft_ow *a_bus, ow_romcode_t *a_romcodes);
+uint16_t ow_net_search_rom(struct soft_ow *a_bus, ow_romcode_t *a_romcodes);
 
 
 
