@@ -29,11 +29,11 @@ typedef struct _gpio_pin {
 
 
 #define GPIO_SET_LOW(__gpio) \
-	*(__gpio)->port &= ~_BV((__gpio)->pin)
+	(*(__gpio)->port) &= ~_BV((__gpio)->pin)
 
 
 #define GPIO_SET_HIGH(__gpio) \
-	*(__gpio)->port |= _BV((__gpio)->pin)
+	(*(__gpio)->port) |= _BV((__gpio)->pin)
 
 
 

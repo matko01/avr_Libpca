@@ -158,6 +158,7 @@ void hd44780_puts(struct dev_hd44780_ctx *a_disp, const char *a_str);
 // ================================================================================
 
 #if HD44780_USE_RW_LINE == 1
+uint8_t hd44780_is_busy(struct dev_hd44780_ctx *a_disp);
 uint8_t hd44780_read(struct dev_hd44780_ctx *a_disp, uint8_t a_rs);
 #endif
 
