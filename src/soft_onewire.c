@@ -29,7 +29,7 @@ void sow_init(struct soft_ow *a_bus) {
 	MCUCR |= _BV(PUD);
 
 	// configure as input, (state high because of pull-up)
-	SOW_INPUT(GET_DDRX_FROM_PORTX(a_bus->port), a_bus->pin);
+	GPIO_CONFIGURE_AS_INPUT(&a_bus->bus);
 
 	// sleep for a while
 	_delay_us(500);
@@ -38,12 +38,12 @@ void sow_init(struct soft_ow *a_bus) {
 
 void sow_strong_pullup(struct soft_ow *a_bus, uint8_t a_enable) {
 	if (a_enable) {
-		SOW_OUTPUT(GET_DDRX_FROM_PORTX(a_bus->port), a_bus->pin);
-		SOW_HIGH(a_bus->port, a_bus->pin);
+		GPIO_CONFIGURE_AS_OUTPUT(&a_bus->bus);
+		GPIO_SET_HIGH(&a_bus->bus);
 		return;
 	}
 
-	SOW_INPUT(GET_DDRX_FROM_PORTX(a_bus->port), a_bus->pin);
+	GPIO_CONFIGURE_AS_INPUT(&a_bus->bus);
 }
 
 
@@ -52,17 +52,17 @@ uint8_t sow_reset(struct soft_ow *a_bus) {
 	uint8_t presence = 0;
 
 	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-		SOW_OUTPUT(GET_DDRX_FROM_PORTX(a_bus->port), a_bus->pin);
-		SOW_LOW(a_bus->port, a_bus->pin);
+		GPIO_CONFIGURE_AS_OUTPUT(&a_bus->bus);
+		GPIO_SET_LOW(&a_bus->bus);
 		_delay_us(500);
 
-		SOW_INPUT(GET_DDRX_FROM_PORTX(a_bus->port), a_bus->pin);
+		GPIO_CONFIGURE_AS_INPUT(&a_bus->bus);
 		_delay_us(50); // 15 - 60
 
-		if (bit_is_clear(*(GET_PINX_FROM_PORTX(a_bus->port)), a_bus->pin)) {
+		if (!GPIO_GET(&a_bus->bus)) {
 			// after 60 - 240
 			_delay_us(300); 
-			presence = (bit_is_set(*(GET_PINX_FROM_PORTX(a_bus->port)), a_bus->pin) ? 0x01 : 0x00);
+			presence = (GPIO_GET(&a_bus->bus) ? 0x01 : 0x00);
 		} // bit is clear
 	} // ATOMIC_BLOCK
 	
@@ -116,16 +116,17 @@ void sow_read_data(struct soft_ow *a_bus, uint8_t *a_data, uint8_t a_maxlen) {
 void _sow_write_bit(struct soft_ow *a_bus, uint8_t a_bit) {
 	
 	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-		SOW_OUTPUT(GET_DDRX_FROM_PORTX(a_bus->port), a_bus->pin);
-		SOW_LOW(a_bus->port, a_bus->pin);
+
+		GPIO_CONFIGURE_AS_OUTPUT(&a_bus->bus);
+		GPIO_SET_LOW(&a_bus->bus);
 
 		_delay_us(5); // max 15
 		
 		if (a_bit & 0x01)
-			SOW_INPUT(GET_DDRX_FROM_PORTX(a_bus->port), a_bus->pin);
+			GPIO_CONFIGURE_AS_INPUT(&a_bus->bus);
 
 		_delay_us(80);
-		SOW_INPUT(GET_DDRX_FROM_PORTX(a_bus->port), a_bus->pin);
+		GPIO_CONFIGURE_AS_INPUT(&a_bus->bus);
 	}
 }
 
@@ -134,14 +135,14 @@ uint8_t _sow_read_bit(struct soft_ow *a_bus) {
 	uint8_t bit = 0;
 
 	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-		SOW_OUTPUT(GET_DDRX_FROM_PORTX(a_bus->port), a_bus->pin);
-		SOW_LOW(a_bus->port, a_bus->pin);
+		GPIO_CONFIGURE_AS_OUTPUT(&a_bus->bus);
+		GPIO_SET_LOW(&a_bus->bus);
 
 		_delay_us(1); // >= 1
-		SOW_INPUT(GET_DDRX_FROM_PORTX(a_bus->port), a_bus->pin);
+		GPIO_CONFIGURE_AS_INPUT(&a_bus->bus);
 
 		_delay_us(12); // sample within 15u slot
-		bit = (bit_is_set(*(GET_PINX_FROM_PORTX(a_bus->port)), a_bus->pin)) ? 0x01 : 0x00;
+		bit = (GPIO_GET(&a_bus->bus) ? 0x01 : 0x00);
 
 		// time slot duration + recovery time
 		_delay_us(60 + 1);

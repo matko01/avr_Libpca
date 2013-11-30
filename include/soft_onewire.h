@@ -1,7 +1,9 @@
 #ifndef SOFT_ONEWIRE_H_ZBD6VGNS
 #define SOFT_ONEWIRE_H_ZBD6VGNS
 
+#include <config.h>
 #include <common.h>
+#include <gpio.h>
 
 /// network layer commands
 #define OWN_READ_ROM 		0x33
@@ -58,11 +60,12 @@ typedef enum _soft_ow_topology {
  * @brief software one-wire bus declaration
  */
 struct soft_ow {
-	uint8_t pin; // the pin number
+	
+	// one wire bus gpio
+	gpio_pin bus;
+
 	// 0 - power_mode
 	// 1 - topology
-
-	volatile uint8_t *port; // PORTX
 	//  ----------- | x | x
 	// -------------+---+---
 	//  7 6 5 4 3 2 | 1 | 0
