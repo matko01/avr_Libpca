@@ -23,7 +23,7 @@
 /* ================================================================================ */
 
 
-void sow_init(struct soft_ow *a_bus) {
+void sow_init(volatile struct soft_ow *a_bus) {
 
 	// disable pull-ups
 	MCUCR |= _BV(PUD);
@@ -36,7 +36,7 @@ void sow_init(struct soft_ow *a_bus) {
 }
 
 
-void sow_strong_pullup(struct soft_ow *a_bus, uint8_t a_enable) {
+void sow_strong_pullup(volatile struct soft_ow *a_bus, uint8_t a_enable) {
 	if (a_enable) {
 		GPIO_CONFIGURE_AS_OUTPUT(&a_bus->bus);
 		GPIO_SET_HIGH(&a_bus->bus);
@@ -47,7 +47,7 @@ void sow_strong_pullup(struct soft_ow *a_bus, uint8_t a_enable) {
 }
 
 
-uint8_t sow_reset(struct soft_ow *a_bus) {
+uint8_t sow_reset(volatile struct soft_ow *a_bus) {
 
 	uint8_t presence = 0;
 
@@ -70,7 +70,7 @@ uint8_t sow_reset(struct soft_ow *a_bus) {
 }
 
 
-void sow_write_byte(struct soft_ow *a_bus, uint8_t a_byte) {
+void sow_write_byte(volatile struct soft_ow *a_bus, uint8_t a_byte) {
 	uint8_t n = 0;
 
 	for (; n<8; n++) {
@@ -80,7 +80,7 @@ void sow_write_byte(struct soft_ow *a_bus, uint8_t a_byte) {
 }
 
 
-uint8_t sow_read_byte(struct soft_ow *a_bus) {
+uint8_t sow_read_byte(volatile struct soft_ow *a_bus) {
 	uint8_t n = 0;
 	uint8_t data = 0x00;
 
@@ -92,7 +92,7 @@ uint8_t sow_read_byte(struct soft_ow *a_bus) {
 }
 
 
-void sow_write_data(struct soft_ow *a_bus, uint8_t *a_data, uint8_t a_len) {
+void sow_write_data(volatile struct soft_ow *a_bus, uint8_t *a_data, uint8_t a_len) {
 
 	while (a_len--) {
 		sow_write_byte(a_bus, (*a_data++));
@@ -101,7 +101,7 @@ void sow_write_data(struct soft_ow *a_bus, uint8_t *a_data, uint8_t a_len) {
 }
 
 
-void sow_read_data(struct soft_ow *a_bus, uint8_t *a_data, uint8_t a_maxlen) {
+void sow_read_data(volatile struct soft_ow *a_bus, uint8_t *a_data, uint8_t a_maxlen) {
 
 	while (a_maxlen--) {
 		(*a_data++) = sow_read_byte(a_bus);
@@ -113,7 +113,7 @@ void sow_read_data(struct soft_ow *a_bus, uint8_t *a_data, uint8_t a_maxlen) {
 /* ================================================================================ */
 
 
-void _sow_write_bit(struct soft_ow *a_bus, uint8_t a_bit) {
+void _sow_write_bit(volatile struct soft_ow *a_bus, uint8_t a_bit) {
 	
 	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
 
@@ -131,7 +131,7 @@ void _sow_write_bit(struct soft_ow *a_bus, uint8_t a_bit) {
 }
 
 
-uint8_t _sow_read_bit(struct soft_ow *a_bus) {
+uint8_t _sow_read_bit(volatile struct soft_ow *a_bus) {
 	uint8_t bit = 0;
 
 	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
