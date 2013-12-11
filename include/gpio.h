@@ -5,6 +5,7 @@
 #include "common.h"
 
 #include <avr/io.h>
+#include <util/atomic.h>
 
 
 /**
@@ -29,12 +30,19 @@ typedef struct _gpio_pin {
 
 
 #define GPIO_SET_LOW(__gpio) \
-	(*(__gpio)->port) &= ~_BV((__gpio)->pin)
+	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) { \
+		(*(__gpio)->port) &= ~_BV((__gpio)->pin); \
+	}
 
 
 #define GPIO_SET_HIGH(__gpio) \
-	(*(__gpio)->port) |= _BV((__gpio)->pin)
+	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) { \
+		(*(__gpio)->port) |= _BV((__gpio)->pin); \
+	}
 
+
+#define GPIO_TOGGLE(__gpio) \
+	*(GET_PINX_FROM_PORTX((__gpio)->port)) = _BV((__gpio)->pin)
 
 
 #endif /* end of include guard: GPIO_H_TUGJ3L7E */

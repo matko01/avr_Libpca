@@ -83,10 +83,13 @@ void hd44780_write(struct dev_hd44780_ctx *a_disp, uint8_t a_data, uint8_t a_rs)
 	uint8_t nibbles = 3;
 #endif
 
-	if (a_rs)
+	if (a_rs) {
 		GPIO_SET_HIGH(&a_disp->rs);
-	else
+	}
+	else {
 		GPIO_SET_LOW(&a_disp->rs);
+	}
+
 
 #if HD44780_8BIT_MODE == 0
 	while (--nibbles) {
@@ -94,10 +97,12 @@ void hd44780_write(struct dev_hd44780_ctx *a_disp, uint8_t a_data, uint8_t a_rs)
 
 		x = HD44780_DATALINES;
 		while (x--) {
-			if (a_data & (0x01 << (x + ((nibbles - 1) << 2))) )
+			if (a_data & (0x01 << (x + ((nibbles - 1) << 2))) ) {
 				GPIO_SET_HIGH(&a_disp->data[x]);
-			else
+			}
+			else {
 				GPIO_SET_LOW(&a_disp->data[x]);
+			}
 		}
 
 		// latch the data

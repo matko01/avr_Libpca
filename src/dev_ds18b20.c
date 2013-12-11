@@ -27,11 +27,11 @@ void ds18b20_start_conversion(volatile struct soft_ow *a_bus, ow_romcode_t *a_ro
 
 		// start conversion
 		sow_write_byte(a_bus, OWN_SKIP_ROM);
-		sow_write_byte(a_bus, DS18B20_CMD_CONVERT_T);
 		
 		// parasite powered sensors requires strong pull-up
 		// during the conversion
 		if (OW_POWER_PARASITE == SOFT_OW_POWER_MODE_GET(a_bus->conf)) {
+			sow_write_byte(a_bus, DS18B20_CMD_CONVERT_T);
 			sow_strong_pullup(a_bus, 1);
 		}
 	}
@@ -78,8 +78,6 @@ void ds18b20_write_rom(volatile struct soft_ow *a_bus, ow_romcode_t *a_romcode, 
 
 
 void ds18b20_read_scratchpad(volatile struct soft_ow *a_bus, ow_romcode_t *a_romcode, volatile uint8_t *a_data, uint8_t len) {
-	if (OW_POWER_PARASITE == SOFT_OW_POWER_MODE_GET(a_bus->conf))
-		sow_strong_pullup(a_bus, 0);
 
 	sow_reset(a_bus);
 

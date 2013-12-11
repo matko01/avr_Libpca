@@ -36,17 +36,6 @@ void sow_init(volatile struct soft_ow *a_bus) {
 }
 
 
-void sow_strong_pullup(volatile struct soft_ow *a_bus, uint8_t a_enable) {
-	if (a_enable) {
-		GPIO_CONFIGURE_AS_OUTPUT(&a_bus->bus);
-		GPIO_SET_HIGH(&a_bus->bus);
-		return;
-	}
-
-	GPIO_CONFIGURE_AS_INPUT(&a_bus->bus);
-}
-
-
 uint8_t sow_reset(volatile struct soft_ow *a_bus) {
 
 	uint8_t presence = 0;

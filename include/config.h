@@ -92,7 +92,7 @@
  *
  * In case user wants to define his own ISR for TIMER0_COMPA_vect, he should disable the library implementation
  */
-#define TDELAY_IMPLEMENT_T0_INT 1
+#define TDELAY_IMPLEMENT_T0_INT 0
 
 /**
  * @brief change to 0 if to disable timer 1 delay and beeper interrupts and routines

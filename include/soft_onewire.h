@@ -58,13 +58,15 @@ typedef enum _soft_ow_topology {
 #define SOFT_OW_POWER_MODE_GET(__conf) (__conf & 0x01)
 #define SOFT_OW_TOPOLOGY_GET(__conf) ((__conf & 0x02) >> 1)
 
+
+
 /**
  * @brief software one-wire bus declaration
  */
 struct soft_ow {
 	
 	// one wire bus gpio
-	gpio_pin bus;
+	volatile gpio_pin bus;
 
 	// 0 - power_mode
 	// 1 - topology
@@ -87,7 +89,7 @@ struct soft_ow {
  *
  * @param a_bus bus descriptor
  */
-void sow_init(struct soft_ow *a_bus);
+void sow_init(volatile struct soft_ow *a_bus);
 
 
 /**
@@ -99,7 +101,14 @@ void sow_init(struct soft_ow *a_bus);
  * @param a_bus bus descriptor
  * @param a_enable 1 - enable pull-up, 0 - disable
  */
-void sow_strong_pullup(struct soft_ow *a_bus, uint8_t a_enable);
+#define sow_strong_pullup(__a_bus, __a_enable) \
+	if (__a_enable) { \
+		GPIO_CONFIGURE_AS_OUTPUT(&__a_bus->bus); \
+		GPIO_SET_HIGH(&__a_bus->bus); \
+	} \
+	else { \
+		GPIO_CONFIGURE_AS_INPUT(&__a_bus->bus); \
+	}
 
 
 /**
@@ -109,7 +118,7 @@ void sow_strong_pullup(struct soft_ow *a_bus, uint8_t a_enable);
  *
  * @return return 1 if presence detected, 0 otherwise
  */
-uint8_t sow_reset(struct soft_ow *a_bus);
+uint8_t sow_reset(volatile struct soft_ow *a_bus);
 
 
 /**
@@ -119,7 +128,7 @@ uint8_t sow_reset(struct soft_ow *a_bus);
  *
  * @return bit read
  */
-uint8_t _sow_read_bit(struct soft_ow *a_bus);
+uint8_t _sow_read_bit(volatile struct soft_ow *a_bus);
 
 
 /**
@@ -129,7 +138,7 @@ uint8_t _sow_read_bit(struct soft_ow *a_bus);
  * @param a_bit bit to be written
  *
  */
-void _sow_write_bit(struct soft_ow *a_bus, uint8_t a_bit);
+void _sow_write_bit(volatile struct soft_ow *a_bus, uint8_t a_bit);
 
 
 /**
@@ -141,7 +150,7 @@ void _sow_write_bit(struct soft_ow *a_bus, uint8_t a_bit);
  *
  * @return byte read
  */
-uint8_t sow_read_byte(struct soft_ow *a_bus);
+uint8_t sow_read_byte(volatile struct soft_ow *a_bus);
 
 
 /**
@@ -153,7 +162,7 @@ uint8_t sow_read_byte(struct soft_ow *a_bus);
  * @param a_byte byte to written
  *
  */
-void sow_write_byte(struct soft_ow *a_bus, uint8_t a_byte);
+void sow_write_byte(volatile struct soft_ow *a_bus, uint8_t a_byte);
 
 
 /**
@@ -166,7 +175,7 @@ void sow_write_byte(struct soft_ow *a_bus, uint8_t a_byte);
  * @param a_maxlen how much data to read
  *
  */
-void sow_read_data(struct soft_ow *a_bus, uint8_t *a_data, uint8_t a_maxlen);
+void sow_read_data(volatile struct soft_ow *a_bus, uint8_t *a_data, uint8_t a_maxlen);
 
 
 /**
@@ -177,7 +186,7 @@ void sow_read_data(struct soft_ow *a_bus, uint8_t *a_data, uint8_t a_maxlen);
  * @param a_len how many bytes to write
  *
  */
-void sow_write_data(struct soft_ow *a_bus, uint8_t *a_data, uint8_t a_len);
+void sow_write_data(volatile struct soft_ow *a_bus, uint8_t *a_data, uint8_t a_len);
 
 
 #endif /* end of include guard: SOFT_ONEWIRE_H_ZBD6VGNS */
