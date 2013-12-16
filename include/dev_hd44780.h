@@ -5,6 +5,8 @@
 #include "common.h"
 #include "gpio.h"
 
+#include <util/delay.h>
+
 
 #if HD44780_8BIT_MODE == 1
 #define HD44780_DATALINES 8
