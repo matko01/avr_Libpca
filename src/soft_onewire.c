@@ -3,30 +3,12 @@
 #include <avr/sfr_defs.h>
 #include <util/atomic.h>
 
-
-#define SOW_OUTPUT(__ddr, __pin) \
-	(*(__ddr)) |= _BV(__pin)
-
-
-#define SOW_INPUT(__ddr, __pin) \
-	(*(__ddr)) &= ~_BV(__pin)
-
-
-#define SOW_HIGH(__port, __pin) \
-	(*(__port)) |= _BV(__pin)
-
-
-#define SOW_LOW(__port, __pin) \
-	(*(__port)) &= ~_BV(__pin)
-
-
 /* ================================================================================ */
-
 
 void sow_init(volatile struct soft_ow *a_bus) {
 
 	// disable pull-ups
-	MCUCR |= _BV(PUD);
+	// MCUCR |= _BV(PUD);
 
 	// configure as input, (state high because of pull-up)
 	GPIO_CONFIGURE_AS_INPUT(&a_bus->bus);

@@ -151,6 +151,19 @@ typedef enum _e_return {
 
 
 /**
+ * @brief exchange value between variables
+ *
+ * This implementation doesn't use a temporary variable
+ *
+ * @param __x first value
+ * @param __y second value
+ *
+ */
+#define EXCHANGE(__x, __y) \
+	__x ^= __y; __y ^= __x; __x ^= __y
+
+
+/**
  * @brief converts binary value to BCD representation
  *
  * @param __val value to be converted
