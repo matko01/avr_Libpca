@@ -161,6 +161,13 @@
 
 // ================================================================================
 
+/**
+ * @brief maximum number of LED 7 segment displays the code can handle
+ */
+#define D7SEG_MAX_DISPLAYS 4
+
+// ================================================================================
+
 
 #endif /* end of include guard: CONFIG_H_VPGOK90D */
 

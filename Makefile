@@ -14,7 +14,8 @@ SOURCES= \
 		timer_common.c \
 		tdelay_common.c \
 		dev_hd44780.c \
-		dev_ds18b20.c
+		dev_ds18b20.c \
+		dev_d7seg.c
 
 DEPS=
 COBJ=$(SOURCES:.c=.o)
