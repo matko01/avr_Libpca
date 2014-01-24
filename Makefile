@@ -23,6 +23,7 @@ COBJ=$(SOURCES:.c=.o)
 CC=avr-gcc
 AS=avr-as
 AR=avr-ar
+RANLIB=avr-ranlib
 STRIP=avr-strip
 MCU=atmega328p
 CFLAGS=-I. -Iinclude/ -Wall -Os -DF_CPU=16000000UL -std=gnu99 \
@@ -44,6 +45,7 @@ $(TARGET): $(COBJ)
 	@echo -e "\tARCHIVING CC" $(COBJ)
 	$(STRIP) -g $(COBJ)
 	$(AR) rcsv $(TARGET) $(COBJ)
+	$(RANLIB) $(TARGET)
 
 clean:
 	@echo ========== cleanup ========== 
