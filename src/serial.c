@@ -72,12 +72,12 @@ ISR(USART_RX_vect, ISR_BLOCK) {
 
 		/// calculate the next available ring buffer data bucket index
 		volatile unsigned char next =
-		   	((g_rx_buff.head + 1) % SERIAL_RX_RING_SIZE);
+		   	((g_rx_buff.u.r.head + 1) % SERIAL_RX_RING_SIZE);
 
 		/// do not overflow the buffer
-		if (next != g_rx_buff.tail) {
-			g_rx_buff.ring[g_rx_buff.head] = data;
-			g_rx_buff.head = next;			
+		if (next != g_rx_buff.u.r.tail) {
+			g_rx_buff.u.r.ring[g_rx_buff.u.r.head] = data;
+			g_rx_buff.u.r.head = next;			
 #if SERIAL_COLLECT_STATS == 1
 			g_rx_buff.stats.ok++;
 #endif
@@ -113,9 +113,9 @@ ISR(USART_RX_vect, ISR_BLOCK) {
 ISR(USART_UDRE_vect, ISR_BLOCK) {
 	
 	// proceed if there still is data to be send
-	if (g_tx_buff.head != g_tx_buff.tail) {
-		UDR0 = g_tx_buff.ring[g_tx_buff.tail];
-		g_tx_buff.tail = (g_tx_buff.tail + 1) % SERIAL_TX_RING_SIZE;
+	if (g_tx_buff.u.r.head != g_tx_buff.u.r.tail) {
+		UDR0 = g_tx_buff.u.r.ring[g_tx_buff.u.r.tail];
+		g_tx_buff.u.r.tail = (g_tx_buff.u.r.tail + 1) % SERIAL_TX_RING_SIZE;
 
 #if SERIAL_COLLECT_STATS == 1
 		g_tx_buff.stats.ok++;
@@ -339,7 +339,7 @@ void serial_install_stdio() {
 
 #if SERIAL_IMPLEMENT_RX_INT == 1
 inline unsigned char serial_available() {
-	return (SERIAL_RX_RING_SIZE + g_rx_buff.head - g_rx_buff.tail) % SERIAL_RX_RING_SIZE;
+	return (SERIAL_RX_RING_SIZE + g_rx_buff.u.r.head - g_rx_buff.u.r.tail) % SERIAL_RX_RING_SIZE;
 }
 
 
@@ -350,7 +350,7 @@ unsigned char serial_peek(void *a_data, unsigned char a_size) {
 
 	for (unsigned char i = 0; i<read; i++) {
 		((unsigned char *)a_data)[i] =
-			g_rx_buff.ring[ (g_rx_buff.tail + i) % SERIAL_RX_RING_SIZE ];
+			g_rx_buff.u.r.ring[ (g_rx_buff.u.r.tail + i) % SERIAL_RX_RING_SIZE ];
 	}
 
 	return read;
@@ -360,7 +360,7 @@ unsigned char serial_peek(void *a_data, unsigned char a_size) {
 unsigned int serial_recv(void *a_data, unsigned int a_size, unsigned char a_waitall) {
 	unsigned int read = 0x00;
 
-	if (!a_waitall && g_rx_buff.head == g_rx_buff.tail) {
+	if (!a_waitall && g_rx_buff.u.r.head == g_rx_buff.u.r.tail) {
 		return 0;
 	}
 
@@ -368,8 +368,8 @@ unsigned int serial_recv(void *a_data, unsigned int a_size, unsigned char a_wait
 
 		while (serial_available() && (read < a_size)) 
 		{
-			((unsigned char *)a_data)[read] = g_rx_buff.ring[ g_rx_buff.tail ];
-			g_rx_buff.tail = (g_rx_buff.tail + 1) % SERIAL_RX_RING_SIZE;
+			((unsigned char *)a_data)[read] = g_rx_buff.u.r.ring[ g_rx_buff.u.r.tail ];
+			g_rx_buff.u.r.tail = (g_rx_buff.u.r.tail + 1) % SERIAL_RX_RING_SIZE;
 			read++;
 		}
 
@@ -383,11 +383,11 @@ unsigned int serial_recv(void *a_data, unsigned int a_size, unsigned char a_wait
 
 unsigned char serial_getc(unsigned char *a_data) {
 	
-	if (g_rx_buff.head == g_rx_buff.tail)
+	if (g_rx_buff.u.r.head == g_rx_buff.u.r.tail)
 		return 0;
 
-	*a_data = g_rx_buff.ring[g_rx_buff.tail];
-	g_rx_buff.tail = (g_rx_buff.tail + 1) % SERIAL_RX_RING_SIZE;
+	*a_data = g_rx_buff.u.r.ring[g_rx_buff.u.r.tail];
+	g_rx_buff.u.r.tail = (g_rx_buff.u.r.tail + 1) % SERIAL_RX_RING_SIZE;
 	return 1;
 }
 #endif
@@ -423,12 +423,12 @@ unsigned char serial_send(void *a_data, unsigned int a_size, unsigned char a_wai
 
 	while (a_size) {
 		volatile unsigned char next =
-		   	((g_tx_buff.head + 1) % SERIAL_TX_RING_SIZE);
+		   	((g_tx_buff.u.r.head + 1) % SERIAL_TX_RING_SIZE);
 
 		/// do not overflow the buffer
-		if (next != g_tx_buff.tail) {
-			g_tx_buff.ring[g_tx_buff.head] = *data;
-			g_tx_buff.head = next;			
+		if (next != g_tx_buff.u.r.tail) {
+			g_tx_buff.u.r.ring[g_tx_buff.u.r.head] = *data;
+			g_tx_buff.u.r.head = next;			
 		}
 		else {
 			if (a_waitall) {
@@ -463,12 +463,12 @@ unsigned char serial_sendc(unsigned char a_data) {
 
 	uint8_t n = 0x00;
 	uint8_t next =
-		((g_tx_buff.head + 1) % SERIAL_TX_RING_SIZE);
+		((g_tx_buff.u.r.head + 1) % SERIAL_TX_RING_SIZE);
 
 	/// do not overflow the buffer
-	if (next != g_tx_buff.tail) {
-		g_tx_buff.ring[g_tx_buff.head] = a_data;
-		g_tx_buff.head = next;
+	if (next != g_tx_buff.u.r.tail) {
+		g_tx_buff.u.r.ring[g_tx_buff.u.r.head] = a_data;
+		g_tx_buff.u.r.head = next;
 		n = 1;
 
 		// enable data register empty interrupt
@@ -508,7 +508,7 @@ void serial_flush() {
 	unsigned char dummy __attribute__((unused)) = 0x00;
 
 #if SERIAL_IMPLEMENT_RX_INT == 1
-	g_rx_buff.tail = g_rx_buff.head = 0x00;
+	g_rx_buff.u.r.tail = g_rx_buff.u.r.head = 0x00;
 #endif
 
 	// flush the input fifo

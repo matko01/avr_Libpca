@@ -48,6 +48,7 @@
 
 #include <config.h>
 #include <common.h>
+#include <ring.h>
 
 
 /**
@@ -114,20 +115,19 @@ typedef struct _t_stats {
  * @brief TX/RX ring buffer declaration
  */
 typedef struct _t_buffer {
+
 	/// data storage space for the ring buffer
-	volatile unsigned char ring[SERIAL_RX_RING_SIZE];
-
-	/// head index
-	volatile unsigned char head;
-
-	/// tail index
-	volatile unsigned char tail;
+	union {
+		volatile uint8_t raw[SERIAL_RX_RING_SIZE + RING_SIZE];
+		volatile ring_buffer r;
+	} u;
 
 #if SERIAL_COLLECT_STATS == 1
 
 	/// statistics for the buffer
 	volatile t_stats stats;
 #endif
+
 } t_buffer;
 
 
