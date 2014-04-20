@@ -13,6 +13,7 @@ SOURCES= \
 		twi_common.c \
 		timer_common.c \
 		tdelay_common.c \
+		spi_hw_poll.c \
 		dev_hd44780.c \
 		dev_ds18b20.c \
 		dev_d7seg.c
