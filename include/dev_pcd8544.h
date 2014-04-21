@@ -57,12 +57,20 @@ struct dev_pcd8544_ctx {
 
 	// reset - active low
 	gpio_pin res;
+
+	uint8_t x,y;
 };
 
 
 void pcd8544_init(struct dev_pcd8544_ctx *a_disp);
 void pcd8544_write(struct dev_pcd8544_ctx *a_disp, uint8_t mode, uint8_t data);
 void pcd8544_clrscr(struct dev_pcd8544_ctx *a_disp);
+void pcd8544_gotoxy(struct dev_pcd8544_ctx *a_disp, uint8_t x, uint8_t y);
+
+void pcd8544_putc(struct dev_pcd8544_ctx *a_disp, char c);
+void pcd8544_install_stdout(struct dev_pcd8544_ctx *a_disp);
+void pcd8544_str(struct dev_pcd8544_ctx *a_disp, char *str);
+
 
 
 #endif /* end of include guard: DEV_PCD8544_H_PN3AJ51E */

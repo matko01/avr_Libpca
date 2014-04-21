@@ -5,6 +5,8 @@
 
 #include <avr/pgmspace.h>
 
+static struct dev_pcd8544_ctx *_g_stdout_lcd = NULL;
+
 static const uint8_t _font[][5] PROGMEM = {
 	{0x00, 0x00, 0x00, 0x00, 0x00} // 20  
 	,{0x00, 0x00, 0x5f, 0x00, 0x00} // 21 !
@@ -105,7 +107,9 @@ static const uint8_t _font[][5] PROGMEM = {
 };
 
 
-
+static void _pcd8544_putc(char c, FILE *stream) {
+	pcd8544_putc(_g_stdout_lcd, c);
+}
 
 
 void pcd8544_write(struct dev_pcd8544_ctx *a_disp, 
@@ -158,8 +162,6 @@ void pcd8544_init(struct dev_pcd8544_ctx *a_disp) {
 
 void pcd8544_clrscr(struct dev_pcd8544_ctx *a_disp) {
 
-	uint16_t i = (PCD8544_W * PCD8544_H) >> 3;
-
 	for (uint8_t y = 0; y < PCD8544_H; y++) {
 		pcd8544_write(a_disp, PCD8544_CMD, PCD8544_CMD_SET_X(0));
 		pcd8544_write(a_disp, PCD8544_CMD, PCD8544_CMD_SET_Y(y));
@@ -168,24 +170,52 @@ void pcd8544_clrscr(struct dev_pcd8544_ctx *a_disp) {
 			pcd8544_write(a_disp, PCD8544_DATA, 0x00);
 		}
 	}
+
+	pcd8544_gotoxy(a_disp, 0, 0);
+}
+
+
+void pcd8544_gotoxy(struct dev_pcd8544_ctx *a_disp, uint8_t x, uint8_t y) {
+	a_disp->x = x;
+	a_disp->y = y;
+	pcd8544_write(a_disp, PCD8544_CMD, PCD8544_CMD_SET_X(x));
+	pcd8544_write(a_disp, PCD8544_CMD, PCD8544_CMD_SET_Y(y));
 }
 
 
 void pcd8544_putc(struct dev_pcd8544_ctx *a_disp, char c) {
-	pcd8544_write(a_disp, PCD8544_DATA, 0x00);
+	uint8_t font_length = sizeof(_font[0]);
+	
+	if (a_disp->y >= (PCD8544_H >> 3)) {
+		return;
+	}
 
-
-	for (uint8_t x = 0; x < 5; x++ ) {
-		pcd8544_write(a_disp, PCD8544_DATA, pgm_read_byte(&_font[c - 0x20][x]));
+	if ((a_disp->x + font_length + 1) > PCD8544_W || (c == '\n')) {
+		pcd8544_gotoxy(a_disp, 0, a_disp->y + 1);
 	}
 	
-
- 
 	pcd8544_write(a_disp, PCD8544_DATA, 0x00);
+	for (uint8_t x = 0; x < font_length; x++ ) {
+		pcd8544_write(a_disp, PCD8544_DATA, pgm_read_byte(&_font[c - 0x20][x]));
+	}
+
+	a_disp->x += (font_length + 1);
+}
+
+
+void pcd8544_str(struct dev_pcd8544_ctx *a_disp, char *str) {
+	if (!str) {
+		return;
+	}
+
+	while (str) {
+		pcd8544_putc(a_disp, *str++);
+	}
 }
 
 
 void pcd8544_install_stdout(struct dev_pcd8544_ctx *a_disp) {
-	/* static FILE uart_stdout = FDEV_SETUP_STREAM(_pcd8544_putc, NULL, _FDEV_SETUP_WRITE); */
-
+	static FILE lcd_stdout = FDEV_SETUP_STREAM(_pcd8544_putc, NULL, _FDEV_SETUP_WRITE);
+	_g_stdout_lcd = a_disp;
+	stdout = &lcd_stdout;
 }
