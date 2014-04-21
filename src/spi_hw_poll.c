@@ -22,11 +22,11 @@ void spi_hw_poll_init(spi_mode mode, spi_speed speed) {
 	if (mode) {
 		SPCR |= _BV(MSTR);
 		
-		// SCK && MOSI
-		DDRB |= _BV(PORTB5) | _BV(PORTB3);
+		// SCK && MOSI && SS
+		DDRB |= _BV(PORTB5) | _BV(PORTB3) | _BV(PORTB2);
 
-		// MISO && SS
-		DDRB &= ~_BV(PORTB4) & ~_BV(PORTB2);
+		// MISO 
+		DDRB &= ~_BV(PORTB4) ;
 	}
 	else {
 		// SCK && MOSI
@@ -66,6 +66,7 @@ uint8_t spi_hw_poll_recv(void *a_data, uint8_t a_len, uint8_t a_waitall) {
 	return i;
 }
 
+#include <util/delay.h>
 
 uint8_t spi_hw_poll_send(void *a_data, uint8_t a_len, uint8_t a_waitall) {
 	uint8_t i = 0x00;

@@ -16,7 +16,8 @@ SOURCES= \
 		spi_hw_poll.c \
 		dev_hd44780.c \
 		dev_ds18b20.c \
-		dev_d7seg.c
+		dev_d7seg.c \
+		dev_pcd8544.c
 
 DEPS=
 COBJ=$(SOURCES:.c=.o)
