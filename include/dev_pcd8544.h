@@ -36,6 +36,12 @@ typedef enum _pcd8544_mode {
 #define PCD8544_CMD_SET_VOP(__vop) \
 	(0x80 | (__vop))
 
+#define PCD8544_SET_BIT_HIGH(__mem, __x, __y) \
+	__mem[x + (y >> 3)*84] |= _BV( y - ((y >> 3) << 3) )
+
+#define PCD8544_SET_BIT_LOW(__mem, __x, __y) \
+	__mem[x + (y >> 3)*84] &= ~_BV( y - ((y >> 3) << 3) )
+
 
 #define PCD8544_CMD 0x00
 #define PCD8544_DATA 0x01
@@ -70,6 +76,11 @@ void pcd8544_gotoxy(struct dev_pcd8544_ctx *a_disp, uint8_t x, uint8_t y);
 void pcd8544_putc(struct dev_pcd8544_ctx *a_disp, char c);
 void pcd8544_install_stdout(struct dev_pcd8544_ctx *a_disp);
 void pcd8544_str(struct dev_pcd8544_ctx *a_disp, char *str);
+
+void pcd8544_putpixel(struct dev_pcd8544_ctx *a_disp, uint8_t x, uint8_t y, uint8_t c);
+void pcd8544_blit(struct dev_pcd8544_ctx *a_disp, uint8_t *data);
+void pcd8544_fill(struct dev_pcd8544_ctx *a_disp, uint8_t data);
+
 
 
 

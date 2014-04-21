@@ -112,6 +112,25 @@ static void _pcd8544_putc(char c, FILE *stream) {
 }
 
 
+static void _pcd8544_fill(struct dev_pcd8544_ctx *a_disp, uint8_t *data, uint16_t len) {
+	if (len > 1) {
+		pcd8544_gotoxy(a_disp, 0, 0);
+	}
+
+	for (uint8_t y = 0; y < PCD8544_H; y++) {
+		pcd8544_write(a_disp, PCD8544_CMD, PCD8544_CMD_SET_X(0));
+		pcd8544_write(a_disp, PCD8544_CMD, PCD8544_CMD_SET_Y(y));
+
+		for (uint8_t x = 0; x < PCD8544_W; x++) {
+			pcd8544_write(a_disp, PCD8544_DATA, *data);
+			if (len > 1) {
+				data++;
+			}
+		}
+	}
+} 
+
+
 void pcd8544_write(struct dev_pcd8544_ctx *a_disp, 
 		uint8_t mode, 
 		uint8_t data) {
@@ -161,16 +180,7 @@ void pcd8544_init(struct dev_pcd8544_ctx *a_disp) {
 
 
 void pcd8544_clrscr(struct dev_pcd8544_ctx *a_disp) {
-
-	for (uint8_t y = 0; y < PCD8544_H; y++) {
-		pcd8544_write(a_disp, PCD8544_CMD, PCD8544_CMD_SET_X(0));
-		pcd8544_write(a_disp, PCD8544_CMD, PCD8544_CMD_SET_Y(y));
-
-		for (uint8_t x = 0; x < PCD8544_W; x++) {
-			pcd8544_write(a_disp, PCD8544_DATA, 0x00);
-		}
-	}
-
+	pcd8544_fill(a_disp, 0);
 	pcd8544_gotoxy(a_disp, 0, 0);
 }
 
@@ -218,4 +228,20 @@ void pcd8544_install_stdout(struct dev_pcd8544_ctx *a_disp) {
 	static FILE lcd_stdout = FDEV_SETUP_STREAM(_pcd8544_putc, NULL, _FDEV_SETUP_WRITE);
 	_g_stdout_lcd = a_disp;
 	stdout = &lcd_stdout;
+}
+
+
+void pcd8544_putpixel(struct dev_pcd8544_ctx *a_disp, uint8_t x, uint8_t y, uint8_t c) {
+	pcd8544_gotoxy(a_disp, x, y);
+	pcd8544_write(a_disp, PCD8544_DATA, c);
+}
+
+
+void pcd8544_blit(struct dev_pcd8544_ctx *a_disp, uint8_t *data) {
+	_pcd8544_fill(a_disp, data, PCD8544_W * PCD8544_H);
+}
+
+
+void pcd8544_fill(struct dev_pcd8544_ctx *a_disp, uint8_t data) {
+	_pcd8544_fill(a_disp, &data, 1);
 }
