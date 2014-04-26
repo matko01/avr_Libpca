@@ -230,4 +230,16 @@ uint32_t common_abs(int32_t a_value);
 
 #define common_zero_mem(__ptr, __len) while (__len--) (*(char *)(__ptr)) = 0x00
 
+
+/**
+ * @brief performs ordered dithering using bayer 8x8 matrix of 6 bit depth color (0-63) to 1 bit.
+ *
+ * @param c color (must be scaled to range 0-63)
+ * @param x x coordinate
+ * @param y y coordinate
+ *
+ * @return true if point should be drawned, flase if otherwise
+ */
+uint8_t common_ditherPoint(uint8_t c, uint8_t x, uint8_t y);
+
 #endif /* __COMMON_H__ */

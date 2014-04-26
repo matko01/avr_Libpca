@@ -5,8 +5,16 @@
 
 #include <avr/pgmspace.h>
 
+
+/**
+ * @brief global lcd context for stdout
+ */
 static struct dev_pcd8544_ctx *_g_stdout_lcd = NULL;
 
+
+/**
+ * @brief default 5x7 font
+ */
 static const uint8_t _font[][5] PROGMEM = {
 	{0x00, 0x00, 0x00, 0x00, 0x00} // 20  
 	,{0x00, 0x00, 0x5f, 0x00, 0x00} // 21 !
@@ -105,6 +113,7 @@ static const uint8_t _font[][5] PROGMEM = {
 	,{0x10, 0x08, 0x08, 0x10, 0x08} // 7e ←
 	,{0x00, 0x06, 0x09, 0x09, 0x06} // 7f →
 };
+
 
 
 static void _pcd8544_putc(char c, FILE *stream) {
@@ -231,7 +240,7 @@ void pcd8544_install_stdout(struct dev_pcd8544_ctx *a_disp) {
 }
 
 
-void pcd8544_putpixel(struct dev_pcd8544_ctx *a_disp, uint8_t x, uint8_t y, uint8_t c) {
+void pcd8544_putblock(struct dev_pcd8544_ctx *a_disp, uint8_t x, uint8_t y, uint8_t c) {
 	pcd8544_gotoxy(a_disp, x, y);
 	pcd8544_write(a_disp, PCD8544_DATA, c);
 }
@@ -245,3 +254,4 @@ void pcd8544_blit(struct dev_pcd8544_ctx *a_disp, uint8_t *data) {
 void pcd8544_fill(struct dev_pcd8544_ctx *a_disp, uint8_t data) {
 	_pcd8544_fill(a_disp, &data, 1);
 }
+
