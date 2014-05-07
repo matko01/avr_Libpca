@@ -33,19 +33,19 @@
  *
  * For the moment the following functionalities are implemented and tested:
  *
- * <ul>
- * <li>Timer Delays (Arduino Library sleep/millis equivalent)</li>
- * <li>Beeper - Tone generation (Arduino Library tone equiv.)</li>
- * <li>Serial port support - Interrupt driven data reception, data reception by polling, data transmission by polling</li>
- * <li>SLIP protocol - serial line data synchronization protocol, to support binary data transfers over serial line</li>
- * </ul>
+ * 
+ * - Timer Delays (Arduino Library sleep/millis equivalent)
+ * - Beeper - Tone generation (Arduino Library tone equiv.)
+ * - Serial port support - Interrupt driven data reception, data reception by polling, data transmission by polling
+ * - SLIP protocol - serial line data synchronization protocol, to support binary data transfers over serial line
+ * 
  *
  * Experimental features (development ongoing)
  *
- * <ul>
- * <li>Timer PWM support</li>
- * <li>ADC API - to be implemented</li>
- * </ul>
+ * 
+ * - Timer PWM support
+ * - ADC API - to be implemented
+ * 
  *
  * @section usage Using the documentation
  *

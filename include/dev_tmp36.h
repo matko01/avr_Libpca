@@ -4,6 +4,10 @@
 #include "config.h"
 #include "common.h"
 
+/**
+ * @brief utility function to convert the tmp36 ADC reading to the Celsius temperature
+ *
+ */
 #define tmp36_raw_to_celsius(__reading, __adc_max, __adc_vref) \
 	(((double)(__reading)/(__adc_max - 1))*__adc_vref - 500.0f)/10
 
