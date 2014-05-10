@@ -28,8 +28,7 @@ uint8_t spi_hw_poll_recv(void *a_data, uint8_t a_len, uint8_t a_waitall);
 uint8_t spi_hw_poll_send(void *a_data, uint8_t a_len, uint8_t a_waitall);
 uint8_t spi_hw_poll_available(void);
 
-// predeclared abstract bus
-extern struct bus_t g_bus_spi_hw_poll;
+struct bus_t spi_hw_poll_bus_get();
 
 
 #endif /* end of include guard: SPI_HW_POLL_H_JM4LGPKV */

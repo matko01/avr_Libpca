@@ -4,6 +4,7 @@
 #include <config.h>
 #include <common.h>
 #include <gpio.h>
+#include <bus.h>
 
 /// network layer commands
 #define OWN_READ_ROM 		0x33
@@ -187,6 +188,16 @@ void sow_read_data(volatile struct soft_ow *a_bus, uint8_t *a_data, uint8_t a_ma
  *
  */
 void sow_write_data(volatile struct soft_ow *a_bus, uint8_t *a_data, uint8_t a_len);
+
+
+/**
+ * @brief create an abstract bus type - for the drivers
+ *
+ * @param a_bus software one-wire specifric private data
+ *
+ * @return bus_t structure
+ */
+struct bus_t sow_bus_get(volatile struct soft_ow *a_bus);
 
 
 #endif /* end of include guard: SOFT_ONEWIRE_H_ZBD6VGNS */

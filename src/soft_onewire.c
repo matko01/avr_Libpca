@@ -5,6 +5,55 @@
 
 /* ================================================================================ */
 
+static uint8_t _sow_getc(void *priv, uint8_t *a_data) {
+	*a_data = sow_read_byte((volatile struct soft_ow *)priv);
+	return 1;
+}
+
+
+static uint8_t _sow_sendc(void *priv, uint8_t *a_data) {
+	sow_write_byte((volatile struct soft_ow *)priv, *a_data);
+	return 1;
+}
+
+
+static uint8_t _sow_recv(void *priv, void *a_data, uint8_t a_len, uint8_t a_waitall) {
+	sow_read_data((volatile struct soft_ow *)priv,
+		   	a_data, a_len);
+	return a_len;
+}
+
+
+static uint8_t _sow_send(void *priv, void *a_data, uint8_t a_len, uint8_t a_waitall) {
+	sow_write_data((volatile struct soft_ow *)priv,
+			a_data,
+			a_len);
+	return a_len;
+}
+
+
+/* ================================================================================ */
+
+struct bus_t sow_bus_get(volatile struct soft_ow *a_bus) {
+
+	struct bus_t bus = {
+		.f_getc = _sow_getc,
+		.f_sendc = _sow_sendc,
+
+		.f_recv = _sow_recv,
+		.f_send = _sow_send,
+
+		.f_avail = NULL,
+		.f_peek = NULL,
+
+		.priv = (void *)a_bus,
+	};
+
+	return bus;
+}
+
+/* ================================================================================ */
+
 void sow_init(volatile struct soft_ow *a_bus) {
 
 	// disable pull-ups

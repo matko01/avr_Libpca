@@ -1,18 +1,54 @@
 #include <spi_hw_poll.h>
 #include <avr/power.h>
 
+/* ================================================================================ */
 
-struct bus_t g_bus_spi_hw_poll = {
-	.f_getc = spi_hw_poll_getc,
-	.f_sendc = spi_hw_poll_sendc,
+static uint8_t _spi_hw_poll_getc(void *priv UNUSED, uint8_t *a_data);
+static uint8_t _spi_hw_poll_sendc(void *priv UNUSED, uint8_t *a_data);
+static uint8_t _spi_hw_poll_recv(void *priv UNUSED, void *a_data, uint8_t a_len, uint8_t a_waitall);
+static uint8_t _spi_hw_poll_send(void *priv UNUSED, void *a_data, uint8_t a_len, uint8_t a_waitall);
+static uint8_t _spi_hw_poll_available(void *priv UNUSED);
 
-	.f_recv = spi_hw_poll_recv,
-	.f_send = spi_hw_poll_send,
+/* ================================================================================ */
 
-	.f_avail = spi_hw_poll_available,
-	.f_peek = NULL,
-};
+static uint8_t _spi_hw_poll_getc(void *priv, uint8_t *a_data) {
+	return spi_hw_poll_getc(a_data);
+}
 
+static uint8_t _spi_hw_poll_sendc(void *priv, uint8_t *a_data) {
+	return spi_hw_poll_sendc(a_data);
+}
+
+static uint8_t _spi_hw_poll_recv(void *priv, void *a_data, uint8_t a_len, uint8_t a_waitall) {
+	return spi_hw_poll_recv(a_data, a_len, a_waitall);
+}
+
+static uint8_t _spi_hw_poll_send(void *priv, void *a_data, uint8_t a_len, uint8_t a_waitall) {
+	return spi_hw_poll_send(a_data, a_len, a_waitall);
+}
+
+static uint8_t _spi_hw_poll_available(void *priv) {
+	return spi_hw_poll_available();
+}
+
+/* ================================================================================ */
+
+struct bus_t spi_hw_poll_bus_get() {
+
+	struct bus_t bus = {
+		.f_getc = _spi_hw_poll_getc,
+		.f_sendc = _spi_hw_poll_sendc,
+
+		.f_recv = _spi_hw_poll_recv,
+		.f_send = _spi_hw_poll_send,
+
+		.f_avail = _spi_hw_poll_available,
+		.f_peek = NULL,
+
+		.priv = NULL,
+	};
+	return bus;
+}
 
 
 void spi_hw_poll_init(spi_mode mode, spi_speed speed) {

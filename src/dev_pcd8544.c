@@ -152,7 +152,10 @@ void pcd8544_write(struct dev_pcd8544_ctx *a_disp,
 	}
 
 	GPIO_SET_LOW(&a_disp->sce);
-	if (a_disp->bus->f_sendc) a_disp->bus->f_sendc(&data);
+	
+	if (a_disp->bus->f_sendc) 
+		a_disp->bus->f_sendc(a_disp->bus->priv, &data);
+
 	GPIO_SET_HIGH(&a_disp->sce);
 }
 

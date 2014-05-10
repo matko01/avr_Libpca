@@ -15,7 +15,7 @@
  *
  * @return 
  */
-typedef uint8_t (*bus_bulkx_routine_t)(void *a_data, uint8_t a_len, uint8_t a_waitall);
+typedef uint8_t (*bus_bulkx_routine_t)(void *priv, void *a_data, uint8_t a_len, uint8_t a_waitall);
 
 
 /**
@@ -27,7 +27,7 @@ typedef uint8_t (*bus_bulkx_routine_t)(void *a_data, uint8_t a_len, uint8_t a_wa
  *
  * @return 
  */
-typedef uint8_t (*bus_bulkx_simple_routine_t)(void *a_data, uint8_t a_len);
+typedef uint8_t (*bus_bulkx_simple_routine_t)(void *priv, void *a_data, uint8_t a_len);
 
 
 /**
@@ -37,7 +37,7 @@ typedef uint8_t (*bus_bulkx_simple_routine_t)(void *a_data, uint8_t a_len);
  *
  * @return 
  */
-typedef uint8_t (*bus_bytex_routine_t)(uint8_t *a_data);
+typedef uint8_t (*bus_bytex_routine_t)(void *priv, uint8_t *a_data);
 
 
 /**
@@ -45,7 +45,7 @@ typedef uint8_t (*bus_bytex_routine_t)(uint8_t *a_data);
  *
  * @return number of bytes ready to be read
  */
-typedef uint8_t (*bus_available_routine_t)(void);
+typedef uint8_t (*bus_available_routine_t)(void *priv);
 
 
 /**
@@ -63,6 +63,8 @@ struct bus_t {
 	// general routines
 	bus_available_routine_t f_avail;
 	bus_bytex_routine_t f_peek;
+
+	void *priv;
 };
 
 
