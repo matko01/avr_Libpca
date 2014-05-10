@@ -2,10 +2,19 @@
 #include <string.h>
 
 
+// lcd io lines setup
+#define LCD_DB_PORT PORTD
+#define LCD_DB_PIN_FIRST 4
+#define LCD_RS_PORT PORTB
+#define LCD_RS_PIN 1
+#define LCD_E_PORT PORTB
+#define LCD_E_PIN 2
+
+
 void main(void) {
 
 	// lcd display
-	struct lcd_ctx lcd_ctx;
+	struct dev_hd44780_ctx lcd_ctx;
 
 	memset((void *)&lcd_ctx, 0x00, sizeof(struct lcd_ctx));
 
