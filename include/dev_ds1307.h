@@ -2,6 +2,21 @@
 #define DEV_DS1307_H_GIQURGE1
 
 
+/**
+ * @file dev_ds1307.h 
+ *
+ * @brief Register addresses and definitions of the ds1307 I2c RTC device
+ *
+ * This header contains the detailed definitions of addresses of registers and the data layout in them for
+ * the ds1307 RTC device. Have a look on provided example in order to familiarize yourself with the usage.
+ *
+ * @example ds1307.c
+ *
+ * Using using the ds1307_time_t structure.
+ */
+
+
+
 // time date elements addresses
 #define DS1307_SECONDS_ADDR 0x00
 #define DS1307_MINUTES_ADDR 0x01
