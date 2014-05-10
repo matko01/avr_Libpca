@@ -15,8 +15,7 @@ void main(void) {
 
 	// lcd display
 	struct dev_hd44780_ctx lcd_ctx;
-
-	memset((void *)&lcd_ctx, 0x00, sizeof(struct lcd_ctx));
+	memset((void *)&lcd_ctx, 0x00, sizeof(struct dev_hd44780_ctx));
 
 	lcd_ctx.rs.port = &LCD_RS_PORT;
 	lcd_ctx.rs.pin = LCD_RS_PIN;
@@ -35,6 +34,9 @@ void main(void) {
 
 	// initialize the device
 	hd44780_init(&lcd_ctx);
+
+	// clear the display initially 
+	hd44780_clrscr(&lcd_ctx);
 
 	hd44780_goto(&lcd_ctx, 0x00);
 	hd44780_puts(&lcd_ctx, "Hello World");
