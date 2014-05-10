@@ -5,6 +5,7 @@
 #include "common.h"
 #include "twi_common.h"
 
+#warning NOT IMPLEMENTED YET
 
 /**
  * @brief TWI bus context structure
