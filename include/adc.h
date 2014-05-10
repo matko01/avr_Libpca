@@ -30,6 +30,8 @@
  *
  * @example adc_01.c
  *
+ * Example, showing the basic adc API usage
+ *
  */
 
 

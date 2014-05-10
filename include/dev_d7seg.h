@@ -7,6 +7,32 @@
 
 #include <avr/pgmspace.h>
 
+
+/**
+ * @file dev_d7seg.h 
+ *
+ * @brief Simple implementation of the 7 segment display multiplexing technique
+ *
+ * This module provides an easy way to handle your 7 segment displays. It provides a general API and a basic font
+ * for 7 segment display.
+ *
+ * This module defines practically 4 routines only to handle the display. The init routine initialize the display context
+ * to a known state, the d7seg_chr_p and d7seg_chr_dot_p macros are used to place a digit into a given display - you can either
+ * use a bare number (0-9) as an argument or any value defined in d7s_chars enumeration in order to use the standard built-in font.
+ * You don't have to worry again about segment mapping to your font etc - the API takes care about everything for you.
+ * The multiplexing routine switches the data on the display data lines and switches the selection line to the next one in order to activate 
+ * another display segment - you can use it anywhere - in you standard execution loop as well as in interrupts - it doesn't matter.
+ *
+ * Since we are relying on static memory allocation you must define the maximum number of segments your display may have (D7SEG_MAX_DISPLAYS) in config.h
+ * By default - in order to save memory this macro is configured to 4. Most common displays have only four segments.
+ * This driver can support many displays at a time as well. Just define as many context as you want (can), and use the accordingly with the procedures provided.
+ *
+ * @example d7seg.c
+ *
+ * Using 7seg display API
+ */
+
+
 /**
  * @brief characters available 
  */

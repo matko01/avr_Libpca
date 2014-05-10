@@ -1,0 +1,6 @@
+- summarize documentation
+- finnish the SPI implementation (interrupt driven)
+- reimplement the TWI context (remove the global variable)
+- finnish the TWI poll implementation
+- create bus abstraction layer for TWI
+

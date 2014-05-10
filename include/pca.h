@@ -35,21 +35,35 @@
  *
  * 
  * - Timer Delays (Arduino Library sleep/millis equivalent)
+ * - Timer PWM support
  * - Beeper - Tone generation (Arduino Library tone equiv.)
  * - Serial port support - Interrupt driven data reception, data reception by polling, data transmission by polling
  * - SLIP protocol - serial line data synchronization protocol, to support binary data transfers over serial line
- * 
- *
- * Experimental features (development ongoing)
- *
- * 
- * - Timer PWM support
- * - ADC API - to be implemented
+ * - Simple ADC API
+ * - Simple GPIO abstraction layer
+ * - Software OneWire 
+ * - I2C 
+ * - SPI
+ *  
+ * The library implements basic device drivers for the following devices:
+ * - general 7 segment display driver - driver for LED 7 segment display, implementing interrupt driven multiplexing
+ * - ds1307 - an interface for the RTC clock to map it's internal registers
+ * - ds18b20 - Digital Temperature sensor, the driver is heavilly dependant on the software onewire implementation
+ * - hd44780 - hitachi display driver
+ * - pcd8544 - display driver for the NOKIA 3310 based LCDs
  * 
  *
  * @section usage Using the documentation
  *
  * For details regarding particular functionality please refer directly to a specific interface file.
+ *
+ * @section examples Examples
+ * Please refer to the provided examples as well for an overview on how to use a particular module.
+ *
+ * @section support Support
+ *
+ * If you are unsure about the something you can also refer to my blog (http://pcarduino.blogspot.co.uk) dedicated to
+ * development in C for arduino platform, where I heavily use this library. You can also contact me through github.com/dagon666
  *
  * @section compilation Compiling with your own project
  *

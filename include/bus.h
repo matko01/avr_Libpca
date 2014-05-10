@@ -7,6 +7,19 @@
 
 
 /**
+ * @file bus.h 
+ *
+ * @brief Generic API for abstracting bus implementations
+ *
+ * You can use the struct bus_t structure definition to collect your bus implementation routines. It's useful when trying
+ * to write drivers independent of the bus implementation. The device driver communicates with the bus using the function
+ * pointers exposed by the bus_t structure - that way you can always change the bus implementation without having to modify the device driver
+ *
+ * As a reference have a look on how the pcd8544.h device driver is implemented. 
+ */
+
+
+/**
  * @brief function pointer type definition for bulk data transfers
  *
  * @param 
