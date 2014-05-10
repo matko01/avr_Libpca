@@ -20,11 +20,28 @@
  */
 
 
+/**
+ * @file dev_hd44780.h 
+ *
+ * @brief Display driver for the hitachi hd44780 based displays
+ *
+ * This file provides a header for the implementation driving the hd44780 display.
+ * Please, refer to the example and functions descriptions for details on using this module with your display
+ *
+ * The driver may handle multiple display at the same time (just declare multiple display context), It as well supports
+ * the 4/8 bit data modes.
+ *
+ * @example hd44780.c
+ *
+ * Basic usage of the display api
+ */
+
 #include "config.h"
 #include "common.h"
 #include "gpio.h"
 
 #include <util/delay.h>
+
 
 
 #if HD44780_8BIT_MODE == 1
@@ -52,21 +69,60 @@
 #define HD44780_CMD_CLRSCR() 0x01
 #define HD44780_CMD_HOME() 0x02
 
+/**
+ * @brief constructs the ENTRY_MODE SET Command byte for the display
+ *
+ * Keep in mind that all the those macros only assemble a valid command byte, THEY DO NOT SEND THE ACTUAL BYTE TO THE DISPLAY - you must do it yourself
+ * i.e. : hd44780_cmd(a_disp, HD44780_CMD_DISPLAY_CONTROL(1, 0, 0));
+ *
+ * @param __inc - cursor move direction 1 - increment, 0 - decrement
+ * @param __shift - 1 - shift display with every new character
+ */
 #define HD44780_CMD_ENTRY_MODE(__inc, __shift) \
 	(0x04 | (__inc << 1) | __shift)
 
+/**
+ * @brief construct the DISPLAY Control command byte
+ *
+ * @param __onoff - turn the display on/off
+ * @param __cursos - turn the cursor on/off
+ * @param __blink - tunr on/off cursor blinking
+ */
 #define HD44780_CMD_DISPLAY_CONTROL(__onoff, __cursor, __blink) \
 	(0x08 | (__onoff << 2 ) | (__cursor << 1) | __blink)
 
+/**
+ * @brief Constructs the CURSOR OR DISPLAY SHIFT command byte
+ *
+ * @param __moveshift - 1 - will shift the display by one in the specified direction, 0 - will move cursor instead
+ * @param __rightleft - 1 - move/shift right, 0 - move shift left
+ */
 #define HD44780_CMD_CD_SHIFT(__moveshift, __rightleft) \
 	(0x10 | (__moveshift << 3) | (__rightleft << 2))
 
+/**
+ * @brief constructs the FUNCTION SET command byte
+ *
+ * @param __dl - sets interface data length 1 - 8 bit, 0 - 4 bit
+ * @param __lines - number of display lines 1 - 2 lines , 0 - 1 line
+ * @param __font - specifies display font 1 - 5x10, 0 - 5x8
+ */
 #define HD44780_CMD_FUNCTION_SET(__dl, __lines, __font) \
 	(0x20 | (__dl << 4) | (__lines << 3) | (__font << 2))
 
+/**
+ * @brief Construct command byte which sets the address of int CGRAM
+ *
+ * @param __acg cgram address
+ */
 #define HD44780_CMD_SET_CGRAM(__acg) \
 	(0x40 | __acg)
 
+/**
+ * @brief constructs the byte which sets the DDRAM address
+ *
+ * @param __add ddram address
+ */
 #define HD44780_CMD_SET_DDRAM(__add) \
 	(0x80 | __add)
 
@@ -76,19 +132,24 @@
  * @brief display context
  */
 struct dev_hd44780_ctx {
+	/// reset line
 	gpio_pin rs;
+
+	/// enable line
 	gpio_pin e;
 
 #if HD44780_USE_RW_LINE == 1
+	/// R/W line
 	gpio_pin rw;
 #endif
 
+	/// data gpio pins - must specify 4 or 8 - dependingly on the configuration
 	gpio_pin data[HD44780_DATALINES];
 
-	// number of display lines
+	/// number of display lines (usualy two)
 	uint8_t lines;
 
-	// font setup
+	/// font setup
 	uint8_t font;
 };
 
@@ -179,7 +240,25 @@ void hd44780_puts(struct dev_hd44780_ctx *a_disp, const char *a_str);
 // ================================================================================
 
 #if HD44780_USE_RW_LINE == 1
+
+/**
+ * @brief checks if the display is busy or not
+ *
+ * @param a_disp display context
+ *
+ * @return 1 if busy
+ */
 uint8_t hd44780_is_busy(struct dev_hd44780_ctx *a_disp);
+
+
+/**
+ * @brief reads a byte from the display (Requires RW line)
+ *
+ * @param a_disp display context
+ * @param a_rs register select value, 0 - instruction register, 1 - data register
+ *
+ * @return read data byte
+ */
 uint8_t hd44780_read(struct dev_hd44780_ctx *a_disp, uint8_t a_rs);
 #endif
 

@@ -128,6 +128,13 @@ uint8_t hd44780_read(struct dev_hd44780_ctx *a_disp, uint8_t a_rs) {
 	uint8_t nibbles = 3;
 #endif
 
+	if (a_rs) {
+		GPIO_SET_HIGH(&a_disp->rs);
+	}
+	else {
+		GPIO_SET_LOW(&a_disp->rs);
+	}
+
 	// raise R/W line
 	GPIO_SET_HIGH(&a_disp->rw);
 
@@ -178,7 +185,7 @@ uint8_t hd44780_read(struct dev_hd44780_ctx *a_disp, uint8_t a_rs) {
 
 
 uint8_t hd44780_is_busy(struct dev_hd44780_ctx *a_disp) {
-	return (hd44780_read(a_disp, 0) * 0x80);
+	return (hd44780_read(a_disp, 0) & 0x80);
 }
 
 #endif

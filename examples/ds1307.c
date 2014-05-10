@@ -1,8 +1,6 @@
 #include "pca.h"
-#include "main.h"
-#include "int_ctx.h"
-
 #include <string.h>
+
 
 void main(void) {
 

@@ -35,7 +35,7 @@
  *
  * @example ds18b20.c
  *
- * Using the ds18b20 API
+ * Basic usage of the ds18b20 API
  */
 
 
