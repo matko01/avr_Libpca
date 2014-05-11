@@ -22,6 +22,11 @@
 
 #include <stdint.h>
 
+/**
+ * @brief ring buffer type definition
+ *
+ * This structure provides a general ring buffer definition which may be used in bus/interfaces implementations
+ */
 typedef struct _ring_buffer {
 
 	/// head index
@@ -35,6 +40,10 @@ typedef struct _ring_buffer {
 
 } ring_buffer;
 
+
+/**
+ * @brief macro to declare the size of the ring buffer
+ */
 #define RING_SIZE (sizeof(ring_buffer) - 1)
 
 

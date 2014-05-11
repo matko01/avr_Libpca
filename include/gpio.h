@@ -20,6 +20,21 @@
  */
 
 
+/**
+ * @file gpio.h 
+ *
+ * @brief Simple GPIO abstraction layer
+ *
+ * This module defines simple abstraction layer for the GPIO lines. You can build gpio independent drivers with this 
+ * implementation. There's no longer need to use ambiguous macro definitions. Please refer to the gpio example
+ * on details how to use this API
+ *
+ * @example gpio.c
+ *
+ * Basic usage of the gpio api
+ */
+
+
 #include "config.h"
 #include "common.h"
 
