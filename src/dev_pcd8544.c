@@ -126,7 +126,7 @@ static void _pcd8544_fill(struct dev_pcd8544_ctx *a_disp, uint8_t *data, uint16_
 		pcd8544_gotoxy(a_disp, 0, 0);
 	}
 
-	for (uint8_t y = 0; y < PCD8544_H; y++) {
+	for (uint8_t y = 0; y < (PCD8544_H >> 3); y++) {
 		pcd8544_write(a_disp, PCD8544_CMD, PCD8544_CMD_SET_X(0));
 		pcd8544_write(a_disp, PCD8544_CMD, PCD8544_CMD_SET_Y(y));
 
