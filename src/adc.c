@@ -29,7 +29,7 @@ void adc_init(e_adc_mode a_mode) {
 		// set the appropriate mode
 		ADCSRB = (a_mode - 1);
 		// enable auto-trigger mode
-		ADCSRA = _BV(ADATE);
+		ADCSRA |= _BV(ADATE);
 	}
 
 	// set data format, Vcc reference and channel zero by default
