@@ -62,6 +62,14 @@ uint32_t common_abs(int32_t a_value) {
 }
 
 
+uint32_t common_swap(uint32_t a_value) {
+	uint8_t *p = (uint8_t *)&a_value;
+	EXCHANGE(p[0], p[3]);
+	EXCHANGE(p[1], p[2]);
+	return a_value;
+}
+
+
 uint8_t common_ditherPoint(uint8_t c, uint8_t x, uint8_t y) {
 	return (c > pgm_read_byte(&_bayer[ x & 0x07 ][ y & 0x07 ]));
 }

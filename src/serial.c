@@ -136,7 +136,7 @@ ISR(USART_UDRE_vect, ISR_BLOCK) {
  * @param c character to 'print'
  * @param stream file stream
  */
-static void _serial_putc(char c, FILE *stream) {
+static int _serial_putc(char c, FILE *stream) {
 	if ('\n' == c) {
 		_serial_putc('\r', stream);
 	}
@@ -149,6 +149,7 @@ static void _serial_putc(char c, FILE *stream) {
 #error SERIAL_STDOUT_POLL must be either 0 (interrupt driven) or 1 (polling)
 #endif
 
+	return 0;
 }
 
 
@@ -159,7 +160,7 @@ static void _serial_putc(char c, FILE *stream) {
  *
  * @return character received
  */
-static char _serial_getc(FILE *stream) {
+static int _serial_getc(FILE *stream) {
 	unsigned char c = 0x00;
 
 #if SERIAL_STDIN_POLL == 1

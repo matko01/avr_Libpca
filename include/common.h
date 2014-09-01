@@ -242,4 +242,14 @@ uint32_t common_abs(int32_t a_value);
  */
 uint8_t common_ditherPoint(uint8_t c, uint8_t x, uint8_t y);
 
+
+/**
+ * @brief exchange byte order in a 32 bit word
+ *
+ * @param a_value
+ *
+ * @return 
+ */
+uint32_t common_swap(uint32_t a_value);
+
 #endif /* __COMMON_H__ */

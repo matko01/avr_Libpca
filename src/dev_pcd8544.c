@@ -116,8 +116,9 @@ static const uint8_t _font[][5] PROGMEM = {
 
 
 
-static void _pcd8544_putc(char c, FILE *stream) {
+static int _pcd8544_putc(char c, FILE *stream) {
 	pcd8544_putc(_g_stdout_lcd, c);
+	return 0;
 }
 
 
