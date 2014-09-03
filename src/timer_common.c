@@ -89,7 +89,7 @@ uint32_t _timer_freq_prescale(e_timer a_timer, uint32_t a_freq, uint16_t a_crite
 	do {
 		*ocr = (uint16_t) (F_CPU / ((a_freq << 1) * (0x01 << prescalers[*presc])));
 		++*presc;		
-	} while ((*ocr > a_criterion) && (prescalers[*presc]));
+	} while ((*ocr > (uint32_t)(a_criterion + 1)) && (prescalers[*presc]));
 
 	--*ocr;
 	if (*ocr > a_criterion) *ocr = a_criterion;
