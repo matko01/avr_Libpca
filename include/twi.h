@@ -47,25 +47,28 @@
 
 
 /**
- * @brief TWI bus context structure
+ * @brief TWI master bus context structure
  */
 struct twi_ctx {
-	/// slave R/W address
+	/// slave R/W address - will be changed by SW during master transactions
 	volatile uint8_t slarw;
 
 	/// status
 	twi_status_t status; 
 
-	/// pointer to the data buffer
-	volatile uint8_t *xdata;
+#ifdef TWI_DEBUG
+	/// pointer to the debugging hook
+	twi_debug_hook_t debug_hook;
+#endif
+
+	/// bus transmission speed
+	uint8_t freq;
 
 	/// data length
 	volatile uint16_t len;
 
-#ifdef TWI_DEBUG
-	twi_debug_hook_t debug_hook;
-#endif
-
+	/// pointer to the data buffer
+	volatile uint8_t *xdata;
 };
 
 
@@ -75,7 +78,22 @@ struct twi_ctx {
  * @param a_freq SCL frequency
  *
  */
-volatile struct twi_ctx* twi_init(uint8_t a_freq);
+void twi_minit(volatile struct twi_ctx *a_ctx, uint8_t a_freq);
+
+/**
+ * @brief initialize the bus as a slave device
+ *
+ * @param a_ctx bus context
+ * @param a_addr slave device address
+ */
+void twi_sinit(volatile struct twi_ctx *a_ctx, uint8_t a_addr);
+
+/**
+ * @brief wait until a data transfer has been completed
+ *
+ * @param twi_m_ctx TWI master context 
+ */
+void twi_sync();
 
 
 #if TWI_MASTER_TRANSMITTER == 1
@@ -86,7 +104,7 @@ volatile struct twi_ctx* twi_init(uint8_t a_freq);
  * @param a_data data buffer
  * @param a_len length of the data
  */
-void twi_mtx(uint8_t a_address, uint8_t *a_data, uint16_t a_len, uint8_t a_flag);
+void twi_mtx(volatile struct twi_ctx *a_ctx, uint8_t a_address, uint8_t *a_data, uint16_t a_len, uint8_t a_flag);
 #endif
 
 
@@ -99,8 +117,18 @@ void twi_mtx(uint8_t a_address, uint8_t *a_data, uint16_t a_len, uint8_t a_flag)
  * @param a_maxlen maximum data length
  *
  */
-void twi_mrx(uint8_t a_address, uint8_t *a_data, uint16_t a_len, uint8_t a_flag);
+void twi_mrx(volatile struct twi_ctx *a_ctx, uint8_t a_address, uint8_t *a_data, uint16_t a_len, uint8_t a_flag);
 #endif
+
+
+/**
+ * @brief get the bus status
+ *
+ * @param a_ctx bus context
+ *
+ * @return bus status
+ */
+uint8_t twi_status(volatile struct twi_ctx *a_ctx);
 
 
 #if TWI_SUPPORT_BUS_STATUS == 1
@@ -111,7 +139,7 @@ void twi_mrx(uint8_t a_address, uint8_t *a_data, uint16_t a_len, uint8_t a_flag)
  *
  * @return number of devices found
  */
-uint8_t twi_search_devices(uint8_t *a_dev);
+uint8_t twi_search_devices(volatile struct twi_ctx *a_ctx, uint8_t *a_dev);
 #endif
 
 
