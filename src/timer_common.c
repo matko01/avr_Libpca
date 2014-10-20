@@ -69,10 +69,13 @@ void _timer_dis_compa_int(e_timer a_timer) {
 	} // switch
 }
 
+// they are outside in order not to declare them every time when they function
+// is called very often
+static const uint8_t _g_prescalers01[] = { 0x00, 0x03, 0x06, 0x08, 0x0a, 0x00 };
+static const uint8_t _g_prescalers2[] = { 0x00, 0x03, 0x05, 0x06, 0x07, 0x08, 0x0a, 0x00};
+
 
 uint32_t _timer_freq_prescale(e_timer a_timer, uint32_t a_freq, uint16_t a_criterion) {
-	uint8_t prescalers01[] = { 0x00, 0x03, 0x06, 0x08, 0x0a, 0x00 };
-	uint8_t prescalers2[] = { 0x00, 0x03, 0x05, 0x06, 0x07, 0x08, 0x0a, 0x00};
 
 	/**
 	 * combine both prescaler and ocr value in one 32bit value 
@@ -80,19 +83,19 @@ uint32_t _timer_freq_prescale(e_timer a_timer, uint32_t a_freq, uint16_t a_crite
 	uint32_t retval = 0x00;
 	uint16_t *ocr = (uint16_t *)&retval;
 	uint8_t *presc = ((uint8_t *)&retval) + 3;
-	uint8_t *prescalers = prescalers01;
 
-	if (E_TIMER2 == a_timer) {
-		prescalers = prescalers2;
-	}
+	uint32_t ocr2 = 0;
+	const uint8_t *prescalers = 
+		(a_timer == E_TIMER2 ? _g_prescalers2 : _g_prescalers01);
 
 	do {
-		*ocr = (uint16_t) (F_CPU / ((a_freq << 1) * (0x01 << prescalers[*presc])));
+		ocr2 = (uint32_t)(F_CPU / ((a_freq << 1) * (0x01 << prescalers[*presc])));
+		if (ocr2) --ocr2;
 		++*presc;		
-	} while ((*ocr > (uint32_t)(a_criterion + 1)) && (prescalers[*presc]));
+	} while ((ocr2 > a_criterion) && (prescalers[*presc]));
 
-	--*ocr;
-	if (*ocr > a_criterion) *ocr = a_criterion;
+	if (ocr2 > a_criterion) ocr2 = a_criterion;
+	*ocr = ocr2 & 0xffff;
 	return retval;
 }
 
@@ -209,8 +212,7 @@ void _timer_setup_ctc(e_timer a_timer, uint32_t a_pocr) {
 		case E_TIMER1:
 			TCCR1B &= 0xf8;
 			TCCR1B |= ((a_pocr >> 24) & 0x07);
-			OCR1AL = a_pocr & 0xff;
-			OCR1AH = (a_pocr >> 8) & 0xff;
+			OCR1A = (a_pocr & 0xffff);
 			TCNT1H = TCNT1L = 0x00;
 			break;
 
