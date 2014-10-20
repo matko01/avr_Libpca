@@ -67,18 +67,6 @@ static volatile struct twi_ctx *g_bus_ctx = NULL;
 	_twi_common_set_idle(g_bus_ctx->status)
 
 
-#ifdef TWI_DEBUG
-/**
- * @brief install debug hook function
- *
- * @param a_dbg
- */
-void twi_debug_hook_install(volatile twi_ctx *a_ctx, twi_debug_hook_t a_dbg) {
-	a_ctx->debug_hook = a_dbg;
-}
-#endif
-
-
 /**
  * @brief TWI wire interface interrupt handler
  *

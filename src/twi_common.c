@@ -55,3 +55,16 @@ void twi_common_setup_slave(uint8_t a_address, uint8_t a_mask) {
 }
 #endif
 
+
+#ifdef TWI_DEBUG
+/**
+ * @brief install debug hook function
+ *
+ * @param a_dbg
+ */
+void twi_common_debug_hook_install(volatile twi_ctx *a_ctx, twi_debug_hook_t a_dbg) {
+	a_ctx->debug_hook = a_dbg;
+}
+#endif
+
+

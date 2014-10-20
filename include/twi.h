@@ -36,43 +36,6 @@
 
 
 /**
- * @brief possible bus errors
- */
-#define E_TWI_ERROR_NO_ERROR 0x00
-#define E_TWI_ERROR_ARB_LOST 0x01
-#define E_TWI_ERROR_MT_SLA_NACK 0x02
-#define E_TWI_ERROR_MT_DATA_NACK 0x03
-#define E_TWI_ERROR_MR_SLA_NACK 0x04
-#define E_TWI_ERROR_MR_DATA_NACK 0x05
-
-
-/**
- * @brief TWI master bus context structure
- */
-struct twi_ctx {
-	/// slave R/W address - will be changed by SW during master transactions
-	volatile uint8_t slarw;
-
-	/// status
-	twi_status_t status; 
-
-#ifdef TWI_DEBUG
-	/// pointer to the debugging hook
-	twi_debug_hook_t debug_hook;
-#endif
-
-	/// bus transmission speed
-	uint8_t freq;
-
-	/// data length
-	volatile uint16_t len;
-
-	/// pointer to the data buffer
-	volatile uint8_t *xdata;
-};
-
-
-/**
  * @brief general TWI interface initialization
  *
  * @param a_freq SCL frequency
@@ -140,16 +103,6 @@ uint8_t twi_status(volatile struct twi_ctx *a_ctx);
  * @return number of devices found
  */
 uint8_t twi_search_devices(volatile struct twi_ctx *a_ctx, uint8_t *a_dev);
-#endif
-
-
-#ifdef TWI_DEBUG
-/**
- * @brief install debug hook which will be called in the interrupt
- *
- * @param a_dbg debug hook to be called
- */
-void twi_debug_hook_install(twi_debug_hook_t);
 #endif
 
 #endif /* end of include guard: TWI_H_V8WDZFBC */

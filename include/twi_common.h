@@ -38,7 +38,7 @@
  * @brief internal repeated start bit definition 
  *
  * When set it means that the system already 
- * sent a repeated start bin
+ * sent a repeated start bit
  */
 #define E_TWI_BIT_REPEATED_START 0x20
 
@@ -57,6 +57,17 @@ typedef enum _e_twi_scl_freq {
 	E_TWI_SCL_250K,
 	E_TWI_SCL_400K
 } e_twi_scl_freq;
+
+
+/**
+ * @brief possible bus errors
+ */
+#define E_TWI_ERROR_NO_ERROR 0x00
+#define E_TWI_ERROR_ARB_LOST 0x01
+#define E_TWI_ERROR_MT_SLA_NACK 0x02
+#define E_TWI_ERROR_MT_DATA_NACK 0x03
+#define E_TWI_ERROR_MR_SLA_NACK 0x04
+#define E_TWI_ERROR_MR_DATA_NACK 0x05
 
 
 /**
@@ -90,6 +101,32 @@ typedef void (*twi_debug_hook_t)(void);
 
 
 /**
+ * @brief TWI bus context structure
+ */
+struct twi_ctx {
+	/// slave R/W address - will be changed by SW during master transactions
+	volatile uint8_t slarw;
+
+	/// status
+	twi_status_t status; 
+
+#ifdef TWI_DEBUG
+	/// pointer to the debugging hook
+	twi_debug_hook_t debug_hook;
+#endif
+
+	/// bus transmission speed
+	uint8_t freq;
+
+	/// data length
+	volatile uint16_t len;
+
+	/// pointer to the data buffer
+	volatile uint8_t *xdata;
+};
+
+
+/**
  * @brief setup frequency prescaler and divider
  *
  * @param a_freq requested frequency enumeration
@@ -107,6 +144,13 @@ void _twi_common_frequency_setup(uint8_t a_freq);
 void twi_common_setup_slave(uint8_t a_address, uint8_t a_mask);
 #endif
 
+
+#ifdef TWI_DEBUG
+/**
+ * @brief install debug hook which will be called in the interrupt
+ */
+void twi_common_debug_hook_install(volatile twi_ctx *a_ctx, twi_debug_hook_t a_dbg);
+#endif
 
 
 #endif /* end of include guard: TWI_COMMON_H_2M5RXJHG */

@@ -24,35 +24,31 @@
 #include "common.h"
 #include "twi_common.h"
 
-#warning NOT IMPLEMENTED YET
 
-/**
- * @brief TWI bus context structure
- */
-struct twi_poll_ctx {
-	/// status
-	twi_status_t status; 
-
-#ifdef TWI_DEBUG
-	twi_debug_hook_t debug_hook;
-#endif
-};
+void twi_minit(volatile struct twi_ctx *a_ctx, uint8_t a_freq);
+void twi_poll_sync();
 
 
-#ifdef TWI_DEBUG
-/**
- * @brief install debug hook which will be called in the interrupt
- *
- * @param a_dbg debug hook to be called
- */
-void twi_common_debug_hook_install(twi_debug_hook_t);
+#if TWI_MASTER_TRANSMITTER == 1
+void twi_poll_mtx(volatile struct twi_ctx *a_ctx, uint8_t a_address, uint8_t *a_data, uint16_t a_len, uint8_t a_flag);
 #endif
 
 
-void twi_poll_init(uint8_t a_freq);
-// twi_poll_mtx()
-// twi_poll_mrx()
-// twi_poll_search_devices()
+#if TWI_MASTER_RECEIVER == 1
+void twi_poll_mrx(volatile struct twi_ctx *a_ctx, uint8_t a_address, uint8_t *a_data, uint16_t a_len, uint8_t a_flag);
+#endif
+
+
+uint8_t twi_poll_status(volatile struct twi_ctx *a_ctx);
+
+
+#if TWI_SUPPORT_BUS_STATUS == 1
+uint8_t twi_poll_search_devices(volatile struct twi_ctx *a_ctx, uint8_t *a_dev);
+#endif
+
+
+
+
 
 
 #endif /* __TWI_POLL_H__ */

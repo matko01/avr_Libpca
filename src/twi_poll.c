@@ -22,61 +22,61 @@
 #include <util/twi.h>
 
 
-// global bus context
-static struct twi_poll_ctx g_bus_ctx;
-
-#define _twi_poll_twint_wait() \
-	while (!(TWCR & _BV(TWINT)))
-
-#ifdef TWI_DEBUG
-/**
- * @brief install debug hook function
- *
- * @param a_dbg
- */
-void twi_common_debug_hook_install(twi_debug_hook_t a_dbg) {
-	g_bus_ctx.debug_hook = a_dbg;
-}
-#endif
+#define _twi_poll_twint_wait() while (!(TWCR & _BV(TWINT)))
 
 
-void twi_poll_init(uint8_t a_freq) {
-	power_twi_enable();		
+void twi_minit(volatile struct twi_ctx *a_ctx, uint8_t a_freq) {
+	uint8_t s = sizeof(struct twi_ctx);
+	common_zero_mem(a_ctx, s);
+
+	power_twi_enable();
+	_twi_common_frequency_setup(a_freq);
 
 	// enable interrupt, twi interface and acknowledge bit
 	TWCR = (_BV(TWEN) | _BV(TWEA));
-#if TWI_MASTER_TRANSMITTER == 1 || TWI_MASTER_RECEIVER == 1
-	_twi_common_frequency_setup(a_freq);
-#endif
 }
 
 
-void twi_poll_mtx(uint8_t a_address, uint8_t *a_data, uint16_t a_len, uint8_t a_flag) {
-	
-	_twi_common_set_busy(g_bus_ctx.status);
-	g_bus_ctx.status &= (E_TWI_BIT_REPEATED_START | E_TWI_BIT_BUSY);
-	g_bus_ctx.status |= a_flag;
-
-	// generate start or repeated start
-#if TWI_SUPPORT_REPEATED_START == 1
-	if (!(g_bus_ctx.status & E_TWI_BIT_REPEATED_START)) 
-	{
-#endif
-		TWCR = _BV(TWINT) | _BV(TWEN) | _BV(TWEA) | _BV(TWSTA);
-#if TWI_SUPPORT_REPEATED_START == 1
-	}
-	else
-   	{
-		// repeated start has been send
-		_twi_common_clear_repeated_start(g_bus_ctx.status);
-		TWCR = _BV(TWEN) | _BV(TWEA);
-	}
-#endif
-
+void twi_poll_sync() {
 	_twi_poll_twint_wait();
-	
 }
 
 
-void twi_poll_mrx(uint8_t a_address, uint8_t *a_data, uint16_t a_len, uint8_t a_flag) {
+#if TWI_MASTER_TRANSMITTER == 1
+void twi_poll_mtx(volatile struct twi_ctx *a_ctx, 
+		uint8_t a_address, 
+		uint8_t *a_data, 
+		uint16_t a_len, 
+		uint8_t a_flag) {
+	a_ctx->xdata = a_data;
+	a_ctx->len = a_len;
+	a_ctx->slarw = a_address;
+	a_ctx->status |= a_flag;
+
+	TWCR = _BV(TWINT) | _BV(TWSTA) | _BV(TWEN);
+	_twi_poll_twint_wait();
+
 }
+#endif
+
+
+#if TWI_MASTER_RECEIVER == 1
+void twi_poll_mrx(volatile struct twi_ctx *a_ctx, 
+		uint8_t a_address, 
+		uint8_t *a_data, 
+		uint16_t a_len, 
+		uint8_t a_flag) {
+}
+#endif
+
+
+uint8_t twi_poll_status(volatile struct twi_ctx *a_ctx) {
+}
+
+
+#if TWI_SUPPORT_BUS_STATUS == 1
+uint8_t twi_poll_search_devices(volatile struct twi_ctx *a_ctx, uint8_t *a_dev) {
+}
+#endif
+
+
