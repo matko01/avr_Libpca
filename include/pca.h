@@ -132,7 +132,6 @@
 
 // buses
 #include <twi.h>
-#include <twi_poll.h>
 #include <soft_onewire.h>
 #include <gpio.h>
 #include <spi_hw_poll.h>
