@@ -38,7 +38,8 @@ static volatile struct twi_ctx *g_bus_ctx = NULL;
 
 // send stop bit
 #define _twi_stop() \
-	TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA) | _BV(TWINT) | _BV(TWSTO)
+	TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA) | _BV(TWINT) | _BV(TWSTO); \
+	_twi_common_set_idle(g_bus_ctx->status)
 
 // disables the interrupt since it's asynchronous and we would land up in a loop
 #define _twi_repeated_start() \

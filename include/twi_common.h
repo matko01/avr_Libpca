@@ -149,7 +149,7 @@ void twi_common_setup_slave(uint8_t a_address, uint8_t a_mask);
 /**
  * @brief install debug hook which will be called in the interrupt
  */
-void twi_common_debug_hook_install(volatile twi_ctx *a_ctx, twi_debug_hook_t a_dbg);
+void twi_common_debug_hook_install(volatile struct twi_ctx *a_ctx, twi_debug_hook_t a_dbg);
 #endif
 
 
