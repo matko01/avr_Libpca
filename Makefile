@@ -32,6 +32,7 @@ CFLAGS=-I. -Iinclude/ -Wall -Os -DF_CPU=16000000UL -std=gnu99 \
 	   -fdata-sections \
 	   -fpack-struct \
 	   -fno-tree-scev-cprop \
+	   -fno-strict-aliasing \
 	   -funsigned-bitfields \
 	   -fno-inline-small-functions
 LDFLAGS=
